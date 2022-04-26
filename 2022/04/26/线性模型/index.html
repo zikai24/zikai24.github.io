@@ -1,0 +1,539 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="肘子开">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="线性模型1、线性回归假如咱们有一个数据集，里面的数据是俄勒冈州波特兰市的 $47$ 套房屋的面积和价格：    居住面积（平方英尺） 价格（千美元）    $2104$ $400$   $1600$ $330$   $2400$ $369$   $1416$ $232$   $3000$ $540$   …… ……    如果来了一个新的面积，假设在销售价钱的记录中没有的，我们怎么办呢？ 我们可以">
+<meta property="og:type" content="article">
+<meta property="og:title" content="线性模型">
+<meta property="og:url" content="http://example.com/2022/04/26/%E7%BA%BF%E6%80%A7%E6%A8%A1%E5%9E%8B/index.html">
+<meta property="og:site_name" content="肘子开的博客">
+<meta property="og:description" content="线性模型1、线性回归假如咱们有一个数据集，里面的数据是俄勒冈州波特兰市的 $47$ 套房屋的面积和价格：    居住面积（平方英尺） 价格（千美元）    $2104$ $400$   $1600$ $330$   $2400$ $369$   $1416$ $232$   $3000$ $540$   …… ……    如果来了一个新的面积，假设在销售价钱的记录中没有的，我们怎么办呢？ 我们可以">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/image/%E7%BA%BF%E6%80%A7%E6%A8%A1%E5%9E%8B/1.png">
+<meta property="og:image" content="http://example.com/image/%E7%BA%BF%E6%80%A7%E6%A8%A1%E5%9E%8B/2.png">
+<meta property="og:image" content="http://example.com/image/%E7%BA%BF%E6%80%A7%E6%A8%A1%E5%9E%8B/3.png">
+<meta property="article:published_time" content="2022-04-26T12:48:49.000Z">
+<meta property="article:modified_time" content="2022-04-26T12:55:46.535Z">
+<meta property="article:author" content="肘子开">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/image/%E7%BA%BF%E6%80%A7%E6%A8%A1%E5%9E%8B/1.png">
+  
+  
+  <title>线性模型 - 肘子开的博客</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>肘子开的博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="线性模型">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-04-26 20:48" pubdate>
+        2022年4月26日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      4.1k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      34 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">线性模型</h1>
+            
+            <div class="markdown-body">
+              <h1 id="线性模型"><a href="#线性模型" class="headerlink" title="线性模型"></a>线性模型</h1><h2 id="1、线性回归"><a href="#1、线性回归" class="headerlink" title="1、线性回归"></a>1、线性回归</h2><p>假如咱们有一个数据集，里面的数据是俄勒冈州波特兰市的 $47$ 套房屋的面积和价格：</p>
+<table>
+<thead>
+<tr>
+<th align="center">居住面积（平方英尺）</th>
+<th align="center">价格（千美元）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">$2104$</td>
+<td align="center">$400$</td>
+</tr>
+<tr>
+<td align="center">$1600$</td>
+<td align="center">$330$</td>
+</tr>
+<tr>
+<td align="center">$2400$</td>
+<td align="center">$369$</td>
+</tr>
+<tr>
+<td align="center">$1416$</td>
+<td align="center">$232$</td>
+</tr>
+<tr>
+<td align="center">$3000$</td>
+<td align="center">$540$</td>
+</tr>
+<tr>
+<td align="center">……</td>
+<td align="center">……</td>
+</tr>
+</tbody></table>
+<p><img src="/./image/%E7%BA%BF%E6%80%A7%E6%A8%A1%E5%9E%8B/1.png" srcset="/img/loading.gif" lazyload></p>
+<p>如果来了一个新的面积，假设在销售价钱的记录中没有的，我们怎么办呢？</p>
+<p>我们可以用一条曲线去尽量准的拟合这些数据，然后如果有新的输入过来，我们可以将曲线上这个点对应的值返回。这就是线性回归的思想。</p>
+<p>为了让我们的房屋案例更有意思，咱们稍微对数据集进行一下补充，增加上每一个房屋的卧室数目：</p>
+<table>
+<thead>
+<tr>
+<th align="center">居住面积（平方英尺）</th>
+<th align="center">卧室数目</th>
+<th align="center">价格（千美元）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">$2104$</td>
+<td align="center">$3$</td>
+<td align="center">$400$</td>
+</tr>
+<tr>
+<td align="center">$1600$</td>
+<td align="center">$3$</td>
+<td align="center">$330$</td>
+</tr>
+<tr>
+<td align="center">$2400$</td>
+<td align="center">$3$</td>
+<td align="center">$369$</td>
+</tr>
+<tr>
+<td align="center">$1416$</td>
+<td align="center">$2$</td>
+<td align="center">$232$</td>
+</tr>
+<tr>
+<td align="center">$3000$</td>
+<td align="center">$4$</td>
+<td align="center">$540$</td>
+</tr>
+<tr>
+<td align="center">……</td>
+<td align="center">……</td>
+<td align="center">……</td>
+</tr>
+</tbody></table>
+<p>也是同样的方法，此时的自变量就变成了二维向量。</p>
+<p>下面是一个典型的机器学习的过程，首先给出一个输入数据，我们的算法会通过一系列的过 程得到一个估计的函数，这个函数有能力对没有见过的新数据给出一个新的估计，也被称为构建一个模型。就如同上面的线性回归函数。</p>
+<p><img src="/./image/%E7%BA%BF%E6%80%A7%E6%A8%A1%E5%9E%8B/2.png" srcset="/img/loading.gif" lazyload></p>
+<p>线性回归假设特征和结果满足线性关系。其实线性关系的表达能力非常强大，每个特征 对结果的影响强弱可以有前面的参数体现，而且每个特征变量可以首先映射到一个函数，然后再参与线性计算。这样就可以表达特征与结果之间的非线性关系。</p>
+<p>我们用$x_1$，$x_2$去描述feature里面的分量，比如 $x_1$&#x3D;居住面积，$x_2$&#x3D;卧室数目，我们可以做出一个估计函数：<br>$$<br>h_\theta  (x) &#x3D; \theta_0 + \theta_1 \times x_1 + \theta_2 \times x_2<br>$$<br>简化一下就为：<br>$$<br>h(x) &#x3D; \sum^n_{i&#x3D;0}  \theta_i x_i &#x3D; \theta^T x<br>$$<br>我们程序也需要一个机制去评估我们$\theta$是否比较好，所以说需要对我们做出的$h$函数进行 评估，一般这个函数称为损失函数（loss function）或者错误函数(error function)，描述$h$函 数不好的程度，在下面，我们称这个函数为$J$函数：<br>$$<br>J(\theta) &#x3D; \frac 12 \sum^m_{i&#x3D;1}(h_\theta(x^{(i)})-y^{(i)})^2<br>$$<br>如何调整$\theta$以使得$J(\theta)$取得最小值有很多方法，其中有最小二乘法(least squares method)和梯度下降法等。</p>
+<h3 id="1-1-最小二乘法"><a href="#1-1-最小二乘法" class="headerlink" title="1.1  最小二乘法"></a>1.1  最小二乘法</h3><p>给定一个训练集，把<strong>设计矩阵（design matrix）</strong> $x$ 设置为一个 $m\times n$ 矩阵（实际上，如果考虑到截距项，也就是 $\theta_0$ 那一项，就应该是 $m\times (n+1)$ 矩阵），这个矩阵里面包含了训练样本的输入值作为每一行：</p>
+<p>$$<br>X &#x3D;\begin{bmatrix}<br>(x^{(1)}) ^T\<br>(x^{(2)}) ^T\<br>\vdots \<br>(x^{(m)}) ^T\<br>\end{bmatrix}<br>$$</p>
+<p>然后，咱们设 $\vec{y}$ 是一个 $m$ 维向量（m-dimensional vector），其中包含了训练集中的所有目标值：</p>
+<p>$$<br>Y &#x3D;\begin{bmatrix}<br>y^{(1)}\<br>y^{(2)}\<br>\vdots \<br>y^{(m)}\<br>\end{bmatrix}<br>$$</p>
+<p>假设$h_\theta(x_1,x_2,…,x_m)&#x3D;\theta_0+ \theta_1 \times x_1 + \theta_2 \times x_2 + … +\theta \times x_m$​ 的矩阵表达式为<br>$$<br>h_\theta(x)&#x3D;X_\theta<br>$$<br>损失函数定义为：<br>$$<br>\frac \partial {\partial\theta_j}J(\theta) &#x3D; \frac12 (X_\theta - Y) ^ T (X_\theta - T)<br>$$<br>这时候我们要对这个损失函数的 $\theta$ 向量进行求导取0，结果如下式：<br>$$<br>\theta &#x3D; (X^T X)^{-1} X^T Y<br>$$</p>
+<h3 id="1-2-梯度下降算法"><a href="#1-2-梯度下降算法" class="headerlink" title="1.2 梯度下降算法"></a>1.2 梯度下降算法</h3><p>我们希望选择一个能让 $J(\theta)$ 最小的 $\theta$ 值。怎么做呢，咱们先用一个搜索的算法，从某一个对 $\theta$ 的“初始猜测值”，然后对 $\theta$ 值不断进行调整，来让 $J(\theta)$ 逐渐变小，最好是直到我们能够达到一个使 $J(\theta)$ 最小的 $\theta$。具体来说，咱们可以考虑使用梯度下降法（gradient descent algorithm），这个方法就是从某一个 $\theta$ 的初始值开始，然后逐渐重复更新：</p>
+<p>$$<br>\theta_j :&#x3D; \theta_j - \alpha \frac \partial {\partial\theta_j}J(\theta)<br>$$</p>
+<p>（上面的这个更新要同时对应从 $0$ 到 $n$ 的所有$j$ 值进行。）这里的 $\alpha$ 也称为学习速率。这个算法是很自然的，逐步重复朝向 $J$ 降低最快的方向移动。</p>
+<p>要实现这个算法，咱们需要解决等号右边的导数项。首先来解决只有一组训练样本 $(x, y)$ 的情况，这样就可以忽略掉等号右边对 $J$ 的求和项目了。公式就简化下面这样：</p>
+<p>$$<br>\begin{aligned}<br>\frac \partial {\partial\theta_j}J(\theta) &amp; &#x3D; \frac \partial {\partial\theta_j} \frac  12(h_\theta(x)-y)^2\<br>&amp; &#x3D; 2 \cdot\frac 12(h_\theta(x)-y)\cdot \frac \partial {\partial\theta_j}  (h_\theta(x)-y) \<br>&amp; &#x3D; (h_\theta(x)-y)\cdot \frac \partial {\partial\theta_j}(\sum^n_{i&#x3D;0} \theta_ix_i-y) \<br>&amp; &#x3D; (h_\theta(x)-y) x_j<br>\end{aligned}<br>$$</p>
+<p>对单个训练样本，更新规则如下所示：</p>
+<p>$$<br>\theta_j :&#x3D; \theta_j + \alpha (y^{(i)}-h_\theta (x^{(i)}))x_j^{(i)}<br>$$</p>
+<p>第一种就是下面这个算法：</p>
+<p>$<br>\begin{aligned}<br>&amp;\qquad 重复直到收敛 { \<br>&amp;\qquad\qquad\theta_j :&#x3D; \theta_j + \alpha \sum^m_{i&#x3D;1}(y^{(i)}-h_\theta (x^{(i)}))x_j^{(i)}\quad(对每个j) \<br>&amp;\qquad}<br>\end{aligned}<br>$</p>
+<p>读者很容易能证明，在上面这个更新规则中求和项的值就是$\frac {\partial J(\theta)}{\partial \theta_j}$ （这是因为对 $J$ 的原始定义）。所以这个更新规则实际上就是对原始的成本函数 $J $进行简单的梯度下降。这一方法在每一个步长内检查所有整个训练集中的所有样本，也叫做<strong>批量梯度下降法（batch gradient descent</strong>）。这里要注意，因为梯度下降法容易被局部最小值影响，而我们要解决的这个线性回归的优化问题只能有一个全局的而不是局部的最优解；因此，梯度下降法应该总是收敛到全局最小值（假设学习速率 $\alpha$ 不设置的过大）。</p>
+<p>对咱们之前的房屋数据集进行批量梯度下降来拟合 $\theta$ ，把房屋价格当作房屋面积的函数来进行预测，我们得到的结果是 $\theta_0 &#x3D; 71.27, \theta_1 &#x3D; 0.1345$。如果把 $h_{\theta}(x)$ 作为一个定义域在 $x$ 上的函数来投影，同时也投上训练集中的已有数据点，会得到下面这幅图：</p>
+<p><img src="/./image/%E7%BA%BF%E6%80%A7%E6%A8%A1%E5%9E%8B/3.png" srcset="/img/loading.gif" lazyload></p>
+<p>如果在数据集中添加上卧室数目作为输入特征，那么得到的结果就是 $\theta_0 &#x3D; 89.60, \theta_1 &#x3D; 0.1392, \theta_2 &#x3D; −8.738$​。这个结果就是用批量梯度下降法来获得的。</p>
+<p>此外还有另外一种方法能够替代批量梯度下降法，这种方法效果也不错。如下所示：</p>
+<p>$<br>\begin{aligned}<br>&amp;\qquad循环：{ \<br>&amp;\qquad\qquad i从1到m,{   \<br>&amp;\qquad\qquad\qquad\theta_j :&#x3D; \theta_j  +\alpha(y^{(i)}-h_{\theta}(x^{(i)}))x_j^{(i)} \qquad(对每个 j) \<br>&amp;\qquad\qquad}  \<br>&amp;\qquad}<br>\end{aligned}<br>$</p>
+<p>在这个算法里，我们对整个训练集进行了循环遍历，每次遇到一个训练样本，根据每个单一训练样本的误差梯度来对参数进行更新。这个算法叫做<strong>随机梯度下降法（stochastic gradient descent）</strong>，或者叫<strong>增量梯度下降法（incremental gradient descent）</strong>。批量梯度下降法要在运行第一步之前先对整个训练集进行扫描遍历，当训练集的规模 $m$ 变得很大的时候，引起的性能开销就很不划算了；随机梯度下降法就没有这个问题，而是可以立即开始，对查询到的每个样本都进行运算。通常情况下，随机梯度下降法查找到足够接近最低值的 $\theta$ 的速度要比批量梯度下降法更快一些。（也要注意，也有可能会一直无法收敛（converge）到最小值，这时候 $\theta$ 会一直在 $J(\theta)$ 最小值附近震荡；不过通常情况下在最小值附近的这些值大多数其实也足够逼近了，足以满足咱们的精度要求，所以也可以用。）由于这些原因，特别是在训练集很大的情况下，随机梯度下降往往比批量梯度下降更受青睐。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Machine-Learning/">Machine Learning</a>
+                    
+                  </div>
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/04/24/hello-world/">
+                        <span class="hidden-mobile">Hello World</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
