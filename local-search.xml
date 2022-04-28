@@ -4,6 +4,63 @@
   
   
   <entry>
+    <title>哈希表</title>
+    <link href="/2022/04/28/%E5%93%88%E5%B8%8C%E8%A1%A8/"/>
+    <url>/2022/04/28/%E5%93%88%E5%B8%8C%E8%A1%A8/</url>
+    
+    <content type="html"><![CDATA[]]></content>
+    
+    
+    <categories>
+      
+      <category>LeetCode</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>链表</title>
+    <link href="/2022/04/28/%E9%93%BE%E8%A1%A8/"/>
+    <url>/2022/04/28/%E9%93%BE%E8%A1%A8/</url>
+    
+    <content type="html"><![CDATA[<h2 id="2-两数相加"><a class="markdownIt-Anchor" href="#2-两数相加"></a> 2、两数相加</h2><p><img src="/img/LeetCode/%E9%93%BE%E8%A1%A8/2.png" alt="" /></p><p>采用递归的思想，当某个链表当前节点存在下一个节点或进位符为1时，往下递归。</p><figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-comment"># Definition for singly-linked list.</span><br><span class="hljs-comment"># class ListNode:</span><br><span class="hljs-comment">#     def __init__(self, val=0, next=None):</span><br><span class="hljs-comment">#         self.val = val</span><br><span class="hljs-comment">#         self.next = next</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">addTwoNumbers</span>(<span class="hljs-params">self, l1: <span class="hljs-type">Optional</span>[ListNode], l2: <span class="hljs-type">Optional</span>[ListNode], carryflag = <span class="hljs-number">0</span></span>) -&gt; <span class="hljs-type">Optional</span>[ListNode]:<br>        n1, n2 = l1.val <span class="hljs-keyword">if</span> l1 <span class="hljs-keyword">else</span> <span class="hljs-number">0</span>, l2.val <span class="hljs-keyword">if</span> l2 <span class="hljs-keyword">else</span> <span class="hljs-number">0</span><br>        s = n1 + n2 + carryflag<br>        val, carry_flag = s % <span class="hljs-number">10</span>, <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> s &gt; <span class="hljs-number">9</span> <span class="hljs-keyword">else</span> <span class="hljs-number">0</span><br>        next1, next2 = l1.<span class="hljs-built_in">next</span> <span class="hljs-keyword">if</span> l1 <span class="hljs-keyword">else</span> <span class="hljs-literal">None</span>, l2.<span class="hljs-built_in">next</span> <span class="hljs-keyword">if</span> l2 <span class="hljs-keyword">else</span> <span class="hljs-literal">None</span><br>        <span class="hljs-keyword">if</span> next1 <span class="hljs-keyword">or</span> next2 <span class="hljs-keyword">or</span> carry_flag:<br>            <span class="hljs-keyword">return</span> ListNode(val, self.addTwoNumbers(next1, next2, carry_flag))<br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-keyword">return</span> ListNode(val)<br></code></pre></div></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>LeetCode</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>数组</title>
+    <link href="/2022/04/28/%E6%95%B0%E7%BB%84/"/>
+    <url>/2022/04/28/%E6%95%B0%E7%BB%84/</url>
+    
+    <content type="html"><![CDATA[]]></content>
+    
+    
+    <categories>
+      
+      <category>LeetCode</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>pytorch</title>
     <link href="/2022/04/27/pytorch/"/>
     <url>/2022/04/27/pytorch/</url>
