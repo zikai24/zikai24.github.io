@@ -16,18 +16,23 @@
   <meta name="author" content="肘子开">
   <meta name="keywords" content="">
   
-    <meta property="og:type" content="article">
-<meta property="og:title" content="数组">
-<meta property="og:url" content="http://example.com/2022/04/28/%E6%95%B0%E7%BB%84/index.html">
+    <meta name="description" content="7、整数反转  123456789101112131415161718class Solution:    def reverse(self, x: int) -&gt; int:        ans &#x3D; 0        flag &#x3D; False        if x &lt; 0:            flag &#x3D; True            x &#x3D; -1 * x        a">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数组及数学">
+<meta property="og:url" content="http://example.com/2022/04/28/%E6%95%B0%E7%BB%84%E5%8F%8A%E6%95%B0%E5%AD%A6/index.html">
 <meta property="og:site_name" content="肘子开的博客">
+<meta property="og:description" content="7、整数反转  123456789101112131415161718class Solution:    def reverse(self, x: int) -&gt; int:        ans &#x3D; 0        flag &#x3D; False        if x &lt; 0:            flag &#x3D; True            x &#x3D; -1 * x        a">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/LeetCode/%E6%95%B0%E7%BB%84%E5%8F%8A%E6%95%B0%E5%AD%A6/1.png">
+<meta property="og:image" content="http://example.com/img/LeetCode/%E6%95%B0%E7%BB%84%E5%8F%8A%E6%95%B0%E5%AD%A6/2.png">
 <meta property="article:published_time" content="2022-04-28T03:57:20.000Z">
-<meta property="article:modified_time" content="2022-04-28T03:58:14.318Z">
+<meta property="article:modified_time" content="2022-04-30T03:49:38.995Z">
 <meta property="article:author" content="肘子开">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/LeetCode/%E6%95%B0%E7%BB%84%E5%8F%8A%E6%95%B0%E5%AD%A6/1.png">
   
   
-  <title>数组 - 肘子开的博客</title>
+  <title>数组及数学 - 肘子开的博客</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
 
@@ -173,7 +178,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="数组">
+            <span class="h2" id="subtitle" title="数组及数学">
               
             </span>
 
@@ -194,7 +199,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      0 字
+      478 字
     </span>
   
 
@@ -203,7 +208,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      1 分钟
+      4 分钟
     </span>
   
 
@@ -232,10 +237,16 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">数组</h1>
+            <h1 style="display: none">数组及数学</h1>
             
             <div class="markdown-body">
-              
+              <h2 id="7-整数反转"><a class="markdownIt-Anchor" href="#7-整数反转"></a> 7、整数反转</h2>
+<p><img src="/img/LeetCode/%E6%95%B0%E7%BB%84%E5%8F%8A%E6%95%B0%E5%AD%A6/1.png" srcset="/img/loading.gif" lazyload alt="" /></p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">reverse</span>(<span class="hljs-params">self, x: <span class="hljs-built_in">int</span></span>) -&gt; <span class="hljs-built_in">int</span>:<br>        ans = <span class="hljs-number">0</span><br>        flag = <span class="hljs-literal">False</span><br>        <span class="hljs-keyword">if</span> x &lt; <span class="hljs-number">0</span>:<br>            flag = <span class="hljs-literal">True</span><br>            x = -<span class="hljs-number">1</span> * x<br>        a = <span class="hljs-number">0</span>   <span class="hljs-comment"># 除法余数</span><br>        <span class="hljs-keyword">while</span> x != <span class="hljs-number">0</span>:<br>            a = x % <span class="hljs-number">10</span><br>            x = x // <span class="hljs-number">10</span><br>            ans = ans * <span class="hljs-number">10</span> + a<br>        <span class="hljs-keyword">if</span> flag:<br>            ans = -<span class="hljs-number">1</span> * ans<br>        <span class="hljs-keyword">if</span> ans &gt; <span class="hljs-number">2</span> ** <span class="hljs-number">31</span> - <span class="hljs-number">1</span> <span class="hljs-keyword">or</span> ans &lt; -(<span class="hljs-number">2</span> ** <span class="hljs-number">31</span>):<br>            <span class="hljs-keyword">return</span> <span class="hljs-number">0</span><br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-keyword">return</span> ans<br></code></pre></div></td></tr></table></figure>
+<h2 id="9-回文数"><a class="markdownIt-Anchor" href="#9-回文数"></a> 9、回文数</h2>
+<p><img src="/img/LeetCode/%E6%95%B0%E7%BB%84%E5%8F%8A%E6%95%B0%E5%AD%A6/2.png" srcset="/img/loading.gif" lazyload alt="" /></p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span>:<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">isPalindrome</span>(<span class="hljs-params">self, x: <span class="hljs-built_in">int</span></span>) -&gt; <span class="hljs-built_in">bool</span>:<br>        <span class="hljs-keyword">if</span> x &lt; <span class="hljs-number">0</span>:<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br>        a = self.reverse(x) <span class="hljs-comment"># 整数反转</span><br>        <span class="hljs-keyword">if</span> a == x:<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br>        <span class="hljs-keyword">else</span>:<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">reverse</span>(<span class="hljs-params">self, x: <span class="hljs-built_in">int</span></span>) -&gt; <span class="hljs-built_in">int</span>:<br>        ans = <span class="hljs-number">0</span><br>        a = <span class="hljs-number">0</span>   <span class="hljs-comment"># 除法余数</span><br>        <span class="hljs-keyword">while</span> x != <span class="hljs-number">0</span>:<br>            a = x % <span class="hljs-number">10</span><br>            x = x // <span class="hljs-number">10</span><br>            ans = ans * <span class="hljs-number">10</span> + a<br>        <span class="hljs-keyword">return</span> ans<br></code></pre></div></td></tr></table></figure>
+
             </div>
             <hr>
             <div>
