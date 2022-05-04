@@ -16,24 +16,22 @@
   <meta name="author" content="肘子开">
   <meta name="keywords" content="">
   
-    <meta name="description" content="NLP 1、Introduction and Word Vectors Word Vectors We will build a dense vector for each word, chosen so that it is similar to vectors of words that appear in similar contexts.  Note: word vector">
+    <meta name="description" content="1 自然语言与词汇含义 1.1 如何在计算机里表达词的意义 要使用计算机处理文本词汇，一种处理方式是WordNet：即构建一个包含同义词集和上位词(“is a”关系)的列表的辞典。英文当中确实有这样一个 wordnet，我们在安装完NLTK工具库和下载数据包后可以使用，对应的 python 代码如下： 123456789from nltk.corpus import wordnet a">
 <meta property="og:type" content="article">
-<meta property="og:title" content="NLP-Stanford_CS224N">
+<meta property="og:title" content="第一讲 NLP介绍与词向量初步">
 <meta property="og:url" content="http://example.com/2022/05/01/NLP-Stanford-CS224N/index.html">
 <meta property="og:site_name" content="肘子开的博客">
-<meta property="og:description" content="NLP 1、Introduction and Word Vectors Word Vectors We will build a dense vector for each word, chosen so that it is similar to vectors of words that appear in similar contexts.  Note: word vector">
+<meta property="og:description" content="1 自然语言与词汇含义 1.1 如何在计算机里表达词的意义 要使用计算机处理文本词汇，一种处理方式是WordNet：即构建一个包含同义词集和上位词(“is a”关系)的列表的辞典。英文当中确实有这样一个 wordnet，我们在安装完NLTK工具库和下载数据包后可以使用，对应的 python 代码如下： 123456789from nltk.corpus import wordnet a">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/img/nlp/1.png">
-<meta property="og:image" content="http://example.com/img/nlp/2.png">
 <meta property="og:image" content="http://example.com/img/nlp/3.png">
 <meta property="article:published_time" content="2022-05-01T13:50:10.000Z">
-<meta property="article:modified_time" content="2022-05-01T14:34:34.757Z">
+<meta property="article:modified_time" content="2022-05-04T13:13:12.685Z">
 <meta property="article:author" content="肘子开">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/img/nlp/1.png">
+<meta name="twitter:image" content="http://example.com/img/nlp/3.png">
   
   
-  <title>NLP-Stanford_CS224N - 肘子开的博客</title>
+  <title>第一讲 NLP介绍与词向量初步 - 肘子开的博客</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
 
@@ -179,7 +177,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="NLP-Stanford_CS224N">
+            <span class="h2" id="subtitle" title="第一讲 NLP介绍与词向量初步">
               
             </span>
 
@@ -200,7 +198,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.1k 字
+      3.8k 字
     </span>
   
 
@@ -209,7 +207,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      10 分钟
+      33 分钟
     </span>
   
 
@@ -238,48 +236,155 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">NLP-Stanford_CS224N</h1>
+            <h1 style="display: none">第一讲 NLP介绍与词向量初步</h1>
             
             <div class="markdown-body">
-              <h1 id="nlp">NLP</h1>
-<h2 id="introduction-and-word-vectors">1、Introduction and Word
-Vectors</h2>
-<h3 id="word-vectors">Word Vectors</h3>
-<p>We will build a dense vector for each word, chosen so that it is
-similar to vectors of words that appear in similar contexts.</p>
-<p><img src="/img/nlp/1.png" srcset="/img/loading.gif" lazyload /></p>
-<p>Note: word vectors are also called word embeddings or (neural) word
-representations. They are a distributed representation.</p>
-<p><img src="/img/nlp/2.png" srcset="/img/loading.gif" lazyload /></p>
-<h3 id="word2vec">Word2vec</h3>
-<p>Word2vec (Mikolov et al. 2013) is a framework for learning word
-vectors</p>
-<p>Idea:</p>
+              <h1 id="自然语言与词汇含义">1 自然语言与词汇含义</h1>
+<h2 id="如何在计算机里表达词的意义">1.1 如何在计算机里表达词的意义</h2>
+<p>要使用计算机处理文本词汇，一种处理方式是<strong>WordNet</strong>：即构建一个包含同义词集和上位词(“is
+a”关系)的列表的辞典。英文当中确实有这样一个
+wordnet，我们在安装完NLTK工具库和下载数据包后可以使用，对应的 python
+代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">from</span> nltk.corpus <span class="hljs-keyword">import</span> wordnet <span class="hljs-keyword">as</span> wn<br>poses = &#123; <span class="hljs-string">&#x27;n&#x27;</span>:<span class="hljs-string">&#x27;noun&#x27;</span>, <span class="hljs-string">&#x27;v&#x27;</span>:<span class="hljs-string">&#x27;verb&#x27;</span>, <span class="hljs-string">&#x27;s&#x27;</span>:<span class="hljs-string">&#x27;adj (s)&#x27;</span>, <span class="hljs-string">&#x27;a&#x27;</span>:<span class="hljs-string">&#x27;adj&#x27;</span>, <span class="hljs-string">&#x27;r&#x27;</span>:<span class="hljs-string">&#x27;adv&#x27;</span>&#125;<br><span class="hljs-keyword">for</span> synset <span class="hljs-keyword">in</span> wn.synsets(<span class="hljs-string">&quot;good&quot;</span>):<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;&#123;&#125;: &#123;&#125;&quot;</span>.<span class="hljs-built_in">format</span>(poses[synset.pos()], <span class="hljs-string">&quot;, &quot;</span>.join([l.name() <span class="hljs-keyword">for</span> l <span class="hljs-keyword">in</span> synset.lemmas()])))<br>        <br><span class="hljs-keyword">from</span> nltk.corpus <span class="hljs-keyword">import</span> wordnet <span class="hljs-keyword">as</span> wn<br>panda = wn.synset(<span class="hljs-string">&quot;panda.n.01&quot;</span>)<br>hyper = <span class="hljs-keyword">lambda</span> s: s.hypernyms()<br><span class="hljs-built_in">list</span>(panda.closure(hyper))<br></code></pre></div></td></tr></table></figure>
+<p>运行结果如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs shell">noun: good<br>noun: good, goodness<br>noun: good, goodness<br>noun: commodity, trade_good, good<br>adj: good<br>adj (sat): full, good<br>adj: good<br>adj (sat): estimable, good, honorable, respectable<br>adj (sat): beneficial, good<br>adj (sat): good<br>adj (sat): good, just, upright<br>…<br>adverb: well, good<br>adverb: thoroughly, soundly, good<br></code></pre></div></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs shell">[Synset(&#x27;procyonid.n.01&#x27;),<br>Synset(&#x27;carnivore.n.01&#x27;),<br>Synset(&#x27;placental.n.01&#x27;),<br>Synset(&#x27;mammal.n.01&#x27;),<br>Synset(&#x27;vertebrate.n.01&#x27;),<br>Synset(&#x27;chordate.n.01&#x27;),<br>Synset(&#x27;animal.n.01&#x27;),<br>Synset(&#x27;organism.n.01&#x27;),<br>Synset(&#x27;living_thing.n.01&#x27;),<br>Synset(&#x27;whole.n.02&#x27;),<br>Synset(&#x27;object.n.01&#x27;),<br>Synset(&#x27;physical_entity.n.01&#x27;),<br>Synset(&#x27;entity.n.01&#x27;)]<br></code></pre></div></td></tr></table></figure>
+<h2 id="wordnet的问题">1.2 WordNet的问题</h2>
 <ul>
-<li>We have a large corpus (“body”) of text</li>
-<li>Every word in a fixed vocabulary is represented by a vector</li>
-<li>Go through each position t in the text, which has a center word c
-and context (“outside”) words o</li>
-<li>Use the similarity of the word vectors for c and o to calculate the
-probability of o given c (or vice versa)</li>
-<li>Keep adjusting the word vectors to maximize this probability</li>
+<li><p>作为一个资源很好，但忽略了细微差别。例如“proficient”被列为“good”的同义词，这只是在一些上下文中是正确的。</p></li>
+<li><p>缺少单词的新含义，难以持续更新。</p></li>
+<li><p>是主观的，需要人们来创造和调整，无法计算单词相似度。</p></li>
+</ul>
+<h2 id="文本词汇的离散表征">1.3 文本(词汇)的离散表征</h2>
+<p>在传统的自然语言处理中，我们会对文本做离散表征，把词语看作离散的符号：例如hotel、conference、motel等。</p>
+<p>one-hot vector是只有一个1，其余全为零的稀疏向量，单词可以通过one-hot
+vector来表示： <span class="math display">\[
+\text { motel }=\left[\begin{array}{lllllllllllllll}
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp;
+0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0
+\end{array}\right]
+\]</span></p>
+<p><span class="math display">\[
+\text { hotel }=\left[\begin{array}{lllllllllllllll}
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp;
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0
+\end{array}\right]
+\]</span></p>
+<p>在one-hot vector中向量维度 = 词汇量（如500，000）</p>
+<h2 id="离散表征的问题">1.4 离散表征的问题</h2>
+<p>在上述的独热向量离散表征里，所有词向量是正交的，这是一个很大的问题。对于独热向量，没有关于相似性概念，并且向量维度过大。</p>
+<p>对于上述问题有一些解决思路：</p>
+<ul>
+<li>①
+使用类似WordNet的工具中的列表，获得相似度，但会因不够完整而失败</li>
+<li>② 通过大量数据学习词向量本身相似性，获得更精确的稠密词向量编码</li>
+</ul>
+<h2 id="基于上下文的词汇表征">1.5 基于上下文的词汇表征</h2>
+<p><strong>近年来在深度学习中比较有效的方式是基于上下文的词汇表征</strong>。它的<strong>核心想法</strong>是：一个单词的意思是由经常出现在它附近的单词给出的</p>
+<p>这是现代统计NLP最成功的理念之一，总体思路有点物以类聚，人以群分的感觉。</p>
+<ul>
+<li>当一个单词<span
+class="math inline">\(w\)</span>出现在文本中时，它的上下文是出现在其附近的一组单词(在一个固定大小的窗口中)</li>
+<li>基于海量数据，使用<span
+class="math inline">\(w\)</span>的许多上下文来构建<span
+class="math inline">\(w\)</span>的表示</li>
+</ul>
+<h1 id="word-vectors">2 Word Vectors</h1>
+<h2 id="词向量表示">2.1 词向量表示</h2>
+<p><strong>Word2vec</strong> (Mikolov et al.
+2013)是一个学习词向量表征的框架。</p>
+<ul>
+<li><strong>核心思路</strong>如下：
+<ul>
+<li>基于海量文本语料库构建</li>
+<li>词汇表中的每个单词都由一个向量表示（学习完成后会固定）</li>
+<li>对应语料库文本中的每个位置<span
+class="math inline">\(t\)</span>，有一个中心词<span
+class="math inline">\(c\)</span>和一些上下文(“外部”)单词<span
+class="math inline">\(o\)</span></li>
+<li>使用<span class="math inline">\(c\)</span>和<span
+class="math inline">\(o\)</span>的词向量来计算概率<span
+class="math inline">\(P(o|c)\)</span>，即给定中心词推断上下文词汇的概率（反之亦然）</li>
+<li>不断调整词向量来最大化这个概率</li>
+</ul></li>
 </ul>
 <p><img src="/img/nlp/3.png" srcset="/img/loading.gif" lazyload /></p>
-<p>For each position t = 1, … , ), predict context words within a window
-of fixed size m, given center word<span
-class="math inline">\(w_j\)</span>​​​. Data likelihood <span
+<h1 id="word2vec-目标函数">3 Word2vec 目标函数</h1>
+<h2 id="似然函数">3.1 似然函数</h2>
+<p>对于每个位置t = 1, … , T, 在大小为<span
+class="math inline">\(m\)</span>的固定窗口内预测上下文单词，给定中心词<span
+class="math inline">\(w_j\)</span>，似然函数可以表示为： <span
 class="math display">\[
 Likelihood = L(\theta) = \prod_{t=1}^{T} \prod_{\substack{-m \leq j \leq
 m \\ j \neq 0}}P(w_{t+j}|w_t;\theta)
 \]</span></p>
-<p>The objective function <span class="math inline">\(J(\theta)\)</span>​​​​
-(sometimes called a cost and loss function)is the (average) negative log
-likelihood <span class="math display">\[
+<p>上述公式中，<span
+class="math inline">\(\theta\)</span>为模型包含的所有待优化权重变量</p>
+<h2 id="目标函数">3.2 目标函数</h2>
+<p>对应上述似然函数的目标函<span
+class="math inline">\(J(\theta)\)</span>可以取作(平均)负对数似然： <span
+class="math display">\[
 Likelihood=-\frac1T \log L(\theta)=-\frac1T \sum_{t=1}^{T}
 \sum_{\substack{-m \leq j \leq m \\ j \neq 0}} \log
 P(w_{t+j}|w_t;\theta)
 \]</span></p>
-<p>Minimizing objective function ⟺ Maximizing predictive accuracy</p>
+<p>注意：</p>
+<ul>
+<li>目标函数<span
+class="math inline">\(J(\theta)\)</span>有时也被称为“<strong>代价函数</strong>”或“<strong>损失函数</strong>”</li>
+<li>最小化目标函数与最大化似然函数（预测概率/精度）<strong>两者等价</strong></li>
+</ul>
+<p>得到目标函数后，我们希望最小化目标函数，那我们如何计算<span
+class="math inline">\(P(w_{t+j}|w_t;\theta)\)</span>?</p>
+<p>对于每个词<span class="math inline">\(w\)</span>都会用两个向量：</p>
+<ul>
+<li>当<span
+class="math inline">\(w\)</span>是中心词时，我们标记词向量为<span
+class="math inline">\(v_w\)</span></li>
+<li>当<span
+class="math inline">\(w\)</span>是上下文词时，我们标记词向量为<span
+class="math inline">\(u_w\)</span></li>
+</ul>
+<p>则对于一个中心词<span
+class="math inline">\(c\)</span>和一个上下文词<span
+class="math inline">\(o\)</span>，我们有如下概率计算公式 <span
+class="math display">\[
+P(o \mid c)=\frac{\exp \left(u_{o}^{T} v_{c}\right)}{\sum_{w \in V} \exp
+\left(u_{w}^{T} v_{c}\right)}
+\]</span></p>
+<ul>
+<li>对<span
+class="math inline">\(u_o^Tv_c\)</span>是将两个向量进行点积，为了计算两个词向量的相似度，点积的结果越大，那么相似度越大。</li>
+<li>模型的训练正是为了使得具有相似上下文的单词，具有相似的向量</li>
+<li>点积是计算相似性的一种简单方法，在注意力机制中常使用点积计算
+Score</li>
+</ul>
+<h1 id="word2vec预测函数">4 Word2vec预测函数</h1>
+<p>这也就是softmax function(<span
+class="math inline">\(R^n\Rightarrow(0,1)^n\)</span>​)的一个例子： <span
+class="math display">\[
+\operatorname{softmax}\left(x_{i}\right)=\frac{\exp
+\left(x_{i}\right)}{\sum_{j=1}^{n} \exp \left(x_{j}\right)}=p_{i}
+\]</span> 为了训练模型，我们就要找出参数最小化loss函数</p>
+<ul>
+<li><p>Recall：<span
+class="math inline">\(\theta\)</span>通过一个长向量来代表所有的模型参数</p></li>
+<li><p>在我们的例子中，对于d维向量和V个单词，我们得出：</p></li>
+<li><p><span class="math display">\[
+\theta=\left[\begin{array}{l}
+v_{\text {aardvark }} \\
+v_{a} \\
+\vdots \\
+v_{z e b r a} \\
+u_{a a r d v a r k} \\
+u_{a} \\
+\vdots \\
+u_{z e b r a}
+\end{array}\right] \in \mathbb{R}^{2 d V}
+\]</span></p></li>
+<li><p>所以我们每个单词有两个向量</p></li>
+</ul>
+<p>我们就需要计算所有向量的梯度进行梯度下降算法来最小化loss函数</p>
 
             </div>
             <hr>
