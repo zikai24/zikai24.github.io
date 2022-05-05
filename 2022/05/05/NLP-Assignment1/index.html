@@ -1,0 +1,547 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=dark>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="肘子开">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Assignment1 所有使用到的头文件如下： 12345678910111213141516171819202122232425262728# All Import Statements Defined Here# Note: Do not add to this list.# ----------------import sysassert sys.version_info[0]&#x3D;&#x3D;3a">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NLP-Assignment1">
+<meta property="og:url" content="http://example.com/2022/05/05/NLP-Assignment1/index.html">
+<meta property="og:site_name" content="肘子开的博客">
+<meta property="og:description" content="Assignment1 所有使用到的头文件如下： 12345678910111213141516171819202122232425262728# All Import Statements Defined Here# Note: Do not add to this list.# ----------------import sysassert sys.version_info[0]&#x3D;&#x3D;3a">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/nlp/assignment1/1.jpg">
+<meta property="og:image" content="http://example.com/img/nlp/assignment1/2.jpg">
+<meta property="article:published_time" content="2022-05-05T12:50:46.000Z">
+<meta property="article:modified_time" content="2022-05-05T13:04:15.556Z">
+<meta property="article:author" content="肘子开">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/nlp/assignment1/1.jpg">
+  
+  
+  <title>NLP-Assignment1 - 肘子开的博客</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/nnfx-dark.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>肘子开的博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/bg/bg2.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="NLP-Assignment1">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-05-05 20:50" pubdate>
+        2022年5月5日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      11k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      92 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">NLP-Assignment1</h1>
+            
+            <div class="markdown-body">
+              <h1 id="assignment1">Assignment1</h1>
+<p>所有使用到的头文件如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-comment"># All Import Statements Defined Here</span><br><span class="hljs-comment"># Note: Do not add to this list.</span><br><span class="hljs-comment"># ----------------</span><br><br><span class="hljs-keyword">import</span> sys<br><span class="hljs-keyword">assert</span> sys.version_info[<span class="hljs-number">0</span>]==<span class="hljs-number">3</span><br><span class="hljs-keyword">assert</span> sys.version_info[<span class="hljs-number">1</span>] &gt;= <span class="hljs-number">5</span><br><br><span class="hljs-keyword">from</span> gensim.models <span class="hljs-keyword">import</span> KeyedVectors<br><span class="hljs-keyword">from</span> gensim.test.utils <span class="hljs-keyword">import</span> datapath<br><span class="hljs-keyword">import</span> pprint<br><span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt<br>plt.rcParams[<span class="hljs-string">&#x27;figure.figsize&#x27;</span>] = [<span class="hljs-number">10</span>, <span class="hljs-number">5</span>]<br><span class="hljs-keyword">import</span> nltk<br>nltk.download(<span class="hljs-string">&#x27;reuters&#x27;</span>)<br><span class="hljs-keyword">from</span> nltk.corpus <span class="hljs-keyword">import</span> reuters<br><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np<br><span class="hljs-keyword">import</span> random<br><span class="hljs-keyword">import</span> scipy <span class="hljs-keyword">as</span> sp<br><span class="hljs-keyword">from</span> sklearn.decomposition <span class="hljs-keyword">import</span> TruncatedSVD<br><span class="hljs-keyword">from</span> sklearn.decomposition <span class="hljs-keyword">import</span> PCA<br><br>START_TOKEN = <span class="hljs-string">&#x27;&lt;START&gt;&#x27;</span><br>END_TOKEN = <span class="hljs-string">&#x27;&lt;END&gt;&#x27;</span><br><br>np.random.seed(<span class="hljs-number">0</span>)<br>random.seed(<span class="hljs-number">0</span>)<br><span class="hljs-comment"># ----------------</span><br></code></pre></div></td></tr></table></figure>
+<h2 id="part-1基于计数的词向量">Part 1：基于计数的词向量</h2>
+<p>大多数词向量模型都是基于一个观点：</p>
+<p><strong>You shall know a word by the company it keeps (<a
+target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/John_Rupert_Firth">Firth, J. R.
+1957:11</a>)</strong></p>
+<p>大多数词向量的实现的核心是 <em>相似词</em>
+，也就是同义词，因为它们有相似的上下文。这里我们介绍一种策略叫做
+<em>共现矩阵</em> (更多信息可以查看 <a
+target="_blank" rel="noopener" href="http://web.stanford.edu/class/cs124/lec/vectorsemantics.video.pdf">这里</a>
+或 <a
+target="_blank" rel="noopener" href="https://medium.com/data-science-group-iitr/word-embedding-2d05d270b285">这里</a>
+)</p>
+<p>这部分要实现的是，给定语料库，根据共现矩阵计算词向量，得到语料库中每个词的词向量，流程如下：</p>
+<ul>
+<li>计算语料库的单词集</li>
+<li>计算共现矩阵</li>
+<li>使用SVD降维</li>
+<li>分析词向量</li>
+</ul>
+<h3 id="问题1.1实现-dicintct_words">问题1.1：实现 dicintct_words</h3>
+<p>计算语料库的单词数量、单词集</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">distinct_words</span>(<span class="hljs-params">corpus</span>):<br>    <span class="hljs-string">&quot;&quot;&quot; Determine a list of distinct words for the corpus.</span><br><span class="hljs-string">        Params:</span><br><span class="hljs-string">            corpus (list of list of strings): corpus of documents</span><br><span class="hljs-string">        Return:</span><br><span class="hljs-string">            corpus_words (list of strings): list of distinct words across the corpus, sorted (using python &#x27;sorted&#x27; function)</span><br><span class="hljs-string">            num_corpus_words (integer): number of distinct words across the corpus</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br>    corpus_words = []<br>    num_corpus_words = -<span class="hljs-number">1</span><br>    <br>    <span class="hljs-comment"># ------------------</span><br>    <span class="hljs-comment"># Write your implementation here.</span><br>    corpus_words =  <span class="hljs-built_in">sorted</span>(<span class="hljs-built_in">list</span>(<span class="hljs-built_in">set</span>([word <span class="hljs-keyword">for</span> sentence <span class="hljs-keyword">in</span> corpus <span class="hljs-keyword">for</span> word <span class="hljs-keyword">in</span> sentence])))<br>    num_corpus_words = <span class="hljs-built_in">len</span>(corpus_words)<br><br>    <span class="hljs-comment"># ------------------</span><br><br>    <span class="hljs-keyword">return</span> corpus_words, num_corpus_words<br></code></pre></div></td></tr></table></figure>
+<p>测试用例：</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-comment"># ---------------------</span><br><span class="hljs-comment"># Run this sanity check</span><br><span class="hljs-comment"># Note that this not an exhaustive check for correctness.</span><br><span class="hljs-comment"># ---------------------</span><br><br><span class="hljs-comment"># Define toy corpus</span><br>test_corpus = [<span class="hljs-string">&quot;&#123;&#125; All that glitters isn&#x27;t gold &#123;&#125;&quot;</span>.<span class="hljs-built_in">format</span>(START_TOKEN, END_TOKEN).split(<span class="hljs-string">&quot; &quot;</span>), <span class="hljs-string">&quot;&#123;&#125; All&#x27;s well that ends well &#123;&#125;&quot;</span>.<span class="hljs-built_in">format</span>(START_TOKEN, END_TOKEN).split(<span class="hljs-string">&quot; &quot;</span>)]<br>test_corpus_words, num_corpus_words = distinct_words(test_corpus)<br><br><span class="hljs-comment"># Correct answers</span><br>ans_test_corpus_words = <span class="hljs-built_in">sorted</span>([START_TOKEN, <span class="hljs-string">&quot;All&quot;</span>, <span class="hljs-string">&quot;ends&quot;</span>, <span class="hljs-string">&quot;that&quot;</span>, <span class="hljs-string">&quot;gold&quot;</span>, <span class="hljs-string">&quot;All&#x27;s&quot;</span>, <span class="hljs-string">&quot;glitters&quot;</span>, <span class="hljs-string">&quot;isn&#x27;t&quot;</span>, <span class="hljs-string">&quot;well&quot;</span>, END_TOKEN])<br>ans_num_corpus_words = <span class="hljs-built_in">len</span>(ans_test_corpus_words)<br><br><span class="hljs-comment"># Test correct number of words</span><br><span class="hljs-keyword">assert</span>(num_corpus_words == ans_num_corpus_words), <span class="hljs-string">&quot;Incorrect number of distinct words. Correct: &#123;&#125;. Yours: &#123;&#125;&quot;</span>.<span class="hljs-built_in">format</span>(ans_num_corpus_words, num_corpus_words)<br><br><span class="hljs-comment"># Test correct words</span><br><span class="hljs-keyword">assert</span> (test_corpus_words == ans_test_corpus_words), <span class="hljs-string">&quot;Incorrect corpus_words.\nCorrect: &#123;&#125;\nYours:   &#123;&#125;&quot;</span>.<span class="hljs-built_in">format</span>(<span class="hljs-built_in">str</span>(ans_test_corpus_words), <span class="hljs-built_in">str</span>(test_corpus_words))<br><br><span class="hljs-comment"># Print Success</span><br><span class="hljs-built_in">print</span> (<span class="hljs-string">&quot;-&quot;</span> * <span class="hljs-number">80</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Passed All Tests!&quot;</span>)<br><span class="hljs-built_in">print</span> (<span class="hljs-string">&quot;-&quot;</span> * <span class="hljs-number">80</span>)<br></code></pre></div></td></tr></table></figure>
+<h3
+id="问题1.2实现compute_co_occurrence_matrix">问题1.2：实现compute_co_occurrence_matrix</h3>
+<p>计算给定语料库的共现矩阵。具体来说，对于每一个词
+<code>w</code>，统计前、后方 <code>window_size</code> 个词的出现次数</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">compute_co_occurrence_matrix</span>(<span class="hljs-params">corpus, window_size=<span class="hljs-number">4</span></span>):<br>    <span class="hljs-string">&quot;&quot;&quot; Compute co-occurrence matrix for the given corpus and window_size (default of 4).</span><br><span class="hljs-string">    </span><br><span class="hljs-string">        Note: Each word in a document should be at the center of a window. Words near edges will have a smaller</span><br><span class="hljs-string">              number of co-occurring words.</span><br><span class="hljs-string">              </span><br><span class="hljs-string">              For example, if we take the document &quot;START All that glitters is not gold END&quot; with window size of 4,</span><br><span class="hljs-string">              &quot;All&quot; will co-occur with &quot;START&quot;, &quot;that&quot;, &quot;glitters&quot;, &quot;is&quot;, and &quot;not&quot;.</span><br><span class="hljs-string">    </span><br><span class="hljs-string">        Params:</span><br><span class="hljs-string">            corpus (list of list of strings): corpus of documents</span><br><span class="hljs-string">            window_size (int): size of context window</span><br><span class="hljs-string">        Return:</span><br><span class="hljs-string">            M (numpy matrix of shape (number of corpus words, number of corpus words)): </span><br><span class="hljs-string">                Co-occurence matrix of word counts. </span><br><span class="hljs-string">                The ordering of the words in the rows/columns should be the same as the ordering of the words given by the distinct_words function.</span><br><span class="hljs-string">            word2Ind (dict): dictionary that maps word to index (i.e. row/column number) for matrix M.</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br>    words, num_words = distinct_words(corpus)<br>    M = np.zeros((num_words, num_words))<br>    word2Ind = <span class="hljs-built_in">dict</span>([(word, index) <span class="hljs-keyword">for</span> index, word <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(words)])<br>    <br>    <span class="hljs-comment"># ------------------</span><br>    <span class="hljs-comment"># Write your implementation here.</span><br>    <span class="hljs-keyword">for</span> sentence <span class="hljs-keyword">in</span> corpus:<br>        current_index = <span class="hljs-number">0</span><br>        sentence_len = <span class="hljs-built_in">len</span>(sentence)<br>        indices = [word2Ind[i] <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> sentence]<br>        <span class="hljs-keyword">while</span> current_index &lt; sentence_len:<br>            left  = <span class="hljs-built_in">max</span>(current_index - window_size, <span class="hljs-number">0</span>)<br>            right = <span class="hljs-built_in">min</span>(current_index + window_size + <span class="hljs-number">1</span>, sentence_len) <br>            current_word = sentence[current_index]<br>            current_word_index = word2Ind[current_word]<br>            words_around = indices[left:current_index] + indices[current_index+<span class="hljs-number">1</span>:right]<br>            <br>            <span class="hljs-keyword">for</span> ind <span class="hljs-keyword">in</span> words_around:<br>                M[current_word_index, ind] += <span class="hljs-number">1</span><br>            <br>            current_index += <span class="hljs-number">1</span><br><br>    <span class="hljs-comment"># ------------------</span><br><br>    <span class="hljs-keyword">return</span> M, word2Ind<br></code></pre></div></td></tr></table></figure>
+<p>测试用例：</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-comment"># ---------------------</span><br><span class="hljs-comment"># Run this sanity check</span><br><span class="hljs-comment"># Note that this is not an exhaustive check for correctness.</span><br><span class="hljs-comment"># ---------------------</span><br><br><span class="hljs-comment"># Define toy corpus and get student&#x27;s co-occurrence matrix</span><br>test_corpus = [<span class="hljs-string">&quot;&#123;&#125; All that glitters isn&#x27;t gold &#123;&#125;&quot;</span>.<span class="hljs-built_in">format</span>(START_TOKEN, END_TOKEN).split(<span class="hljs-string">&quot; &quot;</span>), <span class="hljs-string">&quot;&#123;&#125; All&#x27;s well that ends well &#123;&#125;&quot;</span>.<span class="hljs-built_in">format</span>(START_TOKEN, END_TOKEN).split(<span class="hljs-string">&quot; &quot;</span>)]<br>M_test, word2ind_test = compute_co_occurrence_matrix(test_corpus, window_size=<span class="hljs-number">1</span>)<br><br><span class="hljs-comment"># Correct M and word2ind</span><br>M_test_ans = np.array( <br>    [[<span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">1.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">1.</span>,],<br>     [<span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">1.</span>, <span class="hljs-number">1.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>,],<br>     [<span class="hljs-number">0.</span>, <span class="hljs-number">1.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">1.</span>, <span class="hljs-number">0.</span>,],<br>     [<span class="hljs-number">0.</span>, <span class="hljs-number">1.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">1.</span>,],<br>     [<span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">1.</span>, <span class="hljs-number">1.</span>,],<br>     [<span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">1.</span>, <span class="hljs-number">1.</span>, <span class="hljs-number">0.</span>,],<br>     [<span class="hljs-number">1.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">1.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>,],<br>     [<span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">1.</span>, <span class="hljs-number">1.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>,],<br>     [<span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">1.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">1.</span>, <span class="hljs-number">1.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">1.</span>,],<br>     [<span class="hljs-number">1.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">1.</span>, <span class="hljs-number">1.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">1.</span>, <span class="hljs-number">0.</span>,]]<br>)<br>ans_test_corpus_words = <span class="hljs-built_in">sorted</span>([START_TOKEN, <span class="hljs-string">&quot;All&quot;</span>, <span class="hljs-string">&quot;ends&quot;</span>, <span class="hljs-string">&quot;that&quot;</span>, <span class="hljs-string">&quot;gold&quot;</span>, <span class="hljs-string">&quot;All&#x27;s&quot;</span>, <span class="hljs-string">&quot;glitters&quot;</span>, <span class="hljs-string">&quot;isn&#x27;t&quot;</span>, <span class="hljs-string">&quot;well&quot;</span>, END_TOKEN])<br>word2ind_ans = <span class="hljs-built_in">dict</span>(<span class="hljs-built_in">zip</span>(ans_test_corpus_words, <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(ans_test_corpus_words))))<br><br><span class="hljs-comment"># Test correct word2ind</span><br><span class="hljs-keyword">assert</span> (word2ind_ans == word2ind_test), <span class="hljs-string">&quot;Your word2ind is incorrect:\nCorrect: &#123;&#125;\nYours: &#123;&#125;&quot;</span>.<span class="hljs-built_in">format</span>(word2ind_ans, word2ind_test)<br><br><span class="hljs-comment"># Test correct M shape</span><br><span class="hljs-keyword">assert</span> (M_test.shape == M_test_ans.shape), <span class="hljs-string">&quot;M matrix has incorrect shape.\nCorrect: &#123;&#125;\nYours: &#123;&#125;&quot;</span>.<span class="hljs-built_in">format</span>(M_test.shape, M_test_ans.shape)<br><br><span class="hljs-comment"># Test correct M values</span><br><span class="hljs-keyword">for</span> w1 <span class="hljs-keyword">in</span> word2ind_ans.keys():<br>    idx1 = word2ind_ans[w1]<br>    <span class="hljs-keyword">for</span> w2 <span class="hljs-keyword">in</span> word2ind_ans.keys():<br>        idx2 = word2ind_ans[w2]<br>        student = M_test[idx1, idx2]<br>        correct = M_test_ans[idx1, idx2]<br>        <span class="hljs-keyword">if</span> student != correct:<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Correct M:&quot;</span>)<br>            <span class="hljs-built_in">print</span>(M_test_ans)<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Your M: &quot;</span>)<br>            <span class="hljs-built_in">print</span>(M_test)<br>            <span class="hljs-keyword">raise</span> AssertionError(<span class="hljs-string">&quot;Incorrect count at index (&#123;&#125;, &#123;&#125;)=(&#123;&#125;, &#123;&#125;) in matrix M. Yours has &#123;&#125; but should have &#123;&#125;.&quot;</span>.<span class="hljs-built_in">format</span>(idx1, idx2, w1, w2, student, correct))<br><br><span class="hljs-comment"># Print Success</span><br><span class="hljs-built_in">print</span> (<span class="hljs-string">&quot;-&quot;</span> * <span class="hljs-number">80</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Passed All Tests!&quot;</span>)<br><span class="hljs-built_in">print</span> (<span class="hljs-string">&quot;-&quot;</span> * <span class="hljs-number">80</span>)<br></code></pre></div></td></tr></table></figure>
+<h3 id="问题1.3实现-reduce_to_k_dim">问题1.3：实现 reduce_to_k_dim</h3>
+<p>这一步是降维。在问题1.2得到的是一个N x
+N的矩阵（N是单词集的大小），使用scikit-learn实现的SVD（奇异值分解），从这个大矩阵里分解出一个含k个特制的N
+x k 小矩阵。</p>
+<p><strong>注意</strong>：在numpy、scipy和scikit-learn都提供了一些SVD的实现，但是只有scipy、sklearn有Truncated
+SVD，并且只有sklearn提供了计算大规模SVD的高效的randomized算法，详情参考<a
+target="_blank" rel="noopener" href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.TruncatedSVD.html">sklearn.decomposition.TruncatedSVD</a>
+。</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">reduce_to_k_dim</span>(<span class="hljs-params">M, k=<span class="hljs-number">2</span></span>):<br>    <span class="hljs-string">&quot;&quot;&quot; Reduce a co-occurence count matrix of dimensionality (num_corpus_words, num_corpus_words)</span><br><span class="hljs-string">        to a matrix of dimensionality (num_corpus_words, k) using the following SVD function from Scikit-Learn:</span><br><span class="hljs-string">            - http://scikit-learn.org/stable/modules/generated/sklearn.decomposition.TruncatedSVD.html</span><br><span class="hljs-string">    </span><br><span class="hljs-string">        Params:</span><br><span class="hljs-string">            M (numpy matrix of shape (number of corpus words, number of corpus words)): co-occurence matrix of word counts</span><br><span class="hljs-string">            k (int): embedding size of each word after dimension reduction</span><br><span class="hljs-string">        Return:</span><br><span class="hljs-string">            M_reduced (numpy matrix of shape (number of corpus words, k)): matrix of k-dimensioal word embeddings.</span><br><span class="hljs-string">                    In terms of the SVD from math class, this actually returns U * S</span><br><span class="hljs-string">    &quot;&quot;&quot;</span>    <br>    n_iters = <span class="hljs-number">10</span>     <span class="hljs-comment"># Use this parameter in your call to `TruncatedSVD`</span><br>    M_reduced = <span class="hljs-literal">None</span><br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Running Truncated SVD over %i words...&quot;</span> % (M.shape[<span class="hljs-number">0</span>]))<br>    <br>    <span class="hljs-comment"># ------------------</span><br>    <span class="hljs-comment"># Write your implementation here.</span><br>    TSVD = TruncatedSVD(n_components=k, n_iter=n_iters)<br>    M_reduced = TSVD.fit_transform(M)<br><br>    <span class="hljs-comment"># ------------------</span><br><br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Done.&quot;</span>)<br>    <span class="hljs-keyword">return</span> M_reduced<br></code></pre></div></td></tr></table></figure>
+<p>测试用例：</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-comment"># ---------------------</span><br><span class="hljs-comment"># Run this sanity check</span><br><span class="hljs-comment"># Note that this is not an exhaustive check for correctness </span><br><span class="hljs-comment"># In fact we only check that your M_reduced has the right dimensions.</span><br><span class="hljs-comment"># ---------------------</span><br><br><span class="hljs-comment"># Define toy corpus and run student code</span><br>test_corpus = [<span class="hljs-string">&quot;&#123;&#125; All that glitters isn&#x27;t gold &#123;&#125;&quot;</span>.<span class="hljs-built_in">format</span>(START_TOKEN, END_TOKEN).split(<span class="hljs-string">&quot; &quot;</span>), <span class="hljs-string">&quot;&#123;&#125; All&#x27;s well that ends well &#123;&#125;&quot;</span>.<span class="hljs-built_in">format</span>(START_TOKEN, END_TOKEN).split(<span class="hljs-string">&quot; &quot;</span>)]<br>M_test, word2ind_test = compute_co_occurrence_matrix(test_corpus, window_size=<span class="hljs-number">1</span>)<br>M_test_reduced = reduce_to_k_dim(M_test, k=<span class="hljs-number">2</span>)<br><br><span class="hljs-comment"># Test proper dimensions</span><br><span class="hljs-keyword">assert</span> (M_test_reduced.shape[<span class="hljs-number">0</span>] == <span class="hljs-number">10</span>), <span class="hljs-string">&quot;M_reduced has &#123;&#125; rows; should have &#123;&#125;&quot;</span>.<span class="hljs-built_in">format</span>(M_test_reduced.shape[<span class="hljs-number">0</span>], <span class="hljs-number">10</span>)<br><span class="hljs-keyword">assert</span> (M_test_reduced.shape[<span class="hljs-number">1</span>] == <span class="hljs-number">2</span>), <span class="hljs-string">&quot;M_reduced has &#123;&#125; columns; should have &#123;&#125;&quot;</span>.<span class="hljs-built_in">format</span>(M_test_reduced.shape[<span class="hljs-number">1</span>], <span class="hljs-number">2</span>)<br><br><span class="hljs-comment"># Print Success</span><br><span class="hljs-built_in">print</span> (<span class="hljs-string">&quot;-&quot;</span> * <span class="hljs-number">80</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Passed All Tests!&quot;</span>)<br><span class="hljs-built_in">print</span> (<span class="hljs-string">&quot;-&quot;</span> * <span class="hljs-number">80</span>)<br></code></pre></div></td></tr></table></figure>
+<h3 id="问题1.4-实现-plot_embeddings">问题1.4 实现 plot_embeddings</h3>
+<p>基于matplotlib，用<code>scatter</code> 画 “×”，用 <code>text</code>
+写字</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">plot_embeddings</span>(<span class="hljs-params">M_reduced, word2Ind, words</span>):<br>    <span class="hljs-string">&quot;&quot;&quot; Plot in a scatterplot the embeddings of the words specified in the list &quot;words&quot;.</span><br><span class="hljs-string">        NOTE: do not plot all the words listed in M_reduced / word2Ind.</span><br><span class="hljs-string">        Include a label next to each point.</span><br><span class="hljs-string">        </span><br><span class="hljs-string">        Params:</span><br><span class="hljs-string">            M_reduced (numpy matrix of shape (number of unique words in the corpus , k)): matrix of k-dimensioal word embeddings</span><br><span class="hljs-string">            word2Ind (dict): dictionary that maps word to indices for matrix M</span><br><span class="hljs-string">            words (list of strings): words whose embeddings we want to visualize</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br><br>    <span class="hljs-comment"># ------------------</span><br>    <span class="hljs-comment"># Write your implementation here.</span><br>    <br>    <span class="hljs-keyword">for</span> w <span class="hljs-keyword">in</span> words:<br>        index = word2Ind[w]<br>        embedding = M_reduced[index]<br>        x, y  = embedding[<span class="hljs-number">0</span>], embedding[<span class="hljs-number">1</span>]<br>        plt.scatter(x, y, marker=<span class="hljs-string">&#x27;x&#x27;</span>, color=<span class="hljs-string">&#x27;red&#x27;</span>)<br>        plt.text(x, y, word, fontsize=<span class="hljs-number">9</span>)<br>    plt.show()<br>    <span class="hljs-comment"># ------------------</span><br></code></pre></div></td></tr></table></figure>
+<p>测试用例：</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-comment"># ---------------------</span><br><span class="hljs-comment"># Run this sanity check</span><br><span class="hljs-comment"># Note that this is not an exhaustive check for correctness.</span><br><span class="hljs-comment"># The plot produced should look like the &quot;test solution plot&quot; depicted below. </span><br><span class="hljs-comment"># ---------------------</span><br><br><span class="hljs-built_in">print</span> (<span class="hljs-string">&quot;-&quot;</span> * <span class="hljs-number">80</span>)<br><span class="hljs-built_in">print</span> (<span class="hljs-string">&quot;Outputted Plot:&quot;</span>)<br><br>M_reduced_plot_test = np.array([[<span class="hljs-number">1</span>, <span class="hljs-number">1</span>], [-<span class="hljs-number">1</span>, -<span class="hljs-number">1</span>], [<span class="hljs-number">1</span>, -<span class="hljs-number">1</span>], [-<span class="hljs-number">1</span>, <span class="hljs-number">1</span>], [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>]])<br>word2ind_plot_test = &#123;<span class="hljs-string">&#x27;test1&#x27;</span>: <span class="hljs-number">0</span>, <span class="hljs-string">&#x27;test2&#x27;</span>: <span class="hljs-number">1</span>, <span class="hljs-string">&#x27;test3&#x27;</span>: <span class="hljs-number">2</span>, <span class="hljs-string">&#x27;test4&#x27;</span>: <span class="hljs-number">3</span>, <span class="hljs-string">&#x27;test5&#x27;</span>: <span class="hljs-number">4</span>&#125;<br>words = [<span class="hljs-string">&#x27;test1&#x27;</span>, <span class="hljs-string">&#x27;test2&#x27;</span>, <span class="hljs-string">&#x27;test3&#x27;</span>, <span class="hljs-string">&#x27;test4&#x27;</span>, <span class="hljs-string">&#x27;test5&#x27;</span>]<br>plot_embeddings(M_reduced_plot_test, word2ind_plot_test, words)<br><br><span class="hljs-built_in">print</span> (<span class="hljs-string">&quot;-&quot;</span> * <span class="hljs-number">80</span>)<br></code></pre></div></td></tr></table></figure>
+<p>效果：</p>
+<p><img src="/img/nlp/assignment1/1.jpg" srcset="/img/loading.gif" lazyload/></p>
+<h3 id="问题1.5共现打印分析">问题1.5：共现打印分析</h3>
+<p>将词嵌入到2个维度上，归一化，最终词向量会落到一个单位圆内，在坐标系上寻找相近的词。</p>
+<p>测试用例：</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-comment"># -----------------------------</span><br><span class="hljs-comment"># Run This Cell to Produce Your Plot</span><br><span class="hljs-comment"># ------------------------------</span><br>reuters_corpus = read_corpus()<br>M_co_occurrence, word2ind_co_occurrence = compute_co_occurrence_matrix(reuters_corpus)<br>M_reduced_co_occurrence = reduce_to_k_dim(M_co_occurrence, k=<span class="hljs-number">2</span>)<br><br><span class="hljs-comment"># Rescale (normalize) the rows to make them each of unit-length</span><br>M_lengths = np.linalg.norm(M_reduced_co_occurrence, axis=<span class="hljs-number">1</span>)<br>M_normalized = M_reduced_co_occurrence / M_lengths[:, np.newaxis] <span class="hljs-comment"># broadcasting</span><br><br>words = [<span class="hljs-string">&#x27;barrels&#x27;</span>, <span class="hljs-string">&#x27;bpd&#x27;</span>, <span class="hljs-string">&#x27;ecuador&#x27;</span>, <span class="hljs-string">&#x27;energy&#x27;</span>, <span class="hljs-string">&#x27;industry&#x27;</span>, <span class="hljs-string">&#x27;kuwait&#x27;</span>, <span class="hljs-string">&#x27;oil&#x27;</span>, <span class="hljs-string">&#x27;output&#x27;</span>, <span class="hljs-string">&#x27;petroleum&#x27;</span>, <span class="hljs-string">&#x27;iraq&#x27;</span>]<br><br>plot_embeddings(M_normalized, word2ind_co_occurrence, words)<br></code></pre></div></td></tr></table></figure>
+<p><img src="/img/nlp/assignment1/2.jpg" srcset="/img/loading.gif" lazyload/></p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Deep-Learning/">Deep Learning</a>
+                    
+                      <a class="hover-with-bg" href="/categories/Deep-Learning/NLP/">NLP</a>
+                    
+                  </div>
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/05/05/%E7%AC%AC%E4%BA%8C%E8%AE%B2-%E8%AF%8D%E5%90%91%E9%87%8F%E8%BF%9B%E9%98%B6/">
+                        <span class="hidden-mobile">第二讲-词向量进阶</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        loader: {
+          load: ['ui/lazy']
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
