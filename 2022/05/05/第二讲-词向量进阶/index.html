@@ -1,0 +1,802 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=dark>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="肘子开">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="1 算法优化基础 1.1 词向量梯度下降算法 问题：梯度下降会一次性使用所有数据样本进行参数更新，对应到我们当前的词向量建模问题，就是\(J(\theta)\)的计算需要基于语料库所有的样本(窗口)，数据规模非常大：  计算非常耗资源 计算时间长  解决方案：随机梯度下降算法 Stochastic Gradient Descent（SGD）  在单个样本中计算和更新参数，并遍历所">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第二讲-词向量进阶">
+<meta property="og:url" content="http://example.com/2022/05/05/%E7%AC%AC%E4%BA%8C%E8%AE%B2-%E8%AF%8D%E5%90%91%E9%87%8F%E8%BF%9B%E9%98%B6/index.html">
+<meta property="og:site_name" content="肘子开的博客">
+<meta property="og:description" content="1 算法优化基础 1.1 词向量梯度下降算法 问题：梯度下降会一次性使用所有数据样本进行参数更新，对应到我们当前的词向量建模问题，就是\(J(\theta)\)的计算需要基于语料库所有的样本(窗口)，数据规模非常大：  计算非常耗资源 计算时间长  解决方案：随机梯度下降算法 Stochastic Gradient Descent（SGD）  在单个样本中计算和更新参数，并遍历所">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/nlp/第二讲/1.png">
+<meta property="og:image" content="http://example.com/img/nlp/第二讲/2.png">
+<meta property="og:image" content="http://example.com/img/nlp/第二讲/3.png">
+<meta property="og:image" content="http://example.com/img/nlp/第二讲/4.png">
+<meta property="og:image" content="http://example.com/img/nlp/第二讲/5.png">
+<meta property="og:image" content="http://example.com/img/nlp/第二讲/6.png">
+<meta property="og:image" content="http://example.com/img/nlp/第二讲/7.png">
+<meta property="og:image" content="http://example.com/img/nlp/第二讲/8.png">
+<meta property="og:image" content="http://example.com/img/nlp/第二讲/9.png">
+<meta property="og:image" content="http://example.com/img/nlp/第二讲/10.png">
+<meta property="og:image" content="http://example.com/img/nlp/第二讲/11.png">
+<meta property="og:image" content="http://example.com/img/nlp/第二讲/12.png">
+<meta property="og:image" content="http://example.com/img/nlp/第二讲/13.png">
+<meta property="article:published_time" content="2022-05-05T07:52:50.000Z">
+<meta property="article:modified_time" content="2022-05-05T09:15:18.479Z">
+<meta property="article:author" content="肘子开">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/nlp/第二讲/1.png">
+  
+  
+  <title>第二讲-词向量进阶 - 肘子开的博客</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/nnfx-dark.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>肘子开的博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/bg/bg2.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="第二讲-词向量进阶">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-05-05 15:52" pubdate>
+        2022年5月5日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      5.1k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      43 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">第二讲-词向量进阶</h1>
+            
+            <div class="markdown-body">
+              <h1 id="算法优化基础">1 算法优化基础</h1>
+<h2 id="词向量梯度下降算法">1.1 词向量梯度下降算法</h2>
+<p>问题：梯度下降会一次性使用所有数据样本进行参数更新，对应到我们当前的词向量建模问题，就是<span
+class="math inline">\(J(\theta)\)</span>的计算需要基于语料库所有的样本(窗口)，数据规模非常大：</p>
+<ul>
+<li>计算非常耗资源</li>
+<li>计算时间长</li>
+</ul>
+<p>解决方案：随机梯度下降算法 Stochastic Gradient Descent（SGD）</p>
+<ul>
+<li>在单个样本中计算和更新参数，并遍历所有样本</li>
+</ul>
+<p>但基于单个样本更新会表现为参数震荡很厉害，收敛过程并不平稳，所以很多时候我们会改为使用<strong>mini-batch
+gradient descent</strong></p>
+<h2 id="词向量建模中的随机梯度下降">1.2 词向量建模中的随机梯度下降</h2>
+<ul>
+<li>应用随机梯度下降，在每个窗口计算和更新参数，遍历所有样本</li>
+<li>在每个窗口内，我们最多只有<span
+class="math inline">\(2m+1\)</span>个词，因此<span
+class="math inline">\(\nabla_{\theta}
+J_{t}(\theta)\)</span>是非常稀疏的</li>
+</ul>
+<p><span class="math display">\[
+\nabla_{\theta} J_{t}(\theta)=\left[\begin{array}{l}
+0 \\
+\vdots \\
+\nabla_{v_{\text {like }}} \\
+\vdots \\
+0 \\
+\nabla_{u_{I}} \\
+\vdots \\
+\nabla_{u_{\text {learning }}} \\
+\vdots
+\end{array}\right] \in \mathbb{R}^{2 d V}
+\]</span></p>
+<p>上面提到的稀疏性问题，一种解决方式是我们<strong>只更新实际出现的向量</strong></p>
+<ul>
+<li>需要稀疏矩阵更新操作来只更新矩阵<span
+class="math inline">\(U\)</span>和<span
+class="math inline">\(V\)</span>中的特定行</li>
+<li>需要保留单词向量的哈希/散列</li>
+</ul>
+<p>如果有数百万个单词向量，并且进行分布式计算，我们无需再传输巨大的更新信息（数据传输有成本）</p>
+<h2 id="word2vec的更多细节">1.3 Word2vec的更多细节</h2>
+<p>word2vec有两个模型变体：</p>
+<ul>
+<li>1.Skip-grams (SG)：输入中心词并预测上下文中的单词</li>
+<li>2.Continuous Bag of Words
+(CBOW)：输入上下文中的单词并预测中心词</li>
+</ul>
+<p>之前一直使用naive的softmax(简单但代价很高的训练方法)，其实可以使用负采样方法加快训练速率</p>
+<h2 id="负例采样的skip-gram模型作业2">1.4
+负例采样的skip-gram模型（作业2）</h2>
+<p>softmax中用于归一化的分母的计算代价太高</p>
+<ul>
+<li>我们将在作业2中实现使用 negative sampling/负例采样方法的 skip-gram
+模型。</li>
+<li>使用一个 true pair (中心词及其上下文窗口中的词)与几个 noise pair
+(中心词与随机词搭配) 形成的样本，训练二元逻辑回归。</li>
+</ul>
+<p>原文中的(最大化)目标函数是：<span
+class="math inline">\(J(\theta)=\frac{1}{T} \sum_{t=1}^{T}
+J_{t}(\theta)\)</span> <span class="math display">\[
+J_{t}(\theta)=\log \sigma\left(u_{o}^{T} v_{c}\right)+\sum_{i=1}^{k}
+\mathbb{E}_{j \sim P(w)}\left[\log \sigma\left(-u_{j}^{T}
+v_{c}\right)\right]
+\]</span></p>
+<ul>
+<li>左侧为sigmoid函数(大家会在后续的内容里经常见到它)</li>
+<li>我们要最大化2个词共现的概率</li>
+</ul>
+<p>本课以及作业中的目标函数是: <span class="math display">\[
+J_{n e g-s a m p l e}\left(\boldsymbol{o}, \boldsymbol{v}_{c},
+\boldsymbol{U}\right)=-\log \left(\sigma\left(\boldsymbol{u}_{o}^{\top}
+\boldsymbol{v}_{c}\right)\right)-\sum_{k=1}^{K} \log
+\left(\sigma\left(-\boldsymbol{u}_{k}^{\top}
+\boldsymbol{v}_{c}\right)\right)
+\]</span></p>
+<ul>
+<li>我们取<span class="math inline">\(K\)</span>个负例采样</li>
+<li>最大化窗口中包围「中心词」的这些词语出现的概率，而最小化其他没有出现的随机词的概率</li>
+<li><span class="math inline">\(P(w)=U(w)^{3 / 4} /
+Z\)</span>我们用左侧的公式进行抽样，其中<span
+class="math inline">\(U(w)\)</span>​是 unigram 分布</li>
+<li>通过 3/4 次方，相对减少常见单词的频率，增大稀有词的概率</li>
+<li><span class="math inline">\(Z\)</span>用于生成概率分布</li>
+</ul>
+<h1 id="计数与共线矩阵">2 计数与共线矩阵</h1>
+<h2 id="共现矩阵与词向量构建">2.1 共现矩阵与词向量构建</h2>
+<p>在自然语言处理里另外一个构建词向量的思路是借助于<strong>共现矩阵</strong>（我们设其为<span
+class="math inline">\(X\)</span>），我们有两种方式，可以基于窗口（window）或者全文档（full
+document)统计：</p>
+<ul>
+<li><strong>Window</strong>
+：与word2vec类似，在每个单词周围都使用Window，包括语法(POS)和语义信息</li>
+<li><strong>Word-document</strong>
+共现矩阵的基本假设是在同一篇文章中出现的单词更有可能相互关联。假设单词<span
+class="math inline">\(i\)</span>出现在文章<span
+class="math inline">\(j\)</span>中，则矩阵元素<span
+class="math inline">\(X_{ij}\)</span>加一，当我们处理完数据库中的所有文章后，就得到了矩阵<span
+class="math inline">\(X\)</span>，其大小为<span
+class="math inline">\(|V| \times M\)</span>，其中<span
+class="math inline">\(|V|\)</span>为词汇量，而<span
+class="math inline">\(M\)</span>为文章数。这一构建单词文章co-occurrence
+matrix的方法也是经典的Latent Semantic
+Analysis所采用的【语义分析】。</li>
+</ul>
+<h2 id="基于窗口的共现矩阵示例">2.2 基于窗口的共现矩阵示例</h2>
+<p>利用某个定长窗口(通常取5-10)中单词与单词同时出现的次数，来产生基于窗口的共现矩阵。</p>
+<p>下面以窗口长度为1来举例，假设我们的数据包含以下几个句子：</p>
+<ul>
+<li>I like deep learning.</li>
+<li>I like NLP.</li>
+<li>I enjoy flying.</li>
+</ul>
+<p>我们可以得到如下的词词共现矩阵（word-word co-occurrence matrix）</p>
+<p><img src="/img/nlp/第二讲/1.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="基于直接的共现矩阵构建词向量的问题">2.3
+基于直接的共现矩阵构建词向量的问题</h2>
+<p>直接基于共现矩阵构建词向量，会有一些明显的问题，如下：</p>
+<ul>
+<li>使用共现次数衡量单词的相似性，但是会随着词汇量的增加而增大矩阵的大小。</li>
+<li>需要很多空间来存储这一高维矩阵。</li>
+<li>后续的分类模型也会由于矩阵的稀疏性而存在稀疏性问题，使得效果不佳。</li>
+</ul>
+<h2 id="解决方案低维向量">2.4 解决方案：低维向量</h2>
+<p>针对上述问题，我们的一个处理方式是降维，获得低维稠密向量。</p>
+<ul>
+<li>通常降维到(25-1000)维，和word2vec类似</li>
+</ul>
+<p>如何降维呢？</p>
+<h2 id="方法1对x进行降维作业1">2.5 方法1：对X进行降维（作业1）</h2>
+<p>可以使用奇异值分解（SVD）方法将共现矩阵<span
+class="math inline">\(X\)</span>分解为<span class="math inline">\(U
+\Sigma V^{T}\)</span>，其中：</p>
+<ul>
+<li><span
+class="math inline">\(\Sigma\)</span>是对角线矩阵，对角线上的值是矩阵的奇异值</li>
+<li><span class="math inline">\(U\)</span>，<span
+class="math inline">\(V\)</span>是对应于行和列的正交基</li>
+</ul>
+<p>为了减少尺度同时尽量保存有效信息，可保留对角矩阵的最大的<span
+class="math inline">\(k\)</span>个值，并将矩阵<span
+class="math inline">\(U\)</span>，<span
+class="math inline">\(V\)</span>的相应的行列保留。</p>
+<ul>
+<li>这是经典的线性代数算法，对于大型矩阵而言，计算代价昂贵。</li>
+</ul>
+<h2 id="词向量svd分解的python代码示例">2.6
+词向量SVD分解的python代码示例</h2>
+<p><img src="/img/nlp/第二讲/2.png" srcset="/img/loading.gif" lazyload /></p>
+<p>将向量进行可视化</p>
+<p><img src="/img/nlp/第二讲/3.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="论文讲解">2.7 论文讲解</h2>
+<h3 id="hacks-to-x-several-used-in-rohde-et-al.-2005">Hacks to X
+(several used in Rohde et al. 2005)</h3>
+<p>按比例调整 counts 会很有效</p>
+<ul>
+<li>对高频词进行缩放(语法有太多的影响)
+<ul>
+<li>使用log进行缩放</li>
+<li><span class="math inline">\(\min (X, t), t \approx 100\)</span></li>
+<li>直接全部忽视</li>
+</ul></li>
+<li>在基于window的计数中，提高更加接近的单词的计数</li>
+<li>使用Person相关系数</li>
+</ul>
+<h2 id="词向量分布探究">2.8 词向量分布探究</h2>
+<p>如果对词向量进行空间分布，会发现同一个词汇的附近分布着它不同时态语态的单词：</p>
+<ul>
+<li><span class="math inline">\(dirve \to deriver\)</span></li>
+<li><span class="math inline">\(swim \to swimmer\)</span></li>
+<li><span class="math inline">\(teach \to teacher\)</span></li>
+</ul>
+<p>在向量中出现的有趣的句法模式：语义向量基本上是线性组件，虽然有一些摆动，但是基本是存在动词和动词实施者的方向。</p>
+<h2 id="基于计数-vs.-基于预估">2.9 基于计数 VS. 基于预估</h2>
+<p>我们来总结一下基于共现矩阵计数和基于预估模型两种得到词向量的方式</p>
+<p><strong>基于计数</strong>：使用整个矩阵的全局统计数据来直接估计</p>
+<ul>
+<li><strong>优点</strong>：训练快速；统计数据高效利用</li>
+<li><strong>缺点</strong>：主要用于捕捉单词相似性；对大量数据给予比例失调的重视</li>
+</ul>
+<p><strong>基于预估模型</strong>：定义概率分布并试图预测单词</p>
+<ul>
+<li><strong>优点</strong>：提高其他任务的性能；能捕获除了单词相似性以外的复杂的模式</li>
+<li><strong>缺点</strong>：随语料库增大会增大规模；统计数据的低效使用（采样是对统计数据的低效使用）</li>
+</ul>
+<h1 id="glove模型">3 GloVe模型</h1>
+<h2 id="论文讲解-1">3.1 论文讲解</h2>
+<h3 id="encoding-meaning-in-vector-differences">3.1.1 Encoding meaning
+in vector differences</h3>
+<p>GloVe模型关键思想：共现概率的比值可以对meaning
+component进行编码。将两个流派的想法结合起来，在神经网络中使用计数矩阵。</p>
+<p><img src="/img/nlp/第二讲/4.png" srcset="/img/loading.gif" lazyload /></p>
+<p>例如我们想区分热力学上两种不同状态ice冰与蒸汽steam，如果只是看概率则数值很小，不能透露有效的信息，但是他们的比值比较大，所以使用比值更能体现信息。图中可以看出solid更常来描述ice的状态而不是steam，所以solid在ice的上下文中出现的几率更大。对于gas则恰恰相反，而对于water这种描述ice与steam均可或者fashion这种与两者都没什么联系的单词，则比值接近于1。所以相较于单纯的共现概率，实际上共现概率的相对比值更有意义。</p>
+<h3
+id="combining-the-best-of-both-worlds-glove-pennington-et-al.-emnlp-2014">3.1.2
+Combining the best of both worlds GloVe [Pennington et al., EMNLP
+2014]</h3>
+<p><span class="math display">\[
+w_i \cdot w_j = \log P(i|j)
+\]</span></p>
+<p><span class="math display">\[
+J=\sum_{i, j=1}^{V} f\left(X_{i j}\right)\left(w_{i}^{T}
+\tilde{w}_{j}+b_{i}+\tilde{b}_{j}-\log X_{i j}\right)^{2}
+\]</span></p>
+<ul>
+<li>训练快速</li>
+<li>可以扩展到大型语料库</li>
+<li>即使是小语料库和小向量，性能也很好</li>
+</ul>
+<h2 id="glove的一些结果展示">3.2 GloVe的一些结果展示</h2>
+<p>下图是一个GloVe词向量示例，我们通过GloVe得到的词向量，我们可以找到frog（青蛙）最接近的一些词汇，可以看出它们本身是很类似的动物。</p>
+<p><img src="/img/nlp/第二讲/5.png" srcset="/img/loading.gif" lazyload /></p>
+<h1 id="词向量估计">4 词向量估计</h1>
+<h2 id="如何评估词向量">4.1 如何评估词向量？</h2>
+<p>我们如何评估词向量呢，有内在和外在两种方式：</p>
+<ul>
+<li><strong>内在评估方式</strong>
+<ul>
+<li>对特定/中间子任务进行评估</li>
+<li>计算速度快</li>
+<li>有助于理解这个系统</li>
+<li>不清楚是否真的有用，除非与实际任务建立了相关性</li>
+</ul></li>
+<li><strong>外部任务方式</strong>
+<ul>
+<li>对真实任务（如下游NLP任务）的评估</li>
+<li>计算精确度可能需要很长时间</li>
+<li>不清楚子系统问题所在，是交互还是其他子系统问题</li>
+<li>如果用另一个子系统替换一个子系统可以提高精确度</li>
+</ul></li>
+</ul>
+<h2 id="内在词向量评估">4.2 内在词向量评估</h2>
+<p>一种内在词向量评估方式是「<strong>词向量类比</strong>」：对于具备某种关系的词对a,b，在给定词c的情况下，找到具备类似关系的词d
+<span class="math display">\[
+a: b:: c: ? \rightarrow d=\arg \max _{i}
+\frac{\left(x_{b}-x_{a}+x_{c}\right)^{T}
+x_{i}}{\left\|x_{b}-x_{a}+x_{c}\right\|}
+\]</span></p>
+<ul>
+<li>通过加法后的余弦距离是否能很好地捕捉到直观的语义和句法类比问题来评估单词向量</li>
+<li>从搜索中丢弃输入的单词</li>
+<li>问题:如果有信息但不是线性的怎么办？</li>
+</ul>
+<h2 id="glove可视化效果">4.3 Glove可视化效果</h2>
+<p>下图为GloVe得到的词向量空间分布，我们对词向量进行减法计算，可以发现类比的词对有相似的距离。</p>
+<p>brother – sister, man – woman, king - queen</p>
+<p><img src="/img/nlp/第二讲/6.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="类比任务评估与超参数">4.4 类比任务评估与超参数</h2>
+<p><img src="/img/nlp/第二讲/7.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/nlp/第二讲/8.png" srcset="/img/loading.gif" lazyload /></p>
+<ul>
+<li>数据集越大越好，并且维基百科数据集比新闻文本数据集要好</li>
+<li>300是一个很好的词向量维度</li>
+</ul>
+<h2 id="另一个内在的词向量评估">4.5 另一个内在的词向量评估</h2>
+<p><img src="/img/nlp/第二讲/9.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="相关性评估">4.6 相关性评估</h2>
+<h3 id="section"><img src="/img/nlp/第二讲/10.png" srcset="/img/loading.gif" lazyload /></h3>
+<h1 id="word-senses">5 word senses</h1>
+<h2 id="词义与词义歧义">5.1 词义与词义歧义</h2>
+<p>大多数单词都是多义的</p>
+<ul>
+<li>特别是常见单词</li>
+<li>特别是存在已久的单词</li>
+</ul>
+<p>例如：pike</p>
+<p>那么，词向量是总体捕捉了所有这些信息，还是杂乱在一起了呢？</p>
+<h2 id="pike的不同含义示例">5.2 pike的不同含义示例</h2>
+<p><img src="/img/nlp/第二讲/11.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="论文讲解-2">5.3 论文讲解</h2>
+<h3
+id="improving-word-representations-via-global-context-and-multiple-word-prototypes-huang-et-al.-2012">5.3.1
+Improving Word Representations Via Global Context And Multiple Word
+Prototypes (Huang et al. 2012)</h3>
+<p><img src="/img/nlp/第二讲/12.png" srcset="/img/loading.gif" lazyload /></p>
+<p>将常用词的所有上下文进行聚类，通过该词得到一些清晰的簇，从而将这个常用词分解为多个单词，例如bank1、bank2</p>
+<h3
+id="linear-algebraic-structure-of-word-senses-with-applications-to-polysemy">5.3.2
+Linear Algebraic Structure of Word Senses, with Applications to
+Polysemy</h3>
+<ul>
+<li>单词在标准单词嵌入(如word2vec)中的不同含义以线性叠加(加权和)的形式存在</li>
+</ul>
+<p><span class="math display">\[
+v_{pike} = \alpha_1 v_{pike_1} + \alpha_2 v_{pike_2} + \alpha_3
+v_{pike_3}
+\]</span></p>
+<ul>
+<li>其中，<span class="math inline">\(\alpha =
+\frac{f_{1}}{f_{1}+f_{2}+f_{3}}\)</span></li>
+</ul>
+<p>令人惊讶的结果：</p>
+<ul>
+<li>只是加权平均值就已经可以获得很好的效果</li>
+<li>由于从稀疏编码中得到的概念，你实际上可以将感官分离出来(前提是它们相对比较常见)</li>
+</ul>
+<h2 id="外向词向量评估">5.4 外向词向量评估</h2>
+<ul>
+<li>单词向量的外部评估：词向量可以应用于NLP的很多下游任务</li>
+<li>一个例子是在命名实体识别任务中，寻找人名、机构名、地理位置名，词向量非常有帮助</li>
+</ul>
+<p><img src="/img/nlp/第二讲/13.png" srcset="/img/loading.gif" lazyload /></p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Deep-Learning/">Deep Learning</a>
+                    
+                  </div>
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/05/03/%E5%9B%9E%E6%BA%AF/">
+                        <span class="hidden-mobile">回溯</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        loader: {
+          load: ['ui/lazy']
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
