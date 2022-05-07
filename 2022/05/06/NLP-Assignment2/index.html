@@ -1,0 +1,790 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=dark>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="肘子开">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Assignment2 解答：理解词向量（23分） 我们先快速回顾一下word2vec算法，它的核心思想是“一个词的含义可以由它周围的词来表示”。具体来说，我们有一个中心词（center word） c，和这个词 c 周围上下文构成的窗口，这个窗口内的除了 c 之外的词叫做外围词（outside words）。比如下图中，中心词是“banking”，窗口大小为2，所以上下文窗口是：“t">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NLP-Assignment2">
+<meta property="og:url" content="http://example.com/2022/05/06/NLP-Assignment2/index.html">
+<meta property="og:site_name" content="肘子开的博客">
+<meta property="og:description" content="Assignment2 解答：理解词向量（23分） 我们先快速回顾一下word2vec算法，它的核心思想是“一个词的含义可以由它周围的词来表示”。具体来说，我们有一个中心词（center word） c，和这个词 c 周围上下文构成的窗口，这个窗口内的除了 c 之外的词叫做外围词（outside words）。比如下图中，中心词是“banking”，窗口大小为2，所以上下文窗口是：“t">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/nlp/assignment2/1.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0060yMmAly1gsz2rwoc9sj30hs0dc3zy.jpg">
+<meta property="article:published_time" content="2022-05-06T13:23:33.000Z">
+<meta property="article:modified_time" content="2022-05-06T13:53:22.837Z">
+<meta property="article:author" content="肘子开">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/nlp/assignment2/1.jpg">
+  
+  
+  <title>NLP-Assignment2 - 肘子开的博客</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/nnfx-dark.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>肘子开的博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/bg/bg2.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="NLP-Assignment2">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-05-06 21:23" pubdate>
+        2022年5月6日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      9.4k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      79 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">NLP-Assignment2</h1>
+            
+            <div class="markdown-body">
+              <h1 id="assignment2">Assignment2</h1>
+<h2 id="解答理解词向量23分">解答：理解词向量（23分）</h2>
+<p>我们先快速回顾一下word2vec算法，它的核心思想是“一个词的含义可以由它周围的词来表示”。具体来说，我们有一个中心词（center
+word） <em>c</em>，和这个词 <em>c</em>
+周围上下文构成的窗口，这个窗口内的除了 <em>c</em>
+之外的词叫做外围词（outside
+words）。比如下图中，中心词是“banking”，窗口大小为2，所以上下文窗口是：“turning”、”into“、”crises“和”as“。</p>
+<p><img src="/img/nlp/assignment2/1.jpg" srcset="/img/loading.gif" lazyload/></p>
+<p>Skip-gram模型（word2vec比较常用的一种实现，另一种是cbow）目的是学习概率分布
+<span
+class="math inline">\(𝑃(𝑂|𝐶)\)</span>。这样一来，就能计算给定的一个词
+<span class="math inline">\(o\)</span> 和词 <span
+class="math inline">\(c\)</span> 的概率 <span
+class="math inline">\(𝑃(𝑂=𝑜|𝐶=𝑐)\)</span>（即，在已知词 <span
+class="math inline">\(c\)</span> 出现的情况下，词 <span
+class="math inline">\(o\)</span> 出现的概率）， 其中<span
+class="math inline">\(c\)</span> 是中心词，<span
+class="math inline">\(o\)</span> 是窗口中非中心的外围词。</p>
+<p>在word2vec中，这个条件概率分布是通过计算向量点积（dot-products），再应用naive-softmax函数得到的：
+<span class="math display">\[
+P(O=o \mid C=c)=\frac{\exp \left(\boldsymbol{u}_{o}^{\top}
+\boldsymbol{v}_{c}\right)}{\sum_{w \in \operatorname{Vocab}} \exp
+\left(\boldsymbol{u}_{w}^{\top} \boldsymbol{v}_{c}\right)}
+\]</span></p>
+<p>这里，<span class="math inline">\(𝑢_o\)</span>向量代表外围词，<span
+class="math inline">\(v_c\)</span>向量代表中心词。为了包含这些向量，我们有两个矩阵
+<span class="math inline">\(𝑈\)</span> 和 <span
+class="math inline">\(𝑉\)</span> 。 <span
+class="math inline">\(𝑈\)</span> 的列是外围词， <span
+class="math inline">\(V\)</span> 的列是中心词，这两矩阵都有所有词<span
+class="math inline">\(w \in Vocabulary\)</span>的表示 。</p>
+<p>对于词 <span class="math inline">\(c\)</span> 和词 <span
+class="math inline">\(o\)</span>，损失函数为对数几率： <span
+class="math display">\[
+\boldsymbol{J}_{naive-softmax}(v_c, o, \boldsymbol{U}) = -log P(O=o \mid
+C=c)
+\]</span></p>
+<p>可以从交叉熵的角度看这个损失函数。真实值为 <span
+class="math inline">\(y\)</span> ，是一个独热向量，预测值 <span
+class="math inline">\(\hat{y}\)</span> 计算得到。具体来说， <span
+class="math inline">\(y\)</span>
+如果是第k个单词，那么它的第k维为1，其余维都是0，而 <span
+class="math inline">\(\hat{y}\)</span>
+的第k维表示这是第k个词的概率大小。</p>
+<h3 id="问题a-3分">问题(a) (3分)</h3>
+<p>证明公式(2)给出的naive-softmax的损失函数，和 <span
+class="math inline">\(y\)</span> 与 <span
+class="math inline">\(\hat{y}\)</span>
+的交叉熵损失函数是一样的，均如下所示（答案控制在一行）</p>
+<p><span class="math display">\[-\sum_{w \in V o c a b} y_{w} \log
+\left(\hat{y}_{w}\right)=-\log \left(\hat{y}_{o}\right)\]</span></p>
+<p><strong>答：</strong>因为除了 <span class="math inline">\(o\)</span>
+之外的词都不在窗口内，所以只有词 <span class="math inline">\(o\)</span>
+对损失函数有贡献</p>
+<h3 id="问题b-5分">问题(b) (5分)</h3>
+<p>计算损失函数 <span
+class="math inline">\(\boldsymbol{J}_{naive-softmax}(v_c, o,
+\boldsymbol{U})\)</span> 对中心词 <span
+class="math inline">\(v_c\)</span> 的偏导数，用 <span
+class="math inline">\(y\)</span> ，<span
+class="math inline">\(\hat{y}\)</span>和 <span
+class="math inline">\(𝑈\)</span> 来表示。</p>
+<p><strong>答：</strong> <span class="math display">\[
+\begin{aligned}
+J_{\text {naive-softmax} }\left(\boldsymbol{v}_{c}, o,
+\boldsymbol{U}\right)
+&amp;=-\log P(O=o | C=c) \\
+&amp;= -\log \frac{\exp \left(\boldsymbol{u}_{o}^{\top}
+\boldsymbol{v}_{c}\right)}
+{\sum_{w \in \operatorname{Vocab} } \exp
+\left(\boldsymbol{u}_{\boldsymbol{w} }^{\top} \boldsymbol{v}_{c}\right)}
+\\
+&amp;= - {u}_{o}^{\top}{v}_{c} + \log \sum_{w \in \operatorname{Vocab} }
+\exp \left(\boldsymbol{u}_{\boldsymbol{w} }^{\top}
+\boldsymbol{v}_{c}\right)
+\end{aligned}
+\]</span></p>
+<p><span class="math display">\[
+\begin{aligned}
+\frac{\partial J_{\text {naive-softmax} }\left(\boldsymbol{v}_{c}, o,
+\boldsymbol{U}\right)}{\partial  v_c}
+&amp;= -u_o + \sum_{o \in \operatorname{Vocab} }\frac{\exp(u_o^\top
+v_c)}{\sum_{w \in \operatorname{Vocab} } \exp
+\left(\boldsymbol{u}_{\boldsymbol{w} }^{\top} \boldsymbol{v}_{c}\right)}
+\frac{\partial (u_o^\top v_c)}{\partial v_c}\\
+&amp;=-u_o + \sum_{o \in \operatorname{Vocab} } P(O=o | C=c)  u_o \\
+&amp;=- U y + U \hat y \\
+&amp;= U(\hat y - y)
+\end{aligned}
+\]</span></p>
+<h3 id="问题c-5分">问题(c) (5分)</h3>
+<p>计算损失函数 <span
+class="math inline">\(\boldsymbol{J}_{naive-softmax}(v_c, o,
+\boldsymbol{U})\)</span> 对上下文窗口内的词 <span
+class="math inline">\(w\)</span> 的偏导数，考虑两种情况，即 <span
+class="math inline">\(w\)</span> 是外围词 <span
+class="math inline">\(o\)</span>，和 <span
+class="math inline">\(w\)</span> 不是 <span
+class="math inline">\(o\)</span>，用 <span
+class="math inline">\(y\)</span> ，<span
+class="math inline">\(\hat{y}\)</span>和 <span
+class="math inline">\(v_c\)</span> 来表示。</p>
+<p><strong>答：</strong> <span class="math display">\[
+\begin{aligned}
+\frac{\partial J_{\text {naive-softmax} }\left(\boldsymbol{v}_{c}, o,
+\boldsymbol{U}\right)}{\partial  u_w}
+&amp;= -v_c 1_{\lbrace w=o \rbrace } + \frac{\exp(u_w^\top v_c)}{\sum_{w
+\in \operatorname{Vocab} } \exp \left(\boldsymbol{u}_{\boldsymbol{w}
+}^{\top} \boldsymbol{v}_{c}\right)}
+\frac{\partial (u_w^\top v_c)}{\partial u_w}\\
+&amp;=-v_c  1_{\lbrace w=o \rbrace } +  P(O=w | C=c)  v_c \\
+&amp;=v_c( \hat y_w -  y_w)
+\end{aligned}
+\]</span></p>
+<h3 id="问题d-3分">问题(d) (3分)</h3>
+<p>sigmoid函数如公式所示 <span class="math display">\[
+\sigma(\boldsymbol{x})=\frac{1}{1+e^{-\boldsymbol{x}}}=\frac{e^{\boldsymbol{x}}}{e^{\boldsymbol{x}}+1}
+\]</span> 请计算出它对于 <span class="math inline">\(x\)</span> 的导数，
+<span class="math inline">\(x\)</span> 是一个向量</p>
+<p><strong>答：</strong></p>
+<p>计算雅克比矩阵可得 <span class="math display">\[
+\begin{aligned}
+\frac{\partial \sigma(x_i )}{\partial x_j }
+&amp;= \sigma (x_i) (1 -\sigma(x_i)) 1_{\lbrace i=j\rbrace  }
+\end{aligned}
+\]</span> 所以有 <span class="math display">\[
+\frac{\partial \sigma(x)}{\partial  x}
+=\text{diag}(\sigma(x) (1- \sigma(x)))
+\]</span></p>
+<h3 id="问题e-4分">问题(e) (4分)</h3>
+<p>现在我们考虑负采样的损失函数。假设有K个负样本，表示为<span
+class="math inline">\(w_1, w_2, …, w_K\)</span>，它们对应的向量为 <span
+class="math inline">\(u_1, u_2, …, u_K\)</span>，外围词 <span
+class="math inline">\(o \not\in {w_1, w_2, …, w_K}\)</span>，则外围词
+<span class="math inline">\(o\)</span> 在中心词是 <span
+class="math inline">\(c\)</span> 时产生的损失函数如公式所示。 <span
+class="math display">\[
+\boldsymbol{J}_{\text {neg-sample }}\left(\boldsymbol{v}_{c}, o,
+\boldsymbol{U}\right)=-\log \left(\sigma\left(\boldsymbol{u}_{o}^{\top}
+\boldsymbol{v}_{c}\right)\right)-\sum_{k=1}^{K} \log
+\left(\sigma\left(-\boldsymbol{u}_{k}^{\top}
+\boldsymbol{v}_{c}\right)\right)
+\]</span> 根据该损失函数，重新计算问题(b)、问题(c)的偏导数，用 <span
+class="math inline">\(\boldsymbol{u}_o\)</span>，<span
+class="math inline">\(\boldsymbol{v}_c\)</span>，<span
+class="math inline">\(\boldsymbol{u}_k\)</span> 来表示。</p>
+<p>完成计算后，简要解释为什么这个损失函数比naive-softmax效率更高。</p>
+<p>注意：你可以用问题(d)的答案来帮助你计算导数</p>
+<p><strong>答：</strong> <span class="math display">\[
+\begin{aligned}
+\frac{\partial J_{\text {neg-sample} }\left(v_{c}, o,
+U\right)}{\partial  v_c}
+&amp;=-\frac{\sigma\left(\boldsymbol{u}_{o}^{\top}
+\boldsymbol{v}_{c}\right)\left(1- \sigma\left(\boldsymbol{u}_{o}^{\top}
+\boldsymbol{v}_{c}\right)\right)}{\sigma\left(\boldsymbol{u}_{o}^{\top}
+\boldsymbol{v}_{c}\right)}u _o
+-\sum_{k=1}^K
+\frac{\sigma\left(-\boldsymbol{u}_{k}^{\top}
+\boldsymbol{v}_{c}\right)\left(1- \sigma\left(-\boldsymbol{u}_{k}^{\top}
+\boldsymbol{v}_{c}\right)\right)}
+{\sigma\left(-\boldsymbol{u}_{k}^{\top}
+\boldsymbol{v}_{c}\right)}(-u_k)\\
+&amp;= -\left(1- \sigma\left(\boldsymbol{u}_{o}^{\top}
+\boldsymbol{v}_{c}\right)\right)u_o
++ \sum_{k=1}^K  \left(1- \sigma\left(-\boldsymbol{u}_{k}^{\top}
+\boldsymbol{v}_{c}\right)\right)u_k\\
+\frac{\partial J_{\text {neg-sample} }\left(v_{c}, o,
+U\right)}{\partial  u_o}
+&amp;=-\frac{\sigma\left(\boldsymbol{u}_{o}^{\top}
+\boldsymbol{v}_{c}\right)\left(1- \sigma\left(\boldsymbol{u}_{o}^{\top}
+\boldsymbol{v}_{c}\right)\right)}{\sigma\left(\boldsymbol{u}_{o}^{\top}
+\boldsymbol{v}_{c}\right)}v _c
+\\
+&amp;= -\left(1- \sigma\left(\boldsymbol{u}_{o}^{\top}
+\boldsymbol{v}_{c}\right)\right)v_c \\
+\frac{\partial J_{\text {neg-sample} }\left(v_{c}, o,
+U\right)}{\partial  u_k}
+&amp;=
+-
+\frac{\sigma\left(-\boldsymbol{u}_{k}^{\top}
+\boldsymbol{v}_{c}\right)\left(1- \sigma\left(-\boldsymbol{u}_{k}^{\top}
+\boldsymbol{v}_{c}\right)\right)}
+{\sigma\left(-\boldsymbol{u}_{k}^{\top}
+\boldsymbol{v}_{c}\right)}(-v_c)\\
+&amp;= \left(1- \sigma\left(-\boldsymbol{u}_{k}^{\top}
+\boldsymbol{v}_{c}\right)\right)v_c
+\end{aligned}
+\]</span></p>
+<ul>
+<li><p>原始的损失函数中需要求指数和，很容易溢出，负采样的损失函数能很好地规避这个问题。</p></li>
+<li><p>词库从 𝑉𝑜𝑐𝑎𝑏 变成了K+1个词</p></li>
+<li><p>在求内层导数的时候用了sigmoid函数</p></li>
+</ul>
+<h3 id="问题f-3分">问题(f) (3分)</h3>
+<p>假设中心词是 <span class="math inline">\(c =
+w_t\)</span>，上下文窗口是<span class="math inline">\([w_{t-m}, …,
+w_{t-1}, w_t, w_{t+1}, …, w_{t+m}]\)</span>，<span
+class="math inline">\(m\)</span>
+是窗口大小，回顾skip-gram的word2vec实现，在该窗口下的总损失函数是：
+<span class="math display">\[
+\boldsymbol{J}_{\text {skip-gram }}\left(\boldsymbol{v}_{c}, w_{t-m},
+\ldots w_{t+m}, \boldsymbol{U}\right)=\sum_{-m \leq j \leq m \atop j
+\neq 0} \boldsymbol{J}\left(\boldsymbol{v}_{c}, w_{t+j},
+\boldsymbol{U}\right)
+\]</span> 这里，<span
+class="math inline">\(\boldsymbol{J}(\boldsymbol{v}_c, w_{t+j},
+\boldsymbol{U})\)</span>是外围词是外围词<span
+class="math inline">\(w_{t+j}\)</span>在中心词在中心词<span
+class="math inline">\(c=w_t\)</span>
+下产生的损失，损失函数可以是naive-softmax或者是neg-sample（负采样），这取决于具体实现。</p>
+<p>计算：</p>
+<ol type="i">
+<li><p>损失函数对 <span class="math inline">\(U\)</span>
+的偏导数</p></li>
+<li><p>损失函数对 <span class="math inline">\(\boldsymbol{v}_c\)</span>
+的偏导数</p></li>
+<li><p>损失函数对 <span class="math inline">\(\boldsymbol{v}_w\)</span>
+的偏导数</p></li>
+</ol>
+<strong>答：</strong> $$
+<span class="math display">\[\begin{aligned}
+\partial \boldsymbol{J}_{\text {skip-gram } }\left(\boldsymbol{v}_{c},
+w_{t-m}, \dots w_{t+m}, \boldsymbol{U}\right) / \partial \boldsymbol{U}
+&amp;=\sum_{-m \leq j \leq m \atop j \neq 0} \partial
+\boldsymbol{J}\left(\boldsymbol{v}_{c}, w_{t+j}, \boldsymbol{U}\right) /
+\partial \boldsymbol{U} \\
+
+\partial \boldsymbol{J}_{\text {skip-gram } }\left(\boldsymbol{v}_{c},
+w_{t-m}, \dots w_{t+m}, \boldsymbol{U}\right) / \partial
+\boldsymbol{v_c}
+&amp;=\sum_{-m \leq j \leq m \atop j \neq 0} \partial
+\boldsymbol{J}\left(\boldsymbol{v}_{c}, w_{t+j}, \boldsymbol{U}\right) /
+\partial  \boldsymbol{v_c} \\
+\partial \boldsymbol{J}_{\text {skip-gram } }\left(\boldsymbol{v}_{c},
+w_{t-m}, \dots w_{t+m}, \boldsymbol{U}\right) / \partial
+\boldsymbol{v_w}
+&amp;=\sum_{-m \leq j \leq m \atop j \neq 0} \partial
+\boldsymbol{J}\left(\boldsymbol{v}_{c}, w_{t+j}, \boldsymbol{U}\right) /
+\partial  \boldsymbol{v_w} \\
+\end{aligned}\]</span>
+<p>$$</p>
+<h2 id="代码实现word2vec20分">代码：实现word2vec（20分）</h2>
+<p>点击 <a
+target="_blank" rel="noopener" href="http://web.stanford.edu/class/cs224n/assignments/a2.zip">此处</a>
+下载代码，python版本 &gt;=
+3.5，需要安装numpy，你利用conda来配置环境：</p>
+<figure class="highlight shell"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs shell">conda env create -f env.yml<br>conda activate a2<br></code></pre></div></td></tr></table></figure>
+<p>写完代码后，运行：</p>
+<figure class="highlight shell"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs shell">conda deactivate<br></code></pre></div></td></tr></table></figure>
+<h3 id="问题a-12分">问题(a) (12分)</h3>
+<p>首先，实现 word2vec.py 里的
+sigmoid函数，要支持向量输入。接着实现同一个文件里的 softmax
+、负采样损失和导数。然后实现skip-gram的损失函数和导数。全部做完之后，运行python
+word2vec.py来检查是否正确。</p>
+<p><strong>答：</strong></p>
+<h4 id="sigmoid">sigmoid</h4>
+<p>numpy具备广播特性，最终得到向量输出</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">sigmoid</span>(<span class="hljs-params">x</span>):<br>    <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    Compute the sigmoid function for the input here.</span><br><span class="hljs-string">    Arguments:</span><br><span class="hljs-string">    x -- A scalar or numpy array.</span><br><span class="hljs-string">    Return:</span><br><span class="hljs-string">    s -- sigmoid(x)</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br><br>    <span class="hljs-comment">### YOUR CODE HERE</span><br>    s = <span class="hljs-number">1</span> / (<span class="hljs-number">1</span> + np.exp(-x))<br><br>    <span class="hljs-comment">### END YOUR CODE</span><br><br>    <span class="hljs-keyword">return</span> s<br></code></pre></div></td></tr></table></figure>
+<h4 id="naivesoftmaxlossandgradient">naiveSoftmaxLossAndGradient</h4>
+<p>这个模型其实就是一个三层的前馈神经网络，只需要注意维度即可，注释里已经标记出了维度。</p>
+<p>需要注意的是，单词表示是在行，而不是列。</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-comment">### YOUR CODE HERE</span><br><br><span class="hljs-comment">### Please use the provided softmax function (imported earlier in this file)</span><br><span class="hljs-comment">### This numerically stable implementation helps you avoid issues pertaining</span><br><span class="hljs-comment">### to integer overflow. </span><br><span class="hljs-string">&#x27;&#x27;&#x27;</span><br><span class="hljs-string">    centerWordVec: 1 * d</span><br><span class="hljs-string">    outsideVectors: n * d</span><br><span class="hljs-string">    &#x27;&#x27;&#x27;</span><br><span class="hljs-comment">#1 * n</span><br>vec = centerWordVec.dot(outsideVectors.T)<br><span class="hljs-comment">#1 * n</span><br>prob = softmax(vec)<br>loss = -np.log(prob[outsideWordIdx])<br><span class="hljs-comment">#1 * d</span><br>gradCenterVec = -outsideVectors[outsideWordIdx] + prob.dot(outsideVectors)<br><span class="hljs-comment">#n * d</span><br>gradOutsideVecs = prob.reshape(-<span class="hljs-number">1</span>, <span class="hljs-number">1</span>).dot(centerWordVec.reshape(<span class="hljs-number">1</span>, -<span class="hljs-number">1</span>))<br><span class="hljs-comment">#n * d</span><br>gradOutsideVecs[outsideWordIdx] -= centerWordVec<br><span class="hljs-comment">### END YOUR CODE</span><br></code></pre></div></td></tr></table></figure>
+<h4 id="negsamplinglossandgradient">negSamplingLossAndGradient</h4>
+<p>与native-softmax不同的是：</p>
+<ul>
+<li>只选取K个非外围词作为负样本，加上1个正确的外围词，共K+1个输出</li>
+<li>最后一层使用sigmoid输出，而不是softmax</li>
+</ul>
+<p>注意，反向传播得到的是这K+1个词的梯度，所以需要挨个更新到
+<em>梯度矩阵</em> 中去</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-comment">### Please use your implementation of sigmoid in here.</span><br><br><span class="hljs-comment"># indices might have same index</span><br><span class="hljs-comment"># extract W</span><br>W = np.zeros((<span class="hljs-built_in">len</span>(indices), outsideVectors.shape[<span class="hljs-number">1</span>]))<br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(indices)):<br>    W[i] = outsideVectors[indices[i]]<br><br><span class="hljs-comment"># forward</span><br>a = centerWordVec<br>a = a.reshape((a.shape[<span class="hljs-number">0</span>], <span class="hljs-number">1</span>))<br><br>z = np.dot(W, a) <span class="hljs-comment"># (K+1, 1)</span><br>preds = sigmoid(z)<br><br><span class="hljs-comment"># backprop</span><br>y = np.zeros((preds.shape[<span class="hljs-number">0</span>], <span class="hljs-number">1</span>))<br>y[<span class="hljs-number">0</span>] = <span class="hljs-number">1</span> <span class="hljs-comment"># index 0 is target</span><br><br>loss = -(y*np.log(preds) + (<span class="hljs-number">1</span> - y)*np.log(<span class="hljs-number">1</span> - preds)).<span class="hljs-built_in">sum</span>()<br><br>delta = preds - y<br>gradCenterVec = np.dot(W.T, delta) <span class="hljs-comment"># (V, 1)</span><br>gradW = np.dot(delta, a.T) <span class="hljs-comment"># (K+1, V)</span><br>gradCenterVec = gradCenterVec.flatten()<br><br><span class="hljs-comment"># apply gradW into gradOutsideVecs</span><br>gradOutsideVecs = np.zeros_like(outsideVectors)<br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(indices)):<br>    oi = indices[i]<br>    gradOutsideVecs[oi] += gradW[i]<br></code></pre></div></td></tr></table></figure>
+<h4 id="skipgram">skipgram</h4>
+<p>遍历所有的外围词，求和损失函数</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python">ci = word2Ind[currentCenterWord]<br>vc = centerWordVectors[ci]<br><br><span class="hljs-keyword">for</span> o <span class="hljs-keyword">in</span> outsideWords:<br>    oi = word2Ind[o]<br>    loss_, gradVc, gradUo = word2vecLossAndGradient(vc, oi, outsideVectors, dataset)<br>    gradCenterVecs[ci] += gradVc<br>    gradOutsideVectors += gradUo<br>    loss += loss_<br></code></pre></div></td></tr></table></figure>
+<h3 id="问题b-4分">问题(b) (4分)</h3>
+<p>完成sgd.py文件的SGD优化器，运行python sgd.py来检查是否正确。</p>
+<p><strong>答</strong>：</p>
+<h4 id="sgd">sgd</h4>
+<p>调用函数得到损失值和梯度，更新即可</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-comment">### YOUR CODE HERE</span><br>loss, grad = f(x)<br>x -= step * grad<br><br><span class="hljs-comment">### END YOUR CODE</span><br></code></pre></div></td></tr></table></figure>
+<h3 id="问题c-4分">问题(c) (4分)</h3>
+<p>至此所有的代码都写完了，接下来是下载数据集，这里我们使用Stanform
+Sentiment
+Treebank(SST)数据集，它可以用在简单的语义分析任务中去。通过运行 sh
+get_datasets.sh 可以获得该数据集，下载完成后运行 python run.py
+即可。</p>
+<p>注意：训练的时间取决于代码是否高效（即便是高效的实现，也要跑接近一个小时）</p>
+<p>经过40,000次迭代后，最终结果会保存到 word_vectors.png 里。</p>
+<p><strong>答：</strong></p>
+<p><img src="http://ww1.sinaimg.cn/large/0060yMmAly1gsz2rwoc9sj30hs0dc3zy.jpg" srcset="/img/loading.gif" lazyload referrerpolicy="no-referrer" /></p>
+<ul>
+<li>在上图中可以观察到，male-&gt;famale 和 king -&gt; queen
+这两条向量是平行的</li>
+<li>(women, famale)，(enjoyable,annoying) 这些含义接近的词距离很近</li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Deep-Learning/">Deep Learning</a>
+                    
+                      <a class="hover-with-bg" href="/categories/Deep-Learning/NLP/">NLP</a>
+                    
+                  </div>
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/05/06/%E7%AC%AC%E4%B8%89%E8%AE%B2-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">第三讲-神经网络知识</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/05/05/NLP-Assignment1/">
+                        <span class="hidden-mobile">NLP-Assignment1</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        loader: {
+          load: ['ui/lazy']
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

@@ -1,0 +1,827 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=dark>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="肘子开">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="1 神经网络基础 1.1 分类问题基础 对于分类问题，我们有训练数据集：它由一些样本组成： \[ \{x_i,y_i\}^N_{i&#x3D;1} \]  \(x_i\)是输入，例如单词(索引或是向量)，句子，文档等等(维度为d) \(y_i\)是我们尝试预测的标签(C个类别中的一个)，例如：  类别：感情，命名实体，购买&#x2F;售出的决定 其他单词 多词序列(之后会提到)   1.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第三讲-神经网络知识">
+<meta property="og:url" content="http://example.com/2022/05/06/%E7%AC%AC%E4%B8%89%E8%AE%B2-%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86/index.html">
+<meta property="og:site_name" content="肘子开的博客">
+<meta property="og:description" content="1 神经网络基础 1.1 分类问题基础 对于分类问题，我们有训练数据集：它由一些样本组成： \[ \{x_i,y_i\}^N_{i&#x3D;1} \]  \(x_i\)是输入，例如单词(索引或是向量)，句子，文档等等(维度为d) \(y_i\)是我们尝试预测的标签(C个类别中的一个)，例如：  类别：感情，命名实体，购买&#x2F;售出的决定 其他单词 多词序列(之后会提到)   1.">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/nlp/第三讲/1.png">
+<meta property="og:image" content="http://example.com/img/nlp/第三讲/2.png">
+<meta property="og:image" content="http://example.com/img/nlp/第三讲/3.png">
+<meta property="og:image" content="http://example.com/img/nlp/第三讲/4.png">
+<meta property="og:image" content="http://example.com/img/nlp/第三讲/5.png">
+<meta property="og:image" content="http://example.com/img/nlp/第三讲/6.png">
+<meta property="og:image" content="http://example.com/img/nlp/第三讲/7.png">
+<meta property="og:image" content="http://example.com/img/nlp/第三讲/8.png">
+<meta property="article:published_time" content="2022-05-06T13:56:28.000Z">
+<meta property="article:modified_time" content="2022-05-07T03:59:47.117Z">
+<meta property="article:author" content="肘子开">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/nlp/第三讲/1.png">
+  
+  
+  <title>第三讲-神经网络知识 - 肘子开的博客</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/nnfx-dark.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>肘子开的博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/bg/bg2.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="第三讲-神经网络知识">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-05-06 21:56" pubdate>
+        2022年5月6日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      4.6k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      39 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">第三讲-神经网络知识</h1>
+            
+            <div class="markdown-body">
+              <h1 id="神经网络基础">1 神经网络基础</h1>
+<h2 id="分类问题基础">1.1 分类问题基础</h2>
+<p>对于分类问题，我们有训练<strong>数据集</strong>：它由一些<strong>样本</strong>组成：
+<span class="math display">\[
+\{x_i,y_i\}^N_{i=1}
+\]</span></p>
+<ul>
+<li><span
+class="math inline">\(x_i\)</span>是<strong>输入</strong>，例如单词(索引或是向量)，句子，文档等等(维度为d)</li>
+<li><span
+class="math inline">\(y_i\)</span>是我们尝试预测的标签(C个类别中的一个)，例如：
+<ul>
+<li>类别：感情，命名实体，购买/售出的决定</li>
+<li>其他单词</li>
+<li>多词序列(之后会提到)</li>
+</ul></li>
+</ul>
+<h2 id="分类问题直观理解">1.2 分类问题直观理解</h2>
+<ul>
+<li><p>用一个最简单的2维词向量分类问题作为案例</p>
+<ul>
+<li>使用softmax / logistic回归</li>
+<li>构建线性决策边界</li>
+</ul></li>
+<li><p><strong>传统的机器学习/统计学方法</strong>：假设<span
+class="math inline">\(x_i\)</span>是固定的，训练 softmax/logistic
+回归的权重<span class="math inline">\(W \in R^{C \times
+d}\)</span>来决定决定边界(超平面)</p></li>
+<li><p><strong>预测阶段</strong>，对每个<span
+class="math inline">\(x\)</span>，预测:</p></li>
+</ul>
+<p><span class="math display">\[
+p(y \mid x)=\frac{\exp \left(W_{y} \cdot x\right)}{\sum_{c=1}^{C} \exp
+\left(W_{c} \cdot x\right)}
+\]</span></p>
+<h2 id="softmax分类器的细节">1.3 softmax分类器的细节</h2>
+<p>我们可以将预测函数分为<strong>两个步骤</strong>：</p>
+<h3 id="将w的yth行和x中的对应行相乘得到分数">1 将<span
+class="math inline">\(W\)</span>的<span
+class="math inline">\(y^{th}\)</span>行和<span
+class="math inline">\(x\)</span>中的对应行相乘得到分数：</h3>
+<p><span class="math display">\[
+W_{y} \cdot x=\sum_{i=1}^{d} W_{y i} x_{i}=f_{y}
+\]</span></p>
+<p>对c=1，2，...，C计算所有的<span
+class="math inline">\(f_y\)</span></p>
+<h3 id="使用softmax函数获得归一化的概率">2
+使用softmax函数获得归一化的概率：</h3>
+<p><span class="math display">\[
+p(y \mid x)=\frac{\exp \left(f_{y}\right)}{\sum_{c=1}^{C} \exp
+\left(f_{c}\right)}=\operatorname{softmax}\left(f_{y}\right)
+\]</span></p>
+<h2 id="softmax和交叉熵损失">1.4 softmax和交叉熵损失</h2>
+<p>在softmax分类器中最常用到交叉熵损失，也是负对数概率形态。</p>
+<p>对于每个训练样本<span
+class="math inline">\((x,y)\)</span>，我们的目标<strong>是最大化正确类</strong><span
+class="math inline">\(y\)</span>的概率，或者我们可以<strong>最小化该类的负对数概率</strong>:
+<span class="math display">\[
+-\log p(y \mid x)=-\log \left(\frac{\exp
+\left(f_{y}\right)}{\sum_{c=1}^{C} \exp \left(f_{c}\right)}\right)
+\]</span></p>
+<h2 id="交叉熵损失理解">1.5 交叉熵损失理解</h2>
+<ul>
+<li>交叉熵的概念来源于信息论，衡量两个分布之间的差异，交叉熵越大，变量的取值越不确定，反之则越确定。</li>
+<li>令真实概率分布为<span
+class="math inline">\(p\)</span>，我们计算的模型概率分布为<span
+class="math inline">\(q\)</span></li>
+<li>交叉熵为：</li>
+</ul>
+<p><span class="math display">\[
+H(p, q)=-\sum_{c=1}^{C} p(c) \log q(c)
+\]</span></p>
+<ul>
+<li>假设标准答案的概率分布是，在正确的类上为1，在其他类别上为0：</li>
+</ul>
+<p><span class="math display">\[
+p=[0,...,0,1,...,0]
+\]</span></p>
+<ul>
+<li>因为是独热向量(one-hot
+vector)，所以唯一剩下的项是真实类的负对数概率。</li>
+</ul>
+<h2 id="完整数据集上的分类">1.6 完整数据集上的分类</h2>
+<p>在整个数据集<span
+class="math inline">\(\{x_i,y_i\}_{i=1}^N\)</span>上的交叉熵损失函数，是所有样本的交叉熵的均值
+<span class="math display">\[
+J(\theta)=\frac{1}{N} \sum_{i=1}^{N}-\log
+\left(\frac{e^{f_{y_{i}}}}{\sum_{c=1}^{C} e^{f_{c}}}\right)
+\]</span> 不使用 <span class="math display">\[
+f_{y}=f_{y}(x)=W_{y} \cdot x=\sum_{j=1}^{d} W_{y j} x_{j}
+\]</span> 而是使用向量化的形态，基于矩阵来表示<span
+class="math inline">\(f:f=W_x\)</span></p>
+<h2 id="传统的机器学习优化算法">1.7 传统的机器学习优化算法</h2>
+<p>对于传统的机器学习算法（如逻辑回归）来说，一般机器学习的参数<span
+class="math inline">\(\theta\)</span>通常只由<span
+class="math inline">\(W\)</span>的列组成 <span class="math display">\[
+\theta=\left[\begin{array}{c}
+W_{\cdot 1} \\
+\vdots \\
+W_{\cdot d}
+\end{array}\right]=W(:) \in \mathbb{R}^{C d}
+\]</span> 因此，我们只通过以下方式<strong>更新决策边界</strong> <span
+class="math display">\[
+\nabla_{\theta} J(\theta)=\left[\begin{array}{c}
+\nabla_{W_{1}} \\
+\vdots \\
+\nabla_{W_{d}}
+\end{array}\right] \in \mathbb{R}^{C d}
+\]</span></p>
+<h2 id="神经网络分类器">1.8 神经网络分类器</h2>
+<ul>
+<li>单独使用线性分类器Softmax( ≈ logistic回归)并不十分强大</li>
+</ul>
+<p><img src="/img/nlp/第三讲/1.png" srcset="/img/loading.gif" lazyload /></p>
+<ul>
+<li>如上图所示，Softmax得到的是线性决策边界
+<ul>
+<li>对于复杂问题来说，它的表达能力是有限的</li>
+<li>有一些分错的点，需要更强的非线性表达能力来区分</li>
+</ul></li>
+</ul>
+<h2 id="神经网络非线性切分">1.9 神经网络非线性切分</h2>
+<ul>
+<li><p>神经网络可以学习更复杂的函数和非线性决策边界</p></li>
+<li><p>tip ：更高级的分类需要</p>
+<ul>
+<li>词向量</li>
+<li>更深层次的深层神经网络</li>
+</ul></li>
+</ul>
+<h2 id="基于词向量的分类差异">1.10 基于词向量的分类差异</h2>
+<ul>
+<li>一般在NLP深度学习中：
+<ul>
+<li>我们学习了矩阵<span class="math inline">\(W\)</span>和词向量<span
+class="math inline">\(x\)</span>。</li>
+<li>我们学习传统参数和表示。</li>
+<li>词向量是对独热向量的重新表示——在中间层向量空间中移动它们——以便
+(线性)softmax分类器可以更好地分类。</li>
+</ul></li>
+<li>即将词向量理解为一层神经网络，输入单词的独热向量并获得单词的词向量表示，并且我们需要对其进行更新。</li>
+</ul>
+<p><span class="math display">\[
+\nabla_{\theta} J(\theta)=\left[\begin{array}{c}
+\nabla_{W_{1}} \\
+\vdots \\
+\nabla_{W_{\text {dardvark }}} \\
+\vdots \\
+\nabla_{x_{z e b r a}}
+\end{array}\right] \in \mathbb{R}^{C d+V d}
+\]</span></p>
+<ul>
+<li>其中，<span class="math inline">\(Vd\)</span>是数量很大的参数。</li>
+</ul>
+<h2 id="神经计算">1.11 神经计算</h2>
+<ul>
+<li>An artificial neuron
+<ul>
+<li>神经网络有自己的术语包</li>
+<li>但如果你了解 softmax
+模型是如何工作的，那么你就可以很容易地理解神经元的操作</li>
+</ul></li>
+<li>Neural computation：神经计算</li>
+<li>Neural selectivity：神经选择性</li>
+<li>Hierarchy of neural processing：神经处理层次</li>
+</ul>
+<h2 id="单个神经元可视作二元逻辑回归单元">1.12
+单个神经元：可视作二元逻辑回归单元</h2>
+<p><span class="math display">\[
+h_{w, b}(x)=f\left(w^{T} x+b\right)
+\]</span></p>
+<p><span class="math display">\[
+f(z)=\frac{1}{1+e^{-z}}
+\]</span></p>
+<ul>
+<li><span
+class="math inline">\(b\)</span>：我们可以有一个“总是打开”的特性，它给出一个先验类，或者将它作为一个偏向项分离出来。</li>
+<li><span class="math inline">\(w\)</span>，<span
+class="math inline">\(b\)</span>是神经元的参数。</li>
+</ul>
+<h2 id="一个神经网络多个逻辑回归组合">1.13
+一个神经网络：多个逻辑回归组合</h2>
+<ul>
+<li>如果我们输入一个向量通过一系列逻辑回归函数，那么我们得到一个输出向量。</li>
+<li>但是我们不需要提前决定这些逻辑回归试图预测的变量是什么。</li>
+</ul>
+<p><img src="/img/nlp/第三讲/2.png" srcset="/img/loading.gif" lazyload /></p>
+<ul>
+<li>我们可以输入另一个logistic回归函数。</li>
+<li>损失函数将指导中间隐藏变量应该是什么，以便更好地预测下一层的目标。</li>
+</ul>
+<p><img src="/img/nlp/第三讲/3.png" srcset="/img/loading.gif" lazyload /></p>
+<p>我们添加更多层的神经网络，就得到了多层感知器。</p>
+<p><img src="/img/nlp/第三讲/4.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="单层神经网络的矩阵形态表示">1.14 单层神经网络的矩阵形态表示</h2>
+<p>我们有： <span class="math display">\[
+a_{1}=f\left(W_{11} x_{1}+W_{12} x_{2}+W_{13} x_{3}+b_{1}\right)
+\]</span></p>
+<p><span class="math display">\[
+a_{2}=f\left(W_{21} x_{1}+W_{22} x_{2}+W_{23} x_{3}+b_{2}\right)
+\]</span></p>
+<p>在矩阵中： <span class="math display">\[
+z=Wx+b
+\]</span> 激活函数<span
+class="math inline">\(f\)</span>在运算时是element-wise逐元素的 <span
+class="math display">\[
+f\left(\left[z_{1}, z_{2},
+z_{3}\right]\right)=\left[f\left(z_{1}\right), f\left(z_{2}\right),
+f\left(z_{3}\right)\right]
+\]</span> <img src="/img/nlp/第三讲/5.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="非线性变换的必要性">1.15 非线性变换的必要性</h2>
+<ul>
+<li>例如：函数近似，如回归或分类
+<ul>
+<li>没有非线性，深度神经网络只能做线性变换</li>
+<li>多个线性变换，也还是组成一个线性变换<span
+class="math inline">\(W_1W_2x=Wx\)</span></li>
+</ul></li>
+<li>因为线性变换是以某种方式旋转和拉伸空间，多次的旋转和拉伸可以融合为一次线性变换</li>
+<li>对于非线性函数而言，使用更多的层，他们可以近似更复杂的函数</li>
+</ul>
+<h1 id="命名实体识别">2 命名实体识别</h1>
+<h2 id="命名实体识别ner">2.1 命名实体识别(NER)</h2>
+<ul>
+<li>可能的用途
+<ul>
+<li>跟踪文档中提到的特定实体(组织、个人、地点、歌曲名、电影名等)</li>
+<li>对于问题回答，答案通常是命名实体</li>
+<li>许多需要的信息实际上是命名实体之间的关联</li>
+<li>同样的技术可以扩展到其他 slot-filling 槽填充分类</li>
+</ul></li>
+<li>通常后面是命名实体链接/规范化到知识库</li>
+</ul>
+<h2 id="句子中的命名实体识别">2.2 句子中的命名实体识别</h2>
+<p>我们通过在上下文中对单词进行分类，然后将实体提取为单词子序列来预测实体。</p>
+<p><img src="/img/nlp/第三讲/6.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="ner的难点">2.3 NER的难点</h2>
+<ul>
+<li>很难计算出实体的边界
+<ul>
+<li>第一个实体是 “First National Bank” 还是 “National Bank”</li>
+</ul></li>
+<li>很难知道某物是否是一个实体
+<ul>
+<li>是一所名为“Future School” 的学校，还是这是一所未来的学校？</li>
+</ul></li>
+<li>很难知道未知/新奇实体的类别
+<ul>
+<li>“Zig Ziglar” ? 一个人</li>
+</ul></li>
+<li>实体类是模糊的，依赖于上下文
+<ul>
+<li>这里的“Charles Schwab” 是 PER 不是 ORG</li>
+</ul></li>
+</ul>
+<h1 id="基于窗口数据的分类预测">3.基于窗口数据的分类预测</h1>
+<h2 id="词-窗分类">3.1. 词-窗分类</h2>
+<ul>
+<li>思路：为在上下文中的语言构建分类器
+<ul>
+<li>一般来说，很少对单个单词进行分类</li>
+</ul></li>
+<li>例如，上下文中一个单词的命名实体分类
+<ul>
+<li>人、地点、组织、没有</li>
+</ul></li>
+<li>在上下文中对单词进行分类的一个简单方法，可能是对窗口中的单词向量进行平均，并对平均向量进行分类
+<ul>
+<li>问题：这会丢失位置信息</li>
+</ul></li>
+</ul>
+<h2 id="窗口分类器softmax">3.2 窗口分类器：softmax</h2>
+<ul>
+<li><p>训练softmax分类器对中心词进行分类，方法是在一个窗口内将中心词周围的词向量串联起来</p></li>
+<li><p>例子：在这句话的上下文中对“Paris”进行分类，窗口长度为2</p></li>
+<li><p>结果向量<span class="math inline">\(x_{w i n d o w}=x \in R^{5
+d}\)</span>是一个列向量</p></li>
+</ul>
+<h2 id="最简单的窗口分类器softmax">3.3 最简单的窗口分类器：Softmax</h2>
+<p>对于<span
+class="math inline">\(x=x_{window}\)</span>，我们可以使用与之前相同的softmax分类器
+<span class="math display">\[
+\hat{y}_{y}=p(y \mid x)=\frac{\exp \left(\sqrt{W_{y} \cdot
+x}\right)}{\sum_{c=1}^{C} \exp \left(W_{c} \cdot x\right)}
+\]</span> <strong>如何更新向量</strong>？</p>
+<ul>
+<li>简而言之：就像之前讲的那样，求导和优化</li>
+</ul>
+<h2 id="稍微复杂一点多层感知器">3.4 稍微复杂一点：多层感知器</h2>
+<ul>
+<li><p>假设我们要对中心词是否为一个地点，进行分类</p></li>
+<li><p>与word2vec类似，我们将遍历语料库中的所有位置。但这一次，它将受到监督，只有一些位置能够得到高分。</p>
+<ul>
+<li>例如，在他们的中心有一个实际的NER
+Location的位置是“真实的”位置会获得高分</li>
+</ul></li>
+</ul>
+<h2 id="神经网络前馈计算">3.5 神经网络前馈计算</h2>
+<p>使用神经激活<span
+class="math inline">\(a\)</span>简单地给出一个非标准化的分数 <span
+class="math display">\[
+\operatorname{score}(x)=U^{T} a \in \mathbb{R}
+\]</span> 我们用一个三层神经网络计算一个窗口的得分</p>
+<ul>
+<li>s = score(“museums in Paris are amazing”)</li>
+</ul>
+<p><img src="/img/nlp/第三讲/7.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="附加层">3.6 附加层</h2>
+<p>中间层学习输入词向量之间的非线性交互</p>
+<p><img src="/img/nlp/第三讲/8.png" srcset="/img/loading.gif" lazyload /></p>
+<p>例如：只有当“museum”是第一个向量时，“in”放在第二个位置才重要</p>
+<h1 id="基于pytorch实现的分类器">4.基于pytorch实现的分类器</h1>
+<h2 id="替代最大边缘损失">4.1 替代：最大边缘损失</h2>
+<p>关于训练目标的想法：让真实窗口的得分更高，而其他窗口的得分更低(直到足够好为止)</p>
+<ul>
+<li><span class="math inline">\(s = score(museums\ in\ Paris\ are\
+amazing)\)</span></li>
+<li><span class="math inline">\(s_c = socre(Not\ all\ museums\ in\
+Paris)\)</span></li>
+</ul>
+<p><strong>最小化</strong>： <span class="math display">\[
+J=max(0,1-s-s_c)
+\]</span> 这是不可微的，但它是连续的 → 我们可以用SGD</p>
+<p><strong>补充解析</strong></p>
+<ul>
+<li>单窗口的目标函数为<span
+class="math inline">\(J=max(0,1-s-s_c)\)</span></li>
+<li>每个中心有NER位置的窗口的得分应该比中心没有位置的窗口高1分</li>
+<li>要获得完整的目标函数：为每个真窗口采样几个损坏的窗口。对所有训练样本窗口求和</li>
+<li>类似于word2vec中的负抽样</li>
+</ul>
+<h2 id="随机梯度下降">4.2 随机梯度下降</h2>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Deep-Learning/">Deep Learning</a>
+                    
+                      <a class="hover-with-bg" href="/categories/Deep-Learning/NLP/">NLP</a>
+                    
+                  </div>
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/05/06/NLP-Assignment2/">
+                        <span class="hidden-mobile">NLP-Assignment2</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        loader: {
+          load: ['ui/lazy']
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
