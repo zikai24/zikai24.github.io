@@ -1,0 +1,728 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=dark>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="肘子开">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="1.机器翻译与SMT（统计机器翻译） 1.1 机器翻译 机器翻译(MT)是将一个句子\(x\)从一种语言(源语言)转换为另一种语言(目标语言)的句子\(y\)的任务。 1.2 1950s：早期机器翻译 机器翻译研究始于20世纪50年代初。  俄语 → 英语(冷战的推动) 系统主要是基于规则的，使用双语词典来讲俄语单词映射为对应的英语部分  1.3 1990s-2010s：统计机器">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第八讲-机器翻译、seq2seq与注意力机制">
+<meta property="og:url" content="http://example.com/2022/05/14/%E7%AC%AC%E5%85%AB%E8%AE%B2-%E6%9C%BA%E5%99%A8%E7%BF%BB%E8%AF%91%E3%80%81seq2seq%E4%B8%8E%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6/index.html">
+<meta property="og:site_name" content="肘子开的博客">
+<meta property="og:description" content="1.机器翻译与SMT（统计机器翻译） 1.1 机器翻译 机器翻译(MT)是将一个句子\(x\)从一种语言(源语言)转换为另一种语言(目标语言)的句子\(y\)的任务。 1.2 1950s：早期机器翻译 机器翻译研究始于20世纪50年代初。  俄语 → 英语(冷战的推动) 系统主要是基于规则的，使用双语词典来讲俄语单词映射为对应的英语部分  1.3 1990s-2010s：统计机器">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=P%28x%2Ca%20%5Cmid%20y%29">
+<meta property="og:image" content="http://example.com/img/nlp/第八讲/1.png">
+<meta property="og:image" content="http://example.com/img/nlp/第八讲/2.png">
+<meta property="og:image" content="http://example.com/img/nlp/第八讲/3.png">
+<meta property="og:image" content="http://example.com/img/nlp/第八讲/4.png">
+<meta property="og:image" content="http://example.com/img/nlp/第八讲/5.png">
+<meta property="og:image" content="http://example.com/img/nlp/第八讲/6.png">
+<meta property="og:image" content="http://example.com/img/nlp/第八讲/7.png">
+<meta property="og:image" content="http://example.com/img/nlp/第八讲/8.png">
+<meta property="og:image" content="http://example.com/img/nlp/第八讲/9.png">
+<meta property="og:image" content="http://example.com/img/nlp/第八讲/10.png">
+<meta property="article:published_time" content="2022-05-14T03:37:46.000Z">
+<meta property="article:modified_time" content="2022-05-14T04:15:12.074Z">
+<meta property="article:author" content="肘子开">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://www.zhihu.com/equation?tex=P%28x%2Ca%20%5Cmid%20y%29">
+  
+  
+  <title>第八讲-机器翻译、seq2seq与注意力机制 - 肘子开的博客</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/nnfx-dark.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>肘子开的博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/bg/bg2.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="第八讲-机器翻译、seq2seq与注意力机制">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-05-14 11:37" pubdate>
+        2022年5月14日 中午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.9k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      25 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">第八讲-机器翻译、seq2seq与注意力机制</h1>
+            
+            <div class="markdown-body">
+              <h1 id="机器翻译与smt统计机器翻译">1.机器翻译与SMT（统计机器翻译）</h1>
+<h2 id="机器翻译">1.1 机器翻译</h2>
+<p>机器翻译(MT)是将一个句子<span
+class="math inline">\(x\)</span>从一种语言(<strong>源语言</strong>)转换为另一种语言(<strong>目标语言</strong>)的句子<span
+class="math inline">\(y\)</span>的任务。</p>
+<h2 id="s早期机器翻译">1.2 1950s：早期机器翻译</h2>
+<p>机器翻译研究始于20世纪50年代初。</p>
+<ul>
+<li>俄语 → 英语(冷战的推动)</li>
+<li>系统主要是<strong>基于规则</strong>的，使用双语词典来讲俄语单词映射为对应的英语部分</li>
+</ul>
+<h2 id="s-2010s统计机器翻译">1.3 1990s-2010s：统计机器翻译</h2>
+<p><strong>核心想法</strong>：从<strong>数据</strong>中学习<strong>概率模型</strong></p>
+<p>假设我们正在翻译法语 → 英语，对于给定法语句子<span
+class="math inline">\(x\)</span>，我们想要找到<strong>最好的英语句子</strong><span
+class="math inline">\(y
+\  argmax_yP(y|x)\)</span>，使用Bayes规则将其分解为<strong>两个组件</strong>从而分别学习
+<span class="math display">\[
+argmaxx_yP(x|y)P(y)
+\]</span></p>
+<ul>
+<li><span class="math inline">\(P(x|y)\)</span>：<strong>Translation
+Model / 翻译模型</strong>
+<ul>
+<li>分析单词和短语应该如何翻译(逼真)</li>
+<li>从并行数据中学习</li>
+</ul></li>
+<li><span class="math inline">\(P(y)\)</span>：<strong>Language Model /
+语言模型</strong>
+<ul>
+<li>模型如何写出好英语(流利)</li>
+<li>从单语数据中学习</li>
+</ul></li>
+</ul>
+<h2 id="s-2010s统计机器翻译-1">1.4 1990s-2010s：统计机器翻译</h2>
+<p><strong>问题</strong>：如何学习翻译模型<span
+class="math inline">\(P(x|y)\)</span>？</p>
+<p>首先，需要大量的<strong>并行数据</strong>(例如成对的人工翻译的法语/英语句子)</p>
+<h2 id="smt的学习对齐">1.5SMT的学习对齐</h2>
+<p><strong>问题</strong>：如何从并行语料库中学习翻译模型<span
+class="math inline">\(P(x|y)\)</span>？</p>
+<p>进一步分解：我们实际上想要考虑</p>
+<figure>
+<img src="https://www.zhihu.com/equation?tex=P%28x%2Ca%20%5Cmid%20y%29" srcset="/img/loading.gif" lazyload
+alt="公式" />
+<figcaption aria-hidden="true">公式</figcaption>
+</figure>
+<ul>
+<li><span class="math inline">\(a\)</span>是对齐</li>
+<li>即法语句子<span class="math inline">\(x\)</span>和英语句子<span
+class="math inline">\(y\)</span>之间的单词级对应</li>
+</ul>
+<h2 id="对齐">1.6 对齐</h2>
+<p>对齐是翻译句子中特定词语之间的对应关系</p>
+<ul>
+<li>注意：有些词没有对应词</li>
+</ul>
+<p><img src="/img/nlp/第八讲/1.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="对齐是复杂的">1.7 对齐是复杂的</h2>
+<p>对齐可以是多对一的</p>
+<p><img src="/img/nlp/第八讲/2.png" srcset="/img/loading.gif" lazyload /></p>
+<p>对齐可以是一对多的</p>
+<p><img src="/img/nlp/第八讲/3.png" srcset="/img/loading.gif" lazyload /></p>
+<p>有些词很丰富</p>
+<p>对齐可以是<strong>多对多</strong>(短语级)</p>
+<p>我们学习很多因素的组合，包括</p>
+<ul>
+<li>特定单词对齐的概率(也取决于发送位置)</li>
+<li>特定单词具有特定多词对应的概率(对应单词的数量)</li>
+</ul>
+<h2 id="smt的学习对齐-1">1.8 SMT的学习对齐</h2>
+<ul>
+<li>问题：如何计算argmax
+<ul>
+<li>我们可以列举所有可能的<span
+class="math inline">\(y\)</span>并计算概率？→ 计算成本太高</li>
+</ul></li>
+<li>回答：使用启发式搜索算法搜索最佳翻译，丢弃概率过低的假设
+<ul>
+<li>这个过程称为<strong>解码</strong></li>
+</ul></li>
+</ul>
+<h2 id="smt解码">1.9 SMT解码</h2>
+<p><img src="/img/nlp/第八讲/4.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/nlp/第八讲/5.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="s-2010s统计机器翻译-2">1.10 1990s-2010s：统计机器翻译</h2>
+<p>SMT是一个<strong>巨大的研究领域</strong></p>
+<p>最好的系统非常复杂</p>
+<ul>
+<li>数以百计的重要细节我们还没有提到</li>
+<li>系统有许多<strong>独立设计子组件工程</strong></li>
+<li>大量特征工程
+<ul>
+<li>很多功能需要设计特性来获取特定的语言现象</li>
+</ul></li>
+<li>需要编译和维护额外的资源
+<ul>
+<li>比如双语短语对应表</li>
+</ul></li>
+<li>需要大量的人力来维护
+<ul>
+<li>对于每一对语言都需要重复操作</li>
+</ul></li>
+</ul>
+<h1 id="神经网络机器翻译">2.神经网络机器翻译</h1>
+<h2 id="神经机器翻译neural-machine-translationnmt">2.1
+神经机器翻译Neural Machine Translation(NMT)</h2>
+<p><strong>神经机器翻译</strong>(NMT)是利用单个神经网络进行机器翻译的一种方法</p>
+<p>神经网络架构称为 <strong>sequence-to-sequence</strong>
+(又名seq2seq)，它包含两个RNNs</p>
+<ul>
+<li>编码器RNN生成源语句的编码</li>
+<li>源语句的编码为解码器RNN提供初始隐藏状态</li>
+<li>解码器RNN是一种以编码为条件生成目标句的语言模型</li>
+<li><strong>注意</strong>：此图显示了测试时行为 →
+解码器输出作为下一步的输入</li>
+</ul>
+<p><img src="/img/nlp/第八讲/6.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="sequence-to-sequence是多功能的">2.2
+Sequence-to-sequence是多功能的！</h2>
+<p>序列到序列不仅仅对机器翻译有用</p>
+<p>许多NLP任务可以按照顺序进行表达</p>
+<ul>
+<li><strong>摘要</strong>(长文本 → 短文本)</li>
+<li><strong>对话</strong>(前一句话 → 下一句话)</li>
+<li><strong>解析</strong>(输入文本 → 输出解析为序列)</li>
+<li><strong>代码生成</strong>(自然语言 → Python代码)</li>
+</ul>
+<h2 id="神经机器翻译nmt">2.3 神经机器翻译(NMT)</h2>
+<p><strong>sequence-to-sequence</strong>
+模型是条件语言模型的一个例子</p>
+<ul>
+<li>语言模型(Language Model)，因为解码器正在预测目标句的下一个单词<span
+class="math inline">\(y\)</span></li>
+<li>条件约束的(Conditional)，因为预测也取决于源句<span
+class="math inline">\(x\)</span></li>
+</ul>
+<p>NMT直接计算<span class="math inline">\(P(y|x)\)</span>： <span
+class="math display">\[
+P(y \mid x)=P\left(y_{1} \mid x\right) P\left(y_{2} \mid y_{1}, x\right)
+P\left(y_{3} \mid y_{1}, y_{2}, x\right) \ldots P\left(y_{T} \mid y_{1},
+\ldots, y_{T-1}, x\right)
+\]</span></p>
+<ul>
+<li>上式中最后一项为，给定到目前为止的目标词和源句<span
+class="math inline">\(x\)</span>，下一个目标词的概率</li>
+</ul>
+<p><strong>问题</strong>：如何训练NMT系统？</p>
+<p><strong>回答</strong>：找一个大的平行语料库</p>
+<h2 id="训练一个机器翻译系统">2.4 训练一个机器翻译系统</h2>
+<p>Seq2seq被优化为一个单一的系统。反向传播运行在“端到端”中</p>
+<p><img src="/img/nlp/第八讲/7.png" srcset="/img/loading.gif" lazyload /></p>
+<h1 id="机器翻译解码">3.机器翻译解码</h1>
+<h2 id="贪婪解码">3.1 贪婪解码</h2>
+<p>我们了解了如何生成(或“解码”)目标句，通过对解码器的每个步骤使用
+argmax</p>
+<p>这是<strong>贪婪解码</strong>(每一步都取最可能的单词)</p>
+<p><strong>这种方法有问题吗</strong>？</p>
+<p><img src="/img/nlp/第八讲/8.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="贪婪解码的问题">3.2 贪婪解码的问题</h2>
+<p>贪婪解码没有办法撤销决定</p>
+<p><img src="/img/nlp/第八讲/9.png" srcset="/img/loading.gif" lazyload /></p>
+<p>如何修复？</p>
+<h2 id="穷举搜索解码">3.3 穷举搜索解码</h2>
+<p>理想情况下，我们想要找到一个(长度为<span
+class="math inline">\(T\)</span>)的翻译<span
+class="math inline">\(y\)</span>使其最大化 <span class="math display">\[
+\begin{aligned}
+P(y \mid x) &amp;=P\left(y_{1} \mid x\right) P\left(y_{2} \mid y_{1},
+x\right) P\left(y_{3} \mid y_{1}, y_{2}, x\right) \ldots, P\left(y_{T}
+\mid y_{1}, \ldots, y_{T-1}, x\right) \\
+&amp;=\prod_{t=1}^{T} P\left(y_{t} \mid y_{1}, \ldots, y_{t-1}, x\right)
+\end{aligned}
+\]</span></p>
+<p>我们可以尝试计算所有可能的序列 - 这意味着在解码器的每一步<span
+class="math inline">\(t\)</span>，我们跟踪<span
+class="math inline">\(V^t\)</span>个可能的部分翻译，其中<span
+class="math inline">\(V\)</span>是vocab 大小 - 这种<span
+class="math inline">\(O(V^t)\)</span>的复杂性<strong>太昂贵</strong>了！</p>
+<h2 id="集束搜索解码">3.4 集束搜索解码</h2>
+<ul>
+<li>核心思想：在解码器的每一步，跟踪个最可能的部分翻译(我们称之为假设[hypotheses
+] )
+<ul>
+<li><span
+class="math inline">\(k\)</span>是Beam的大小(实际中大约是5到10)</li>
+</ul></li>
+<li>假设<span
+class="math inline">\(y_1,y_2,...,y_t\)</span>有一个<strong>分数</strong>，即它的对数概率</li>
+</ul>
+<p><span class="math display">\[
+\operatorname{score}\left(y_{1}, \ldots, y_{t}\right)=\log
+P_{\mathrm{LM}}\left(y_{1}, \ldots, y_{t} \mid x\right)=\sum_{i=1}^{t}
+\log P_{\mathrm{LM}}\left(y_{i} \mid y_{1}, \ldots, y_{i-1}, x\right)
+\]</span></p>
+<ul>
+<li><p>分数都是负数，分数越高越好</p></li>
+<li><p>我们寻找得分较高的假设，跟踪每一步的 top k 个部分翻译</p></li>
+<li><p>波束搜索 <strong>不一定能</strong> 找到最优解</p></li>
+<li><p>但比穷举搜索<strong>效率高得多</strong></p></li>
+</ul>
+<h2 id="集束搜索解码示例">3.5 集束搜索解码：示例</h2>
+<p>Beam size = k = 2，蓝色的数字是 <span class="math display">\[
+\operatorname{score}\left(y_{1}, \ldots, y_{t}\right)=\sum_{i=1}^{t}
+\log P_{\mathrm{LM}}\left(y_{i} \mid y_{1}, \ldots, y_{i-1}, x\right)
+\]</span> <img src="/img/nlp/第八讲/10.png" srcset="/img/loading.gif" lazyload /></p>
+<ul>
+<li>计算下一个单词的概率分布</li>
+<li>取前个单词并计算分数
+<ul>
+<li>对于每一次的<span
+class="math inline">\(k\)</span>个假设，找出最前面的<span
+class="math inline">\(k\)</span>个单词并计算分数</li>
+<li>在的假设中，保留个最高的分值
+<ul>
+<li><span class="math inline">\(t=2\)</span>时，保留分数最高的
+<code>hit</code> 和 <code>was</code></li>
+<li><span class="math inline">\(t=3\)</span>时，保留分数最高的
+<code>a</code> 和 <code>me</code></li>
+<li><span class="math inline">\(t=4\)</span>时，保留分数最高的
+<code>pie</code> 和 <code>with</code></li>
+<li><span class="math inline">\(t=5\)</span>时，保留分数最高的
+<code>a</code> 和 <code>one</code></li>
+<li><span class="math inline">\(t=6\)</span>时，保留分数最高的
+<code>pie</code></li>
+</ul></li>
+</ul></li>
+<li>这是最高得分的假设</li>
+<li>回溯以获得完整的假设</li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Deep-Learning/">Deep Learning</a>
+                    
+                      <a class="hover-with-bg" href="/categories/Deep-Learning/NLP/">NLP</a>
+                    
+                  </div>
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/05/13/%E7%AC%AC%E4%B8%83%E8%AE%B2-%E6%A2%AF%E5%BA%A6%E6%B6%88%E5%A4%B1%E9%97%AE%E9%A2%98%E4%B8%8ERNN%E5%8F%98%E7%A7%8D/">
+                        <span class="hidden-mobile">第七讲-梯度消失问题与RNN变种</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        loader: {
+          load: ['ui/lazy']
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
