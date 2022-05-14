@@ -23,7 +23,6 @@
 <meta property="og:site_name" content="肘子开的博客">
 <meta property="og:description" content="1.机器翻译与SMT（统计机器翻译） 1.1 机器翻译 机器翻译(MT)是将一个句子\(x\)从一种语言(源语言)转换为另一种语言(目标语言)的句子\(y\)的任务。 1.2 1950s：早期机器翻译 机器翻译研究始于20世纪50年代初。  俄语 → 英语(冷战的推动) 系统主要是基于规则的，使用双语词典来讲俄语单词映射为对应的英语部分  1.3 1990s-2010s：统计机器">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://www.zhihu.com/equation?tex=P%28x%2Ca%20%5Cmid%20y%29">
 <meta property="og:image" content="http://example.com/img/nlp/第八讲/1.png">
 <meta property="og:image" content="http://example.com/img/nlp/第八讲/2.png">
 <meta property="og:image" content="http://example.com/img/nlp/第八讲/3.png">
@@ -39,10 +38,10 @@
 <meta property="og:image" content="http://example.com/img/nlp/第八讲/13.png">
 <meta property="og:image" content="http://example.com/img/nlp/第八讲/14.png">
 <meta property="article:published_time" content="2022-05-14T03:37:46.000Z">
-<meta property="article:modified_time" content="2022-05-14T12:04:29.412Z">
+<meta property="article:modified_time" content="2022-05-14T12:56:43.552Z">
 <meta property="article:author" content="肘子开">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://www.zhihu.com/equation?tex=P%28x%2Ca%20%5Cmid%20y%29">
+<meta name="twitter:image" content="http://example.com/img/nlp/第八讲/1.png">
   
   
   <title>第八讲-机器翻译、seq2seq与注意力机制 - 肘子开的博客</title>
@@ -295,11 +294,9 @@ class="math inline">\(P(x|y)\)</span>？</p>
 <p><strong>问题</strong>：如何从并行语料库中学习翻译模型<span
 class="math inline">\(P(x|y)\)</span>？</p>
 <p>进一步分解：我们实际上想要考虑</p>
-<figure>
-<img src="https://www.zhihu.com/equation?tex=P%28x%2Ca%20%5Cmid%20y%29" srcset="/img/loading.gif" lazyload
-alt="公式" />
-<figcaption aria-hidden="true">公式</figcaption>
-</figure>
+<p><span class="math display">\[
+P(x,a|y)
+\]</span></p>
 <ul>
 <li><span class="math inline">\(a\)</span>是对齐</li>
 <li>即法语句子<span class="math inline">\(x\)</span>和英语句子<span
