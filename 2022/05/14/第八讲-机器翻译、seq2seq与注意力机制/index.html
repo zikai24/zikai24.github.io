@@ -34,8 +34,12 @@
 <meta property="og:image" content="http://example.com/img/nlp/第八讲/8.png">
 <meta property="og:image" content="http://example.com/img/nlp/第八讲/9.png">
 <meta property="og:image" content="http://example.com/img/nlp/第八讲/10.png">
+<meta property="og:image" content="http://example.com/img/nlp/第八讲/11.png">
+<meta property="og:image" content="http://example.com/img/nlp/第八讲/12.png">
+<meta property="og:image" content="http://example.com/img/nlp/第八讲/13.png">
+<meta property="og:image" content="http://example.com/img/nlp/第八讲/14.png">
 <meta property="article:published_time" content="2022-05-14T03:37:46.000Z">
-<meta property="article:modified_time" content="2022-05-14T04:15:12.074Z">
+<meta property="article:modified_time" content="2022-05-14T12:04:29.412Z">
 <meta property="article:author" content="肘子开">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://www.zhihu.com/equation?tex=P%28x%2Ca%20%5Cmid%20y%29">
@@ -208,7 +212,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      2.9k 字
+      5.5k 字
     </span>
   
 
@@ -217,7 +221,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      25 分钟
+      47 分钟
     </span>
   
 
@@ -479,6 +483,191 @@ class="math inline">\(k\)</span>个单词并计算分数</li>
 <li>这是最高得分的假设</li>
 <li>回溯以获得完整的假设</li>
 </ul>
+<h2 id="集束搜索解码停止判据">3.6 集束搜索解码：停止判据</h2>
+<ul>
+<li>在贪心解码中，我们通常解码到模型产生一个令牌
+<ul>
+<li>例如： he hit me with a pie</li>
+</ul></li>
+<li>在集束搜索解码中，不同的假设可能在<strong>不同的时间步长</strong>上产生令牌
+<ul>
+<li>当一个假设生成了令牌，该假设<strong>完成</strong></li>
+<li><strong>把它放在一边</strong>，通过 Beam Search
+继续探索其他假设</li>
+</ul></li>
+<li>通常我们继续进行 Beam Search ，直到
+<ul>
+<li>我们到达时间步长<span class="math inline">\(T\)</span>(其中<span
+class="math inline">\(T\)</span>是预定义截止点)</li>
+<li>我们至少有<span
+class="math inline">\(n\)</span>个已完成的假设(其中<span
+class="math inline">\(n\)</span>是预定义截止点)</li>
+</ul></li>
+</ul>
+<h2 id="集束搜索解码完成">3.7 集束搜索解码：完成</h2>
+<p>我们有完整的假设列表,如何选择得分最高的？</p>
+<p>我们清单上的每个假设<span
+class="math inline">\(y_1,...,y_t\)</span>都有一个分数 <span
+class="math display">\[
+\operatorname{score}\left(y_{1}, \ldots, y_{t}\right)=\log
+P_{\mathrm{LM}}\left(y_{1}, \ldots, y_{t} \mid x\right)=\sum_{i=1}^{t}
+\log P_{\mathrm{LM}}\left(y_{i} \mid y_{1}, \ldots, y_{i-1}, x\right)
+\]</span> <strong>问题在于</strong> ：较长的假设得分较低</p>
+<p><strong>修正</strong>：按长度标准化。用下式来选择top one <span
+class="math display">\[
+\frac{1}{t} \sum_{i=1}^{t} \log P_{\mathrm{LM}}\left(y_{i} \mid y_{1},
+\ldots, y_{i-1}, x\right)
+\]</span></p>
+<h2 id="神经机器翻译nmt的优点">3.8 神经机器翻译(NMT)的优点</h2>
+<p>与SMT相比，NMT有很多<strong>优点</strong></p>
+<p>更好的性能</p>
+<ul>
+<li>更流利</li>
+<li>更好地使用上下文</li>
+<li>更好地使用短语相似性</li>
+</ul>
+<p>单个神经网络端到端优化</p>
+<ul>
+<li>没有子组件需要单独优化</li>
+</ul>
+<p>需要更少的人类工程付出</p>
+<ul>
+<li>无特征工程</li>
+<li>所有语言对的方法相同</li>
+</ul>
+<h2 id="神经机器翻译nmt的缺点">3.9 神经机器翻译(NMT)的缺点</h2>
+<p>SMT相比，NMT的<strong>缺点</strong></p>
+<p>NMT的可解释性较差</p>
+<ul>
+<li>难以调试</li>
+</ul>
+<p>NMT很难控制</p>
+<ul>
+<li>例如，不能轻松指定翻译规则或指南</li>
+<li>安全问题</li>
+</ul>
+<h1 id="机器翻译评估">4.机器翻译评估</h1>
+<h2 id="如何评估机器翻译质量">4.1 如何评估机器翻译质量</h2>
+<p>BLEU(Bilingual Evaluation Understudy)</p>
+<ul>
+<li>你将会在 Assignment 4 中看到BLEU的细节</li>
+</ul>
+<p>BLEU将机器翻译和人工翻译(一个或多个)，并计算一个相似的分数</p>
+<ul>
+<li>n-gram 精度 (n通常为1-4)</li>
+<li>对过于短的机器翻译的加上惩罚</li>
+</ul>
+<p>BLEU很有用，但不完美</p>
+<ul>
+<li>有很多有效的方法来翻译一个句子</li>
+<li>所以一个<strong>好的</strong>翻译可以得到一个糟糕的BLEU
+score，因为它与人工翻译的n-gram重叠较低</li>
+</ul>
+<h2 id="机器翻译问题完美解决了吗">4.2 机器翻译问题完美解决了吗？</h2>
+<p>没有！</p>
+<p>许多困难仍然存在</p>
+<ul>
+<li><strong>词表外</strong>的单词处理</li>
+<li>训练和测试数据之间的<strong>领域不匹配</strong></li>
+<li>在较长文本上维护上下文</li>
+<li><strong>资源较低</strong>的语言对</li>
+</ul>
+<p>使用常识仍然很难</p>
+<ul>
+<li>NMT在训练数据中发现偏差</li>
+<li>无法解释的系统会做一些奇怪的事情</li>
+</ul>
+<h1 id="注意力机制">5.注意力机制</h1>
+<h2 id="sequence-to-sequence瓶颈问题">5.1
+Sequence-to-sequence：瓶颈问题</h2>
+<ul>
+<li>源语句的编码</li>
+<li>需要捕获关于源语句的所有信息</li>
+<li>信息瓶颈！</li>
+</ul>
+<p><img src="/img/nlp/第八讲/11.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="注意力">5.2 注意力</h2>
+<p><strong>注意力</strong>为瓶颈问题提供了一个解决方案</p>
+<p><strong>核心理念</strong>：在解码器的每一步，使用与<strong>编码器的直接连接</strong>来专注于源序列的<strong>特定部分</strong></p>
+<p>首先我们将通过图表展示(没有方程)，然后我们将用方程展示</p>
+<h2 id="带注意力机制的序列到序列模型">5.3
+带注意力机制的序列到序列模型</h2>
+<ul>
+<li><p>将解码器部分的第一个token 与源语句中的每一个时间步的隐藏状态进行
+Dot Product 得到每一时间步的分数</p></li>
+<li><p>通过softmax将分数转化为概率分布</p></li>
+<li><p>在这个解码器时间步长上，我们主要关注第一个编码器隐藏状态(“he”)</p></li>
+<li><p>利用<strong>注意力分布</strong>对编码器的隐藏状态进行<strong>加权求和</strong></p></li>
+<li><p>注意力输出主要包含来自于受到<strong>高度关注</strong>的<strong>隐藏状态</strong>的信息</p></li>
+<li><p>连接的<strong>注意力输出</strong>与<strong>解码器隐藏状态</strong>
+，然后用来计算<span class="math inline">\(\hat{y_1}\)</span></p></li>
+<li><p>有时，我们从前面的步骤中提取注意力输出，并将其输入解码器(连同通常的解码器输入)。我们在作业4中做这个。</p></li>
+</ul>
+<p><img src="/img/nlp/第八讲/12.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="注意力公式">5.4 注意力：公式</h2>
+<p>我们有编码器隐藏状态<span class="math inline">\(h_{1}, \ldots, h_{N}
+\in \mathbb{R}^{h}\)</span></p>
+<p>在时间步<span
+class="math inline">\(t\)</span>上，我们有解码器隐藏状态<span
+class="math inline">\(s_{t} \in \mathbb{R}^{h}\)</span></p>
+<p>我们得到这一步的注意分数 <span class="math display">\[
+e^{t}=\left[s_{t}^{T} \boldsymbol{h}_{1}, \ldots, \boldsymbol{s}_{t}^{T}
+\boldsymbol{h}_{N}\right] \in \mathbb{R}^{N}
+\]</span> 我们使用softmax得到这一步的注意分布<span
+class="math inline">\(\alpha^t\)</span>(这是一个概率分布，和为1) <span
+class="math display">\[
+\alpha^{t}=\operatorname{softmax}\left(e^{t}\right) \in \mathbb{R}^{N}
+\]</span> 我们使用<span
+class="math inline">\(\alpha^t\)</span>来获得编码器隐藏状态的加权和，得到注意力输出<span
+class="math inline">\(\alpha^{t} \boldsymbol{a}_{t}=\sum_{i=1}^{N}
+\alpha_{i}^{t} \boldsymbol{h}_{i} \in \mathbb{R}^{h}\)</span></p>
+<p>最后，我们将注意输出<span
+class="math inline">\(\alpha^t\)</span>与解码器隐藏状态连接起来，并按照非注意
+seq2seq 模型继续进行 <span class="math display">\[
+\left[\boldsymbol{a}_{t} ; \boldsymbol{s}_{t}\right] \in \mathbb{R}^{2
+h}
+\]</span></p>
+<h2 id="注意力很棒">5.5 注意力很棒！</h2>
+<p>注意力显著提高了NMT性能</p>
+<ul>
+<li>这是非常有用的，让解码器专注于某些部分的源语句</li>
+</ul>
+<p>注意力解决瓶颈问题</p>
+<ul>
+<li>注意力允许解码器直接查看源语句；绕过瓶颈</li>
+</ul>
+<p>注意力帮助消失梯度问题</p>
+<ul>
+<li>提供了通往遥远状态的捷径</li>
+</ul>
+<p>注意力提供了一些可解释性</p>
+<ul>
+<li>通过检查注意力的分布，我们可以看到解码器在关注什么</li>
+<li>我们可以免费得到(软)对齐</li>
+<li>这很酷，因为我们从来没有明确训练过对齐系统</li>
+<li>网络只是自主学习了对齐</li>
+</ul>
+<h2 id="注意力是一种普遍的深度学习技巧">5.6
+注意力是一种普遍的深度学习技巧</h2>
+<p>我们已经看到，注意力是改进机器翻译的序列到序列模型的一个很好的方法</p>
+<p>然而：你可以在<strong>许多结构</strong>(不仅仅是seq2seq)和许多任务(不仅仅是MT)中使用注意力</p>
+<p>我们有时说 <strong>query attends to the values</strong></p>
+<p>例如，在seq2seq +
+attention模型中，每个解码器的隐藏状态(查询)关注所有编码器的隐藏状态(值)</p>
+<h2 id="注意力是一种普遍的深度学习技巧-1">5.7
+注意力是一种普遍的深度学习技巧</h2>
+<p>注意力的更一般定义</p>
+<ul>
+<li>给定一组向量<strong>值</strong>和一个向量<strong>查询</strong>，注意力是一种根据查询，计算值的加权和的技术</li>
+</ul>
+<p>直觉</p>
+<ul>
+<li>加权和是值中包含的信息的<strong>选择性汇总</strong>，查询在其中确定要关注哪些值</li>
+<li>注意是一种获取<strong>任意一组表示(值)的固定大小表示的方法</strong>，依赖于其他一些表示(查询)。</li>
+</ul>
+<h2 id="有几种注意力的变体">5.8 有几种注意力的变体</h2>
+<p><img src="/img/nlp/第八讲/13.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/nlp/第八讲/14.png" srcset="/img/loading.gif" lazyload /></p>
 
             </div>
             <hr>
