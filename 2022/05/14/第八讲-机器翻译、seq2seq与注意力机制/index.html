@@ -34,11 +34,18 @@
 <meta property="og:image" content="http://example.com/img/nlp/第八讲/9.png">
 <meta property="og:image" content="http://example.com/img/nlp/第八讲/10.png">
 <meta property="og:image" content="http://example.com/img/nlp/第八讲/11.png">
+<meta property="og:image" content="http://example.com/img/nlp/第八讲/15.png">
+<meta property="og:image" content="http://example.com/img/nlp/第八讲/16.png">
+<meta property="og:image" content="http://example.com/img/nlp/第八讲/17.png">
+<meta property="og:image" content="http://example.com/img/nlp/第八讲/18.png">
+<meta property="og:image" content="http://example.com/img/nlp/第八讲/19.png">
+<meta property="og:image" content="http://example.com/img/nlp/第八讲/20.png">
+<meta property="og:image" content="http://example.com/img/nlp/第八讲/21.png">
 <meta property="og:image" content="http://example.com/img/nlp/第八讲/12.png">
 <meta property="og:image" content="http://example.com/img/nlp/第八讲/13.png">
 <meta property="og:image" content="http://example.com/img/nlp/第八讲/14.png">
 <meta property="article:published_time" content="2022-05-14T03:37:46.000Z">
-<meta property="article:modified_time" content="2022-05-14T12:56:43.552Z">
+<meta property="article:modified_time" content="2022-05-15T09:08:04.771Z">
 <meta property="article:author" content="肘子开">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://example.com/img/nlp/第八讲/1.png">
@@ -590,16 +597,23 @@ Sequence-to-sequence：瓶颈问题</h2>
 <h2 id="带注意力机制的序列到序列模型">5.3
 带注意力机制的序列到序列模型</h2>
 <ul>
-<li><p>将解码器部分的第一个token 与源语句中的每一个时间步的隐藏状态进行
-Dot Product 得到每一时间步的分数</p></li>
-<li><p>通过softmax将分数转化为概率分布</p></li>
-<li><p>在这个解码器时间步长上，我们主要关注第一个编码器隐藏状态(“he”)</p></li>
-<li><p>利用<strong>注意力分布</strong>对编码器的隐藏状态进行<strong>加权求和</strong></p></li>
-<li><p>注意力输出主要包含来自于受到<strong>高度关注</strong>的<strong>隐藏状态</strong>的信息</p></li>
-<li><p>连接的<strong>注意力输出</strong>与<strong>解码器隐藏状态</strong>
-，然后用来计算<span class="math inline">\(\hat{y_1}\)</span></p></li>
-<li><p>有时，我们从前面的步骤中提取注意力输出，并将其输入解码器(连同通常的解码器输入)。我们在作业4中做这个。</p></li>
+<li>将解码器部分的第一个token 与源语句中的每一个时间步的隐藏状态进行 Dot
+Product 得到每一时间步的分数</li>
+<li>通过softmax将分数转化为概率分布</li>
+<li>在这个解码器时间步长上，我们主要关注第一个编码器隐藏状态(“he”)</li>
+<li>利用<strong>注意力分布</strong>对编码器的隐藏状态进行<strong>加权求和</strong></li>
+<li>注意力输出主要包含来自于受到<strong>高度关注</strong>的<strong>隐藏状态</strong>的信息</li>
+<li>连接的<strong>注意力输出</strong>与<strong>解码器隐藏状态</strong>
+，然后用来计算<span class="math inline">\(\hat{y_1}\)</span></li>
+<li>有时，我们从前面的步骤中提取注意力输出，并将其输入解码器(连同通常的解码器输入)。我们在作业4中做这个。</li>
 </ul>
+<p><img src="/img/nlp/第八讲/15.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/nlp/第八讲/16.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/nlp/第八讲/17.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/nlp/第八讲/18.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/nlp/第八讲/19.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/nlp/第八讲/20.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/nlp/第八讲/21.png" srcset="/img/loading.gif" lazyload /></p>
 <p><img src="/img/nlp/第八讲/12.png" srcset="/img/loading.gif" lazyload /></p>
 <h2 id="注意力公式">5.4 注意力：公式</h2>
 <p>我们有编码器隐藏状态<span class="math inline">\(h_{1}, \ldots, h_{N}
