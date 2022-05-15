@@ -1,0 +1,600 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=dark>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="肘子开">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Assignment4讲解 RNN和神经网络机器翻译 机器翻译是指，构建一个系统完成源语言到目标语言的变换映射，比如给定一个源句子（比如西班牙语），输出一个目标句子（比如英语）。本次作业中要实现的是一个带注意力机制的Seq2Seq神经模型，用于构建神经网络机器翻译（NMT）系统。首先我们来看NMT系统的训练过程，它用到了双向LSTM作为编码器（encoder）和单向LSTM作为解码器（deco">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NLP-Assignment4">
+<meta property="og:url" content="http://example.com/2022/05/15/NLP-Assignment4/index.html">
+<meta property="og:site_name" content="肘子开的博客">
+<meta property="og:description" content="Assignment4讲解 RNN和神经网络机器翻译 机器翻译是指，构建一个系统完成源语言到目标语言的变换映射，比如给定一个源句子（比如西班牙语），输出一个目标句子（比如英语）。本次作业中要实现的是一个带注意力机制的Seq2Seq神经模型，用于构建神经网络机器翻译（NMT）系统。首先我们来看NMT系统的训练过程，它用到了双向LSTM作为编码器（encoder）和单向LSTM作为解码器（deco">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/0060yMmAly1gsjzdzvwbaj30pv0hzjuy.jpg">
+<meta property="article:published_time" content="2022-05-15T12:31:26.000Z">
+<meta property="article:modified_time" content="2022-05-15T13:42:57.445Z">
+<meta property="article:author" content="肘子开">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://ww1.sinaimg.cn/large/0060yMmAly1gsjzdzvwbaj30pv0hzjuy.jpg">
+  
+  
+  <title>NLP-Assignment4 - 肘子开的博客</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/nnfx-dark.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>肘子开的博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/bg/bg2.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="NLP-Assignment4">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-05-15 20:31" pubdate>
+        2022年5月15日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      8.7k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      73 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">NLP-Assignment4</h1>
+            
+            <div class="markdown-body">
+              <h1 id="assignment4讲解">Assignment4讲解</h1>
+<h2 id="rnn和神经网络机器翻译">RNN和神经网络机器翻译</h2>
+<p>机器翻译是指，构建一个系统完成源语言到目标语言的变换映射，比如给定一个源句子（比如西班牙语），输出一个目标句子（比如英语）。本次作业中要实现的是一个带注意力机制的Seq2Seq神经模型，用于构建神经网络机器翻译（NMT）系统。首先我们来看NMT系统的训练过程，它用到了双向LSTM作为编码器（encoder）和单向LSTM作为解码器（decoder）。</p>
+<p><img src="http://ww1.sinaimg.cn/large/0060yMmAly1gsjzdzvwbaj30pv0hzjuy.jpg" srcset="/img/loading.gif" lazyload referrerpolicy="no-referrer"/></p>
+<p>给定长度为m的源语言句子（source），经过嵌入层，得到输入序列 <span
+class="math inline">\(x_1, x_2, …, x_m \in R^{e \times
+1}\)</span>，<span
+class="math inline">\(e\)</span>是词向量大小。经过双向Encoder后，得到前向（→）和反向（←）LSTM的隐藏层和神经元状态，将两个方向的状态连接起来得到时间步
+<span class="math inline">\(i\)</span> 的隐藏状态 <span
+class="math inline">\(h_i^{enc}\)</span> 和 <span
+class="math inline">\(c_i^{enc}\)</span> ： <span
+class="math display">\[
+\mathbf{h}_{i}^{\text {enc }}=\left[\overleftarrow{\mathbf{h}_{i}^{\text
+{enc }}} ; \overrightarrow{\mathbf{h}_{i}^{\text {enc }}}\right] \text {
+where } \mathbf{h}_{i}^{\text {enc }} \in \mathbb{R}^{2 h \times 1},
+\overleftarrow{\mathbf{h}_{i}^{\text {enc }}},
+\overrightarrow{\mathbf{h}_{i}^{\text {en }}} \in \mathbb{R}^{h \times
+1} \quad 1 \leq i \leq m
+\]</span></p>
+<p><span class="math display">\[
+\mathbf{c}_{i}^{\text {enc }}=\left[\overleftarrow{\mathbf{c}_{i}^{\text
+{enc }}} ; \overrightarrow{\mathbf{c}_{i}^{\text {enc }}}\right] \text {
+where } \mathbf{c}_{i}^{\text {enc }} \in \mathbb{R}^{2 h \times 1},
+\overleftarrow{\mathbf{c}_{i}^{\text {enc }}},
+\overrightarrow{\mathbf{c}_{i}^{\text {en }}} \in \mathbb{R}^{h \times
+1} \quad 1 \leq i \leq m
+\]</span></p>
+<p>接着我们使用一个线性层来初始化Decoder的初始隐藏、神经元的状态： <span
+class="math display">\[
+\mathbf{h}_{0}^{\text {dec
+}}=\mathbf{W}_{h}\left[\overleftarrow{\mathbf{h}_{1}^{\text {enc }}} ;
+\overrightarrow{\mathbf{h}_{m}^{\text {enc }}}\right] \text { where }
+\mathbf{h}_{0}^{\text {dec }} \in \mathbb{R}^{h \times 1},
+\mathbf{W}_{h} \in \mathbb{R}^{h \times 2 h}
+\]</span></p>
+<p><span class="math display">\[
+\mathbf{c}_{0}^{\text {dec
+}}=\mathbf{W}_{c}\left[\overleftarrow{\mathbf{c}_{1}^{\text {enc }}} ;
+\overrightarrow{\mathbf{c}_{m}^{\text {enc }}}\right] \text { where }
+\mathbf{c}_{0}^{\text {dec }} \in \mathbb{R}^{h \times 1},
+\mathbf{W}_{c} \in \mathbb{R}^{h \times 2 h}
+\]</span></p>
+<p>Decoder的时间步<span class="math inline">\(t\)</span> 的输入为 <span
+class="math inline">\(\bar{y}_t\)</span> ，它由目标语言句子 <span
+class="math inline">\(y_t\)</span>和上一神经元的输出和上一神经元的输出<span
+class="math inline">\(o_{t-1}\)</span>经过连接得到，经过连接得到，<span
+class="math inline">\(o_0\)</span>是0向量，所以 <span
+class="math inline">\(\bar{y}_t \in R^{(e + h) \times 1}\)</span> <span
+class="math display">\[
+\mathbf{h}_{t}^{\mathrm{dec}},
+\mathbf{c}_{t}^{\mathrm{dec}}=\operatorname{Decoder}\left(\overline{\mathbf{y}_{t}},
+\mathbf{h}_{t-1}^{\mathrm{dec}}, \mathbf{c}_{t-1}^{\mathrm{dec}}\right)
+\text { where } \mathbf{h}_{t}^{\mathrm{dec}} \in \mathbb{R}^{h \times
+1}, \mathbf{c}_{t}^{\mathrm{dec}} \in \mathbb{R}^{h \times 1}
+\]</span> 接着我们使用 <span class="math inline">\(h^{dec}_t\)</span>
+来计算在 <span class="math inline">\(h^{enc}_0, h^{enc}_1, …,
+h^{enc}_m\)</span> 的乘积注意力（multiplicative attention）： <span
+class="math display">\[
+\begin{array}{c}
+\mathbf{e}_{t, i}=\left(\mathbf{h}_{t}^{\mathrm{dec}}\right)^{T}
+\mathbf{W}_{\text {attProj }} \mathbf{h}_{i}^{\text {enc }} \text {
+where } \mathbf{e}_{t} \in \mathbb{R}^{m \times 1}, \mathbf{W}_{\text
+{attProj }} \in \mathbb{R}^{h \times 2 h} \quad 1 \leq i \leq m \\
+\alpha_{t}=\operatorname{softmax}\left(\mathbf{e}_{t}\right) \text {
+where } \alpha_{t} \in \mathbb{R}^{m \times 1} \\
+\mathbf{a}_{t}=\sum_{i=1}^{m} \alpha_{t, i} \mathbf{h}_{i}^{\text {enc
+}} \text { where } \mathbf{a}_{t} \in \mathbb{R}^{2 h \times 1}
+\end{array}
+\]</span> 然后将注意力 <span class="math inline">\(\alpha_t\)</span>
+和解码器的隐藏状态 <span class="math inline">\(h^{dec}_t\)</span>
+连接，送入线性层，得到 <em>combined-output</em> 向量 <span
+class="math inline">\(o_t\)</span> <span class="math display">\[
+\begin{array}{r}
+\mathbf{u}_{t}=\left[\mathbf{a}_{t} ;
+\mathbf{h}_{t}^{\mathrm{dec}}\right] \text { where } \mathbf{u}_{t} \in
+\mathbb{R}^{3 h \times 1} \\
+\mathbf{v}_{t}=\mathbf{W}_{u} \mathbf{u}_{t} \text { where }
+\mathbf{v}_{t} \in \mathbb{R}^{h \times 1}, \mathbf{W}_{u} \in
+\mathbb{R}^{h \times 3 h} \\
+\mathbf{o}_{t}=\operatorname{dropout}\left(\tanh
+\left(\mathbf{v}_{t}\right)\right) \text { where } \mathbf{o}_{t} \in
+\mathbb{R}^{h \times 1}
+\end{array}
+\]</span> 这样以来，目标词的概率分布则为： <span class="math display">\[
+\mathbf{P}_{t}=\operatorname{softmax}\left(\mathbf{W}_{\text {vocab }}
+\mathbf{o}_{t}\right) \text { where } \mathbf{P}_{t} \in
+\mathbb{R}^{V_{t} \times 1}, \mathbf{W}_{\text {vocab }} \in
+\mathbb{R}^{V_{t} \times h}
+\]</span> 使用交叉熵做目标函数即可 <span class="math display">\[
+J_{t}(\theta)=\text { CrossEntropy }\left(\mathbf{P}_{t},
+\mathbf{g}_{t}\right)
+\]</span></p>
+<p>代码实现部分，关键在于过程中的向量维度，向量维度匹配没有问题，整个过程的实现就比较清晰。</p>
+<h2 id="part1-神经网络翻译系统代码实现">part1
+神经网络翻译系统代码实现</h2>
+<h3 id="a">(a)</h3>
+<p>In order to apply tensor operations, we must ensure that the
+sentences in a given batch are of the same length. Thus, we must
+identify the longest sentence in a batch and pad others to be the same
+length. Implement the pad sents function in utils.py, which shall
+produce these padded sentences.</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">pad_sents</span>(<span class="hljs-params">sents, pad_token</span>):<br>    <span class="hljs-string">&quot;&quot;&quot; Pad list of sentences according to the longest sentence in the batch.</span><br><span class="hljs-string">    @param sents (list[list[str]]): list of sentences, where each sentence</span><br><span class="hljs-string">                                    is represented as a list of words</span><br><span class="hljs-string">    @param pad_token (str): padding token</span><br><span class="hljs-string">    @returns sents_padded (list[list[str]]): list of sentences where sentences shorter</span><br><span class="hljs-string">        than the max length sentence are padded out with the pad_token, such that</span><br><span class="hljs-string">        each sentences in the batch now has equal length.</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br>    sents_padded = []<br><br>    <span class="hljs-comment"># YOUR CODE HERE (~6 Lines)</span><br>    corpus_size = <span class="hljs-built_in">len</span>(sents)<br>    lens = [<span class="hljs-built_in">len</span>(i) <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> sents]  <span class="hljs-comment"># every sentence&#x27;s length</span><br>    max_lens = <span class="hljs-built_in">max</span>(lens)<br>    sents_padded = [sents[i] + [pad_token] * (max_lens - lens[i]) <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(corpus_size)]      <span class="hljs-comment"># shape N x max_lens</span><br>    <span class="hljs-comment"># END YOUR CODE</span><br><br>    <span class="hljs-keyword">return</span> sents_padded<br></code></pre></div></td></tr></table></figure>
+<h3 id="b">(b)</h3>
+<p>Implement the <code>__init__</code> function in model embeddings.py
+to initialize the necessary source and target embeddings.</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">ModelEmbeddings</span>(nn.Module): <br>    <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    Class that converts input words to their embeddings.</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, embed_size, vocab</span>):<br>        <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">        Init the Embedding layers.</span><br><span class="hljs-string"></span><br><span class="hljs-string">        @param embed_size (int): Embedding size (dimensionality)</span><br><span class="hljs-string">        @param vocab (Vocab): Vocabulary object containing src and tgt languages</span><br><span class="hljs-string">                              See vocab.py for documentation.</span><br><span class="hljs-string">        &quot;&quot;&quot;</span><br>        <span class="hljs-built_in">super</span>(ModelEmbeddings, self).__init__()<br>        self.embed_size = embed_size<br><br>        <span class="hljs-comment"># default values</span><br>        self.source = <span class="hljs-literal">None</span><br>        self.target = <span class="hljs-literal">None</span><br><br>        src_pad_token_idx = vocab.src[<span class="hljs-string">&#x27;&lt;pad&gt;&#x27;</span>]<br>        tgt_pad_token_idx = vocab.tgt[<span class="hljs-string">&#x27;&lt;pad&gt;&#x27;</span>]<br><br>        <span class="hljs-comment"># YOUR CODE HERE (~2 Lines)</span><br>        <span class="hljs-comment"># TODO - Initialize the following variables:</span><br>        <span class="hljs-comment">#     self.source (Embedding Layer for source language)</span><br>        <span class="hljs-comment">#     self.target (Embedding Layer for target langauge)</span><br>        <span class="hljs-comment">#</span><br>        <span class="hljs-comment"># Note:</span><br>        <span class="hljs-comment">#     1. `vocab` object contains two vocabularies:</span><br>        <span class="hljs-comment">#            `vocab.src` for source</span><br>        <span class="hljs-comment">#            `vocab.tgt` for target</span><br>        <span class="hljs-comment">#     2. You can get the length of a specific vocabulary by running:</span><br>        <span class="hljs-comment">#             `len(vocab.&lt;specific_vocabulary&gt;)`</span><br>        <span class="hljs-comment">#     3. Remember to include the padding token for the specific vocabulary</span><br>        <span class="hljs-comment">#        when creating your Embedding.</span><br>        <span class="hljs-comment">#</span><br>        <span class="hljs-comment"># Use the following docs to properly initialize these variables:</span><br>        <span class="hljs-comment">#     Embedding Layer:</span><br>        <span class="hljs-comment">#         https://pytorch.org/docs/stable/nn.html#torch.nn.Embedding</span><br><br>        self.source = nn.Embedding(<span class="hljs-built_in">len</span>(vocab.src), embed_size, padding_idx=src_pad_token_idx)<br>        self.target = nn.Embedding(<span class="hljs-built_in">len</span>(vocab.tgt), embed_size, padding_idx=tgt_pad_token_idx)<br><br>        <span class="hljs-comment"># END YOUR CODE</span><br></code></pre></div></td></tr></table></figure>
+<h3 id="c">(c)</h3>
+<p>Implement the <code>__init__</code> function in nmt model.py to
+initialize the necessary model embeddings (using the ModelEmbeddings
+class from model embeddings.py) and layers (LSTM, projection, and
+dropout) for the NMT system</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">NMT</span>(nn.Module):<br>    <span class="hljs-string">&quot;&quot;&quot; Simple Neural Machine Translation Model:</span><br><span class="hljs-string">        - Bidrectional LSTM Encoder</span><br><span class="hljs-string">        - Unidirection LSTM Decoder</span><br><span class="hljs-string">        - Global Attention Model (Luong, et al. 2015)</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, embed_size, hidden_size, vocab, dropout_rate=<span class="hljs-number">0.2</span></span>):<br>        <span class="hljs-string">&quot;&quot;&quot; Init NMT Model.</span><br><span class="hljs-string"></span><br><span class="hljs-string">        @param embed_size (int): Embedding size (dimensionality)</span><br><span class="hljs-string">        @param hidden_size (int): Hidden Size (dimensionality)</span><br><span class="hljs-string">        @param vocab (Vocab): Vocabulary object containing src and tgt languages</span><br><span class="hljs-string">                              See vocab.py for documentation.</span><br><span class="hljs-string">        @param dropout_rate (float): Dropout probability, for attention</span><br><span class="hljs-string">        &quot;&quot;&quot;</span><br>        <span class="hljs-built_in">super</span>(NMT, self).__init__()<br>        self.model_embeddings = ModelEmbeddings(embed_size, vocab)<br>        self.hidden_size = hidden_size<br>        self.dropout_rate = dropout_rate<br>        self.vocab = vocab<br><br>        <span class="hljs-comment"># default values</span><br>        self.encoder = <span class="hljs-literal">None</span> <br>        self.decoder = <span class="hljs-literal">None</span><br>        self.h_projection = <span class="hljs-literal">None</span><br>        self.c_projection = <span class="hljs-literal">None</span><br>        self.att_projection = <span class="hljs-literal">None</span><br>        self.combined_output_projection = <span class="hljs-literal">None</span><br>        self.target_vocab_projection = <span class="hljs-literal">None</span><br>        self.dropout = <span class="hljs-literal">None</span><br><br>        <span class="hljs-comment"># YOUR CODE HERE (~8 Lines)</span><br>        <span class="hljs-comment"># TODO - Initialize the following variables:</span><br>        <span class="hljs-comment">#     self.encoder (Bidirectional LSTM with bias)</span><br>        <span class="hljs-comment">#     self.decoder (LSTM Cell with bias)</span><br>        <span class="hljs-comment">#     self.h_projection (Linear Layer with no bias), called W_&#123;h&#125; in the PDF.</span><br>        <span class="hljs-comment">#     self.c_projection (Linear Layer with no bias), called W_&#123;c&#125; in the PDF.</span><br>        <span class="hljs-comment">#     self.att_projection (Linear Layer with no bias), called W_&#123;attProj&#125; in the PDF.</span><br>        <span class="hljs-comment">#     self.combined_output_projection (Linear Layer with no bias), called W_&#123;u&#125; in the PDF.</span><br>        <span class="hljs-comment">#     self.target_vocab_projection (Linear Layer with no bias), called W_&#123;vocab&#125; in the PDF.</span><br>        <span class="hljs-comment">#     self.dropout (Dropout Layer)</span><br>        <span class="hljs-comment">#</span><br>        <span class="hljs-comment"># Use the following docs to properly initialize these variables:</span><br>        <span class="hljs-comment">#     LSTM:</span><br>        <span class="hljs-comment">#         https://pytorch.org/docs/stable/nn.html#torch.nn.LSTM</span><br>        <span class="hljs-comment">#     LSTM Cell:</span><br>        <span class="hljs-comment">#         https://pytorch.org/docs/stable/nn.html#torch.nn.LSTMCell</span><br>        <span class="hljs-comment">#     Linear Layer:</span><br>        <span class="hljs-comment">#         https://pytorch.org/docs/stable/nn.html#torch.nn.Linear</span><br>        <span class="hljs-comment">#     Dropout Layer:</span><br>        <span class="hljs-comment">#         https://pytorch.org/docs/stable/nn.html#torch.nn.Dropout</span><br><br>        self.encoder = nn.LSTM(embed_size, hidden_size, bias=<span class="hljs-literal">True</span>, bidirectional=<span class="hljs-literal">True</span>)<br>        self.decoder = nn.LSTMCell(embed_size + hidden_size, hidden_size, bias=<span class="hljs-literal">True</span>)<br>        self.h_projection = nn.Linear(hidden_size * <span class="hljs-number">2</span>, hidden_size, bias=<span class="hljs-literal">False</span>) <span class="hljs-comment"># prj output of last h_state of encode (R^2h) to R^h</span><br>        self.c_projection = nn.Linear(hidden_size * <span class="hljs-number">2</span>, hidden_size, bias=<span class="hljs-literal">False</span>)<br>        self.att_projection = nn.Linear(hidden_size * <span class="hljs-number">2</span>, hidden_size, bias=<span class="hljs-literal">False</span>) <span class="hljs-comment"># 1 x 2h (h_encode_i) * 2h x h (W) * h * 1 (h_decode_t) = 1 x 1 = e_t,i</span><br>        self.combined_output_projection = nn.Linear(hidden_size * <span class="hljs-number">3</span>, hidden_size, bias=<span class="hljs-literal">False</span>) <span class="hljs-comment"># use after combined attention output and h_decode</span><br>        self.target_vocab_projection    = nn.Linear(hidden_size, <span class="hljs-built_in">len</span>(vocab.tgt), bias=<span class="hljs-literal">False</span>) <span class="hljs-comment"># for softmax of last</span><br>        self.dropout = nn.Dropout(self.dropout_rate)<br>        <span class="hljs-comment"># END YOUR CODE</span><br></code></pre></div></td></tr></table></figure>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Deep-Learning/">Deep Learning</a>
+                    
+                      <a class="hover-with-bg" href="/categories/Deep-Learning/NLP/">NLP</a>
+                    
+                  </div>
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/05/14/%E7%AC%AC%E5%85%AB%E8%AE%B2-%E6%9C%BA%E5%99%A8%E7%BF%BB%E8%AF%91%E3%80%81seq2seq%E4%B8%8E%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6/">
+                        <span class="hidden-mobile">第八讲-机器翻译、seq2seq与注意力机制</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        loader: {
+          load: ['ui/lazy']
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
