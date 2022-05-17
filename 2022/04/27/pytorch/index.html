@@ -34,8 +34,12 @@
 <meta property="og:image" content="http://example.com/img/pytorch/9.png">
 <meta property="og:image" content="http://example.com/img/pytorch/10.png">
 <meta property="og:image" content="http://example.com/img/pytorch/11.png">
+<meta property="og:image" content="http://example.com/2022/04/27/img/pytorch/12.png">
+<meta property="og:image" content="http://example.com/2022/04/27/img/pytorch/13.png">
+<meta property="og:image" content="http://example.com/2022/04/27/img/pytorch/14.png">
+<meta property="og:image" content="http://example.com/2022/04/27/img/pytorch/15.png">
 <meta property="article:published_time" content="2022-04-27T08:32:20.000Z">
-<meta property="article:modified_time" content="2022-04-30T16:59:35.440Z">
+<meta property="article:modified_time" content="2022-05-17T09:35:27.480Z">
 <meta property="article:author" content="肘子开">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://example.com/img/pytorch/1.png">
@@ -208,7 +212,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      15k 字
+      24k 字
     </span>
   
 
@@ -217,7 +221,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      130 分钟
+      199 分钟
     </span>
   
 
@@ -440,6 +444,181 @@ id="搭建小实例和sequential的使用">9、搭建小实例和Sequential的�
 <p>输出为：</p>
 <figure class="highlight shell"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs shell">tensor([[ 0.3308,  0.0307,  0.9064,  0.9474,  0.2715,  0.8123, -0.4077,  0.2044,<br>         -0.4149, -1.0106]])<br>tensor([3])<br></code></pre></div></td></tr></table></figure>
 <p>可以看到最后预测我们的图片属于第三类</p>
+<h2 id="lstm">17、LSTM</h2>
+<p><strong>输入的参数列表包括:</strong></p>
+<ul>
+<li>input_size
+输入数据的特征维数，通常就是embedding_dim(词向量的维度)</li>
+<li>hidden_size　LSTM中隐层的维度</li>
+<li>num_layers　循环神经网络的层数</li>
+<li>bias　用不用偏置，default=True</li>
+<li>batch_first
+这个要注意，通常我们输入的数据shape=(batch_size,seq_length,embedding_dim),而batch_first默认是False,所以我们的输入数据最好送进LSTM之前将batch_size与seq_length这两个维度调换</li>
+<li>dropout　默认是0，代表不用dropout</li>
+<li>bidirectional默认是false，代表不用双向LSTM</li>
+</ul>
+<p><strong>输入数据包括input,(h_0,c_0):</strong></p>
+<ul>
+<li>input就是shape=(seq_length,batch_size,input_size)的张量</li>
+<li>h_0是shape=(num_layers*num_directions,batch_size,hidden_size)的张量，它包含了在当前这个batch_size中每个句子的初始隐藏状态。其中num_layers就是LSTM的层数。如果bidirectional=True,num_directions=2,否则就是１，表示只有一个方向。</li>
+<li>c_0和h_0的形状相同，它包含的是在当前这个batch_size中的每个句子的初始细胞状态。h_0,c_0如果不提供，那么默认是０。</li>
+</ul>
+<p><strong>输出数据包括output,(h_n,c_n):</strong></p>
+<ul>
+<li>output的shape=(seq_length,batch_size,num_directions*hidden_size),它包含的是LSTM的最后一时间步的输出特征(h_t),ｔ是batch_size中每个句子的长度。</li>
+<li>h_n.shape==(num_directions * num_layers,batch,hidden_size)</li>
+<li>h_n包含的是句子的最后一个单词（也就是最后一个时间步）的隐藏状态，c_n包含的是句子的最后一个单词的细胞状态，所以它们都与句子的长度seq_length无关。</li>
+<li>output[-1]与h_n是相等的，因为output[-1]包含的正是batch_size个句子中每一个句子的最后一个单词的隐藏状态，注意LSTM中的隐藏状态其实就是输出，cell
+state细胞状态才是LSTM中一直隐藏的，记录着信息。</li>
+</ul>
+<h2 id="lstmcell">18、LSTMcell</h2>
+<p>上述的nn.LSTM模块一次构造完若干层的LSTM,但是为了对模型有更加灵活的处nn中还有一个LSTMCell模块，是组成LSTM整个序列计算过程的基本组成单元，也就是进行sequence中一个word的计算。</p>
+<p>同时它的参数也就只有3个：输入维度，隐节点数据维度，是否带有偏置。仅提供最基本一个LSTM单元结构，想要完整的进行一个序列的训练的要还要自己编写传播函数把cell间的输入输出连接起来。但是想要自定义不同cell隐节点维度的多层LSTM的话，这个模块还是挺有用的。</p>
+<h2 id="pad_sequence">19、pad_sequence</h2>
+<p><strong>sequences</strong>：表示输入样本序列，为 list 类型，list
+中的元素为 tensor 类型。 tensor 的 size 为 L * F 。其中，L
+为单个序列的长度，F 为序列中每个时间步（time
+step）特征的个数，根据任务的不同 F 的维度会有所不同。</p>
+<p><strong>batch_first</strong>：为 True 对应 [batch_size, seq_len,
+feature]；False 对应[seq_len, batch_size,
+feature]，从习惯上来讲一般设置为 True 比较符合我们的认知。</p>
+<p><strong>padding_value</strong>：填充值，默认值为 0 。</p>
+<p><strong>说明</strong></p>
+<p>主要用来对样本进行填充，填充值一般为 0
+。我们在训练网络时，一般会采用一个一个 mini-batch
+的方式，将训练样本数据喂给网络。在 PyTorch 里面数据都是以 tensor
+的形式存在，一个 mini-batch 实际上就是一个高维的 tensor
+，每个序列数据的长度必须相同才能组成一个 tensor 。为了使网络可以处理
+mini-batch 形式的数据，就必须对序列样本进行填充，保证一个 mini-batch
+里面的数据长度是相同的。</p>
+<p>在 PyTorch 里面一般是使用 DataLoader 进行数据加载，返回 mini-batch
+形式的数据，再将此数据喂给网络进行训练。我们一般会自定义一个 collate_fn
+函数，完成对数据的填充。</p>
+<p><strong>示例</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">import</span> torch<br><span class="hljs-keyword">from</span> torch.utils.data <span class="hljs-keyword">import</span> Dataset, DataLoader<br><span class="hljs-keyword">from</span> torch.nn.utils.rnn <span class="hljs-keyword">import</span> pad_sequence,pack_padded_sequence,pack_sequence,pad_packed_sequence<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">MyData</span>(<span class="hljs-title class_ inherited__">Dataset</span>):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, data</span>):<br>        self.data = data<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__len__</span>(<span class="hljs-params">self</span>):<br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">len</span>(self.data)<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__getitem__</span>(<span class="hljs-params">self, idx</span>):<br>        <span class="hljs-keyword">return</span> self.data[idx]<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">collate_fn</span>(<span class="hljs-params">data</span>):<br>    data.sort(key=<span class="hljs-keyword">lambda</span> x: <span class="hljs-built_in">len</span>(x), reverse=<span class="hljs-literal">True</span>)<br>    data = pad_sequence(data, batch_first=<span class="hljs-literal">True</span>, padding_value=<span class="hljs-number">0</span>)<br>    <span class="hljs-keyword">return</span> data<br><br>a = torch.tensor([<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>])<br>b = torch.tensor([<span class="hljs-number">5</span>,<span class="hljs-number">6</span>,<span class="hljs-number">7</span>])<br>c = torch.tensor([<span class="hljs-number">7</span>,<span class="hljs-number">8</span>])<br>d = torch.tensor([<span class="hljs-number">9</span>])<br>train_x = [a, b, c, d]<br><br>data = MyData(train_x)<br>data_loader = DataLoader(data, batch_size=<span class="hljs-number">2</span>, shuffle=<span class="hljs-literal">True</span>, collate_fn=collate_fn)<br><span class="hljs-comment"># 采用默认的 collate_fn 会报错</span><br><span class="hljs-comment">#data_loader = DataLoader(data, batch_size=2, shuffle=True) </span><br>batch_x = <span class="hljs-built_in">iter</span>(data_loader).<span class="hljs-built_in">next</span>()<br></code></pre></div></td></tr></table></figure>
+<p>运行程序，得到 batch_x 的值：</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-comment"># batch_x</span><br>tensor([[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>],<br>        [<span class="hljs-number">9</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>]])<br></code></pre></div></td></tr></table></figure>
+<p>从 batch_x 的值可以看出，第二行填充了三个 0
+，使其长度和第一行保持一致。</p>
+<p>需要说明的是，对于长度不同的序列，使用默认的 collate_fn
+函数，不自定义 collate_fn 函数完成对序列的填充，上面的程序就会报错。</p>
+<h2 id="pack_padded_sequence">20、pack_padded_sequence</h2>
+<p><strong>参数</strong></p>
+<p><strong>input</strong>：经过 pad_sequence 处理之后的数据。</p>
+<p><strong>lengths</strong>：mini-batch中各个序列的实际长度。</p>
+<p><strong>batch_first</strong>：True 对应 [batch_size, seq_len,
+feature] ；</p>
+<p>False 对应 [seq_len, batch_size, feature] 。</p>
+<p><strong>enforce_sorted</strong>：如果是 True
+，则输入应该是按长度降序排序的序列。如果是 False
+，会在函数内部进行排序。默认值为 True 。</p>
+<p><strong>说明</strong></p>
+<p>这个 pack 的意思可以理解为压紧或压缩
+，因为数据在经过填充之后，会有很多冗余的
+padding_value，所以需要压缩一下。</p>
+<p>为什么要使用这个函数呢？</p>
+<p>RNN 读取数据的方式：网络每次吃进去一组同样时间步 （time step）
+的数据，也就是 mini-batch 的所有样本中下标相同的数据，然后获得一个
+mini-batch 的输出；再移到下一个时间步 （time step），再读入 mini-batch
+中所有该时间步的数据，再输出；直到处理完所有的时间步数据。</p>
+<p>第一个时间步：</p>
+<p><img src="../img/pytorch/12.png" srcset="/img/loading.gif" lazyload /></p>
+<p>第二个时间步：</p>
+<p><img src="../img/pytorch/13.png" srcset="/img/loading.gif" lazyload /></p>
+<p>mini-batch 中的 0 只是用来做数据对齐的 padding_value ，如果进行
+forward 计算时，把 padding_value
+也考虑进去，可能会导致RNN通过了非常多无用的
+padding_value，这样不仅浪费计算资源，最后得到的值可能还会存在误差。对于上面的序列
+2 的数据，通过 RNN 网络：</p>
+<p><img src="../img/pytorch/14.png" srcset="/img/loading.gif" lazyload /></p>
+<p>实际上从第 2 个时间步开始一直到最后的计算都是多余的，输入都是无效的
+padding_value 而已。</p>
+<p>从上面的分析可以看出，为了使 RNN 可以高效的读取数据进行训练，就需要在
+pad 之后再使用 pack_padded_sequence 对数据进行处理。</p>
+<p>需要注意的是，默认条件下，我们必须把输入数据按照序列长度从大到小排列后才能送入
+pack_padded_sequence ，否则会报错。</p>
+<p><strong>示例</strong></p>
+<p>只需要将上面的例子中的 collate_fn
+函数稍作修改即可，其余部分保持不变。</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">collate_fn</span>(<span class="hljs-params">data</span>):<br>    data.sort(key=<span class="hljs-keyword">lambda</span> x: <span class="hljs-built_in">len</span>(x), reverse=<span class="hljs-literal">True</span>)<br>    seq_len = [s.size(<span class="hljs-number">0</span>) <span class="hljs-keyword">for</span> s <span class="hljs-keyword">in</span> data] <span class="hljs-comment"># 获取数据真实的长度</span><br>    data = pad_sequence(data, batch_first=<span class="hljs-literal">True</span>)    <br>    data = pack_padded_sequence(data, seq_len, batch_first=<span class="hljs-literal">True</span>)<br>    <span class="hljs-keyword">return</span> data<br></code></pre></div></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-comment"># batch_x</span><br>PackedSequence(data=tensor([<span class="hljs-number">1</span>, <span class="hljs-number">9</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>]), <br>               batch_sizes=tensor([<span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>]), <br>               sorted_indices=<span class="hljs-literal">None</span>, unsorted_indices=<span class="hljs-literal">None</span>)<br></code></pre></div></td></tr></table></figure>
+<p>可以看出，输出返回一个 PackedSequence 对象，它主要包含两部分：data 和
+batch_sizes 。</p>
+<p><img src="../img/pytorch/15.png" srcset="/img/loading.gif" lazyload /></p>
+<p>填充值 0 就被跳过了。batch_size
+中的值，实际上就是告诉网络每个时间步需要吃进去多少数据。</p>
+<p>如果仔细看，其实输出的 PackedSequence 对象还包含两个部分
+sorted_indices 和unsorted_indices 。前面说到 pack_padded_sequence
+还有一个参数 <strong>enforce_sorted</strong> ，如果是 True
+，则输入应该是按长度降序排序的序列。如果是 False
+，会在函数内部进行排序。默认值为 True 。也就是说在输入
+pack_padded_sequence 前，我们也可以不对数据进行排序。</p>
+<p>现在我们将 enforce_sorted 设置为 False
+，且输入数据不预先进行排序。</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python">data = [torch.tensor([<span class="hljs-number">9</span>]), <br>        torch.tensor([<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>]),<br>        torch.tensor([<span class="hljs-number">5</span>,<span class="hljs-number">6</span>])]<br><br>seq_len = [s.size(<span class="hljs-number">0</span>) <span class="hljs-keyword">for</span> s <span class="hljs-keyword">in</span> data]<br>data = pad_sequence(data, batch_first=<span class="hljs-literal">True</span>)    <br>data = pack_padded_sequence(data, seq_len, batch_first=<span class="hljs-literal">True</span>, enforce_sorted=<span class="hljs-literal">False</span>)<br></code></pre></div></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python">PackedSequence(data=tensor([<span class="hljs-number">1</span>, <span class="hljs-number">5</span>, <span class="hljs-number">9</span>, <span class="hljs-number">2</span>, <span class="hljs-number">6</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>]), <br>               batch_sizes=tensor([<span class="hljs-number">3</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>]), <br>               sorted_indices=tensor([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">0</span>]), <br>               unsorted_indices=tensor([<span class="hljs-number">2</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>]))<br></code></pre></div></td></tr></table></figure>
+<p>sorted_indices = tensor([1, 2, 0]，表示排序之后的结果与原始 data 中的
+tensor 的下标对应关系。1 表示原始 data 中 第 1
+行最长，排序之后排在最前面，其次是第 2 行、第 0 行。</p>
+<p>假设排序之后的结果为：</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python">sort_data = [torch.tensor([<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>]),<br>             torch.tensor([<span class="hljs-number">5</span>,<span class="hljs-number">6</span>])<br>             torch.tensor([<span class="hljs-number">9</span>]), <br>             ]<br></code></pre></div></td></tr></table></figure>
+<p>unsorted_indices = tensor([2, 0, 1]，表示未排序前结果。2 表示
+sort_data 的第 2 行对应 data 中第 0 行；0 表示 sort_data 的第 0 行对应
+data 中的第 1 行；1 表示 sort_data 的第 1 行对应 data 中的第 2 行。</p>
+<h2 id="pack_sequence">21、pack_sequence</h2>
+<p><strong>参数</strong></p>
+<p><strong>sequences</strong>：输入样本序列，为 list 类型，list
+中的元素为 tensor ；tensor 的 size 为 L * F，其中，L 为单个序列的长度，F
+为序列中每个时间步（time step）特征的个数，根据任务的不同 F
+的维度会有所不同。</p>
+<p><strong>enforce_sorted</strong>：如果是 True
+，则输入应该是按长度降序排序的序列。如果是 False
+，会在函数内部进行排序。默认值为 True 。</p>
+<p><strong>说明</strong></p>
+<p>我们看看 PyTorch 中的源码：</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">pack_sequence</span>(<span class="hljs-params">sequences, enforce_sorted=<span class="hljs-literal">True</span></span>): <br>	lengths = torch.as_tensor([v.size(<span class="hljs-number">0</span>) <span class="hljs-keyword">for</span> v <span class="hljs-keyword">in</span> sequences]) <br>	<span class="hljs-keyword">return</span> pack_padded_sequence(pad_sequence(sequences),lengths,enforce_sorted=enforce_sorted)<br></code></pre></div></td></tr></table></figure>
+<p>可以看出 pack_sequence 实际上就是对 pad_sequence 和
+pack_padded_sequence
+操作的一个封装。通过一个函数完成了两步才能完成的工作。</p>
+<p><strong>示例</strong></p>
+<p>前面的 collate_fn 函数可以进一步修改为：</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">collate_fn</span>(<span class="hljs-params">data</span>):<br>    data.sort(key=<span class="hljs-keyword">lambda</span> x: <span class="hljs-built_in">len</span>(x), reverse=<span class="hljs-literal">True</span>)<br>   <br>    data = pack_sequence(data)<br>    <span class="hljs-comment">#seq_len = [s.size(0) for s in data]</span><br>    <span class="hljs-comment">#data = pad_sequence(data, batch_first=True)    </span><br>    <span class="hljs-comment">#data = pack_padded_sequence(data, seq_len, batch_first=True)</span><br>    <span class="hljs-keyword">return</span> data<br></code></pre></div></td></tr></table></figure>
+<p>输出结果与前面相同：</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-comment"># batch_x</span><br>PackedSequence(data=tensor([<span class="hljs-number">1</span>, <span class="hljs-number">9</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>]), <br>               batch_sizes=tensor([<span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>]), <br>               sorted_indices=<span class="hljs-literal">None</span>, unsorted_indices=<span class="hljs-literal">None</span>)<br></code></pre></div></td></tr></table></figure>
+<h2 id="pad_packed_sequence">22、pad_packed_sequence</h2>
+<p><strong>参数</strong></p>
+<p><strong>sequences</strong>：PackedSequence 对象，将要被填充的 batch
+；</p>
+<p><strong>batch_first</strong>：一般设置为 True，返回的数据格式为
+[batch_size, seq_len, feature] ；</p>
+<p><strong>padding_value</strong>：填充值；</p>
+<p><strong>total_length</strong>：如果不是<code>None</code>，输出将被填充到长度：<code>total_length</code>。</p>
+<p><strong>说明</strong></p>
+<p>如果在喂给网络数据的时候，用了 pack_sequence 进行打包，pytorch 的 RNN
+也会把输出 out 打包成一个 PackedSequence 对象。</p>
+<p>这个函数实际上是 pack_padded_sequence
+函数的逆向操作。就是把压紧的序列再填充回来。</p>
+<p>为啥要填充回来呢？我的理解是，在 collate_fn 函数里面通常也会调用
+pad_sequence 对 label 进行填充，RNN 的输出结果为了和 label
+对齐，需要将压紧的序列再填充回来，方便后续的计算。</p>
+<p><strong>示例</strong></p>
+<p>需要说明的是，下面的程序中，为了产生符合 LSTM 输入格式 [batch_size,
+seq_len, feature] 的数据，使用了函数 unsqueeze 进行升维处理。其中，
+batch_size 是<strong>样本数</strong>，seq_len
+是<strong>序列长度</strong>，feature 是<strong>特征数</strong>。</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">MyData</span>(<span class="hljs-title class_ inherited__">Dataset</span>):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, data</span>):<br>        self.data = data<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__len__</span>(<span class="hljs-params">self</span>):<br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">len</span>(self.data)<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__getitem__</span>(<span class="hljs-params">self, idx</span>):<br>        <span class="hljs-keyword">return</span> self.data[idx]<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">collate_fn</span>(<span class="hljs-params">data</span>):<br>    data.sort(key=<span class="hljs-keyword">lambda</span> x: <span class="hljs-built_in">len</span>(x), reverse=<span class="hljs-literal">True</span>)<br>    seq_len = [s.size(<span class="hljs-number">0</span>) <span class="hljs-keyword">for</span> s <span class="hljs-keyword">in</span> data]<br>    data = pad_sequence(data, batch_first=<span class="hljs-literal">True</span>).<span class="hljs-built_in">float</span>()    <br>    data = data.unsqueeze(-<span class="hljs-number">1</span>)<br>    data = pack_padded_sequence(data, seq_len, batch_first=<span class="hljs-literal">True</span>)<br>    <span class="hljs-keyword">return</span> data<br><br>a = torch.tensor([<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>])<br>b = torch.tensor([<span class="hljs-number">5</span>,<span class="hljs-number">6</span>,<span class="hljs-number">7</span>])<br>c = torch.tensor([<span class="hljs-number">7</span>,<span class="hljs-number">8</span>])<br>d = torch.tensor([<span class="hljs-number">9</span>])<br>train_x = [a, b, c, d]<br><br>data = MyData(train_x)<br>data_loader = DataLoader(data, batch_size=<span class="hljs-number">2</span>, shuffle=<span class="hljs-literal">True</span>, collate_fn=collate_fn)<br>batch_x = <span class="hljs-built_in">iter</span>(data_loader).<span class="hljs-built_in">next</span>()<br><br>rnn = nn.LSTM(<span class="hljs-number">1</span>, <span class="hljs-number">4</span>, <span class="hljs-number">1</span>, batch_first=<span class="hljs-literal">True</span>)<br>h0 = torch.rand(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">4</span>).<span class="hljs-built_in">float</span>()<br>c0 = torch.rand(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">4</span>).<span class="hljs-built_in">float</span>()<br>out, (h1, c1) = rnn(batch_x, (h0, c0))<br></code></pre></div></td></tr></table></figure>
+<p>得到 out 的结果如下，是一个 PackedSequence 类型的对象，与前面调用
+pack_padded_sequence 得到的结果类型相同。</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-comment"># out</span><br>PackedSequence(data=tensor([[-<span class="hljs-number">1.3302e-04</span>,  <span class="hljs-number">5.7754e-02</span>,  <span class="hljs-number">4.3181e-02</span>,  <span class="hljs-number">6.4226e-02</span>],<br>        [-<span class="hljs-number">2.8673e-02</span>,  <span class="hljs-number">3.9089e-02</span>, -<span class="hljs-number">2.6875e-03</span>,  <span class="hljs-number">4.2686e-03</span>],<br>        [-<span class="hljs-number">1.0216e-01</span>,  <span class="hljs-number">2.5236e-02</span>, -<span class="hljs-number">1.2230e-01</span>,  <span class="hljs-number">5.1524e-02</span>],<br>        [-<span class="hljs-number">1.6211e-01</span>,  <span class="hljs-number">2.1079e-02</span>, -<span class="hljs-number">1.5849e-01</span>,  <span class="hljs-number">5.2800e-02</span>],<br>        [-<span class="hljs-number">1.5774e-01</span>,  <span class="hljs-number">2.6749e-02</span>, -<span class="hljs-number">1.3333e-01</span>,  <span class="hljs-number">4.7894e-02</span>]],<br>       grad_fn=&lt;CatBackward&gt;), <br>       batch_sizes=tensor([<span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>]), <br>       sorted_indices=<span class="hljs-literal">None</span>, unsorted_indices=<span class="hljs-literal">None</span>)<br></code></pre></div></td></tr></table></figure>
+<p>对 out 调用 pad_packed_sequence 进行填充：</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python">out_pad, out_len = pad_packed_sequence(out, batch_first=<span class="hljs-literal">True</span>)<br></code></pre></div></td></tr></table></figure>
+<p>out_pad 和 out_len 的结果如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-comment"># out_pad </span><br>tensor([[[-<span class="hljs-number">1.3302e-04</span>,  <span class="hljs-number">5.7754e-02</span>,  <span class="hljs-number">4.3181e-02</span>,  <span class="hljs-number">6.4226e-02</span>],<br>         [-<span class="hljs-number">1.0216e-01</span>,  <span class="hljs-number">2.5236e-02</span>, -<span class="hljs-number">1.2230e-01</span>,  <span class="hljs-number">5.1524e-02</span>],<br>         [-<span class="hljs-number">1.6211e-01</span>,  <span class="hljs-number">2.1079e-02</span>, -<span class="hljs-number">1.5849e-01</span>,  <span class="hljs-number">5.2800e-02</span>],<br>         [-<span class="hljs-number">1.5774e-01</span>,  <span class="hljs-number">2.6749e-02</span>, -<span class="hljs-number">1.3333e-01</span>,  <span class="hljs-number">4.7894e-02</span>]],<br><br>        [[-<span class="hljs-number">2.8673e-02</span>,  <span class="hljs-number">3.9089e-02</span>, -<span class="hljs-number">2.6875e-03</span>,  <span class="hljs-number">4.2686e-03</span>],<br>         [ <span class="hljs-number">0.0000e+00</span>,  <span class="hljs-number">0.0000e+00</span>,  <span class="hljs-number">0.0000e+00</span>,  <span class="hljs-number">0.0000e+00</span>],<br>         [ <span class="hljs-number">0.0000e+00</span>,  <span class="hljs-number">0.0000e+00</span>,  <span class="hljs-number">0.0000e+00</span>,  <span class="hljs-number">0.0000e+00</span>],<br>         [ <span class="hljs-number">0.0000e+00</span>,  <span class="hljs-number">0.0000e+00</span>,  <span class="hljs-number">0.0000e+00</span>,  <span class="hljs-number">0.0000e+00</span>]]],<br>       grad_fn=&lt;TransposeBackward0&gt;)<br><br><span class="hljs-comment"># out_len</span><br>tensor([<span class="hljs-number">4</span>, <span class="hljs-number">1</span>])<br></code></pre></div></td></tr></table></figure>
+<p>再回想下我们调用 pad_sequence 填充之后的输入：</p>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-comment"># batch_x</span><br>tensor([[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>],<br>        [<span class="hljs-number">9</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>]])<br></code></pre></div></td></tr></table></figure>
+<p>这个 out_pad 结果其实就和我们填充之后的输入对应起来了。</p>
 
             </div>
             <hr>
