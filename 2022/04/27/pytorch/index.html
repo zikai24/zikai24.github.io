@@ -39,7 +39,7 @@
 <meta property="og:image" content="http://example.com/2022/04/27/img/pytorch/14.png">
 <meta property="og:image" content="http://example.com/2022/04/27/img/pytorch/15.png">
 <meta property="article:published_time" content="2022-04-27T08:32:20.000Z">
-<meta property="article:modified_time" content="2022-05-17T11:22:22.008Z">
+<meta property="article:modified_time" content="2022-05-18T11:48:47.269Z">
 <meta property="article:author" content="肘子开">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://example.com/img/pytorch/1.png">
@@ -212,7 +212,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      24k 字
+      25k 字
     </span>
   
 
@@ -221,7 +221,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      202 分钟
+      209 分钟
     </span>
   
 
@@ -623,6 +623,36 @@ pack_padded_sequence 得到的结果类型相同。</p>
 <p>出了两个张量A和B，分别是2行3列，4行3列。即他们都是2维张量。因为只有两维，这样在用torch.cat拼接的时候就有两种拼接方式：按行拼接和按列拼接。即所谓的维数0和维数1.</p>
 <p>C=torch.cat((A,B),0)就表示按维数0（行）拼接A和B，也就是竖着拼接，A上B下。此时需要注意：列数必须一致，即维数1数值要相同，这里都是3列，方能列对齐。拼接后的C的第0维是两个维数0数值和，即2+4=6.</p>
 <p>C=torch.cat((A,B),1)就表示按维数1（列）拼接A和B，也就是横着拼接，A左B右。此时需要注意：行数必须一致，即维数0数值要相同，这里都是2行，方能行对齐。拼接后的C的第1维是两个维数1数值和，即3+4=7.</p>
+<h2 id="torch.split">23、torch.split</h2>
+<p><code>torch.split(tensor, split_size_or_sections, dim=0)</code></p>
+<p>torch.split()作用将tensor分成块结构。</p>
+<p>参数：</p>
+<ul>
+<li>tesnor：input，待分输入</li>
+<li>split_size_or_sections：需要切分的大小(int or list )</li>
+<li>dim：切分维度</li>
+<li>output：切分后块结构 &lt;class 'tuple'&gt;</li>
+<li>当split_size_or_sections为<strong>int</strong>时，tenor结构和split_size_or_sections，正好匹配，那么ouput就是大小相同的块结构。如果按照split_size_or_sections结构，tensor不够了，那么就把剩下的那部分做一个块处理。</li>
+<li>当split_size_or_sections
+为<strong>list</strong>时，那么tensor结构会一共切分成len(list)这么多的小块，每个小块中的大小按照list中的大小决定，其中list中的数字总和应等于该维度的大小，否则会报错（注意这里与split_size_or_sections为int时的情况不同）。</li>
+</ul>
+<h2
+id="torch.squeeze和torch.unsqueeze">24、torch.squeeze和torch.unsqueeze</h2>
+<p>⼀、先看torch.squeeze()
+这个函数主要对数据的维度进⾏压缩，去掉维数为1的的维度，⽐如是⼀⾏或者⼀列这种，⼀个⼀⾏三列（1,3）的数去掉第⼀个维数为⼀的维度之后就变成（3）⾏。</p>
+<ul>
+<li>1.squeeze(a)就是将a中所有为1的维度删掉。不为1的维度没有影响。</li>
+<li>2.a.squeeze(N) 就是去掉a中指定的维数为⼀的维度。</li>
+<li>3.还有⼀种形式就是b=torch.squeeze(a，N)
+a中去掉指定的维数N为⼀的维度。</li>
+</ul>
+<p>⼆、再看torch.unsqueeze()这个函数主要是对数据维度进⾏扩充。</p>
+<ul>
+<li>1.给指定位置加上维数为⼀的维度，⽐如原本有个三⾏的数据（3），在0的位置加了⼀维就变成⼀⾏三列（1,3）。a.unsqueeze(N)
+就是在a中指定位置N加上⼀个维数为1的维度。</li>
+<li>2.还有⼀种形式就是b=torch.unsqueeze(a，N)
+a就是在a中指定位置N加上⼀个维数为1的维度</li>
+</ul>
 
             </div>
             <hr>
