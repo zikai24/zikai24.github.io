@@ -1,0 +1,964 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=dark>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="肘子开">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="1 词向量知识回顾 1.1 词向量表征  现在我们可以获得一个单词的表示  我们开始时学过的单词向量  Word2vec，GloVe，fastText    1.2 预训练的词向量  我们可以随机初始化词向量，并根据我们自己的下游任务训练它们 但在绝大多数情况下，使用预训练词向量是有帮助的，因为它们本身是自带信息的 (我们可以在更大体量的预训练语料上训练得到它们)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第十三讲-基于上下文的表征与NLP预训练模型">
+<meta property="og:url" content="http://example.com/2022/06/15/%E7%AC%AC%E5%8D%81%E4%B8%89%E8%AE%B2-%E5%9F%BA%E4%BA%8E%E4%B8%8A%E4%B8%8B%E6%96%87%E7%9A%84%E8%A1%A8%E5%BE%81%E4%B8%8ENLP%E9%A2%84%E8%AE%AD%E7%BB%83%E6%A8%A1%E5%9E%8B/index.html">
+<meta property="og:site_name" content="肘子开的博客">
+<meta property="og:description" content="1 词向量知识回顾 1.1 词向量表征  现在我们可以获得一个单词的表示  我们开始时学过的单词向量  Word2vec，GloVe，fastText    1.2 预训练的词向量  我们可以随机初始化词向量，并根据我们自己的下游任务训练它们 但在绝大多数情况下，使用预训练词向量是有帮助的，因为它们本身是自带信息的 (我们可以在更大体量的预训练语料上训练得到它们)">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/nlp/第十三讲/1.png">
+<meta property="og:image" content="http://example.com/img/nlp/第十三讲/2.png">
+<meta property="og:image" content="http://example.com/img/nlp/第十三讲/3.png">
+<meta property="og:image" content="http://example.com/img/nlp/第十三讲/4.png">
+<meta property="og:image" content="http://example.com/img/nlp/第十三讲/5.png">
+<meta property="og:image" content="http://example.com/img/nlp/第十三讲/6.png">
+<meta property="og:image" content="http://example.com/img/nlp/第十三讲/7.png">
+<meta property="og:image" content="http://example.com/img/nlp/第十三讲/11.png">
+<meta property="og:image" content="http://example.com/img/nlp/第十三讲/9.png">
+<meta property="og:image" content="http://example.com/img/nlp/第十三讲/8.png">
+<meta property="og:image" content="http://example.com/img/nlp/第十三讲/10.png">
+<meta property="og:image" content="http://example.com/img/nlp/第十三讲/12.png">
+<meta property="og:image" content="http://example.com/img/nlp/第十三讲/13.png">
+<meta property="og:image" content="http://example.com/img/nlp/第十三讲/14.png">
+<meta property="og:image" content="http://example.com/img/nlp/第十三讲/15.png">
+<meta property="og:image" content="http://example.com/img/nlp/第十三讲/16.png">
+<meta property="og:image" content="http://example.com/img/nlp/第十三讲/17.png">
+<meta property="og:image" content="http://example.com/img/nlp/第十三讲/18.png">
+<meta property="og:image" content="http://example.com/img/nlp/第十三讲/19.png">
+<meta property="og:image" content="http://example.com/img/nlp/第十三讲/120.png">
+<meta property="article:published_time" content="2022-06-15T12:47:52.000Z">
+<meta property="article:modified_time" content="2022-06-16T12:41:44.441Z">
+<meta property="article:author" content="肘子开">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/nlp/第十三讲/1.png">
+  
+  
+  <title>第十三讲-基于上下文的表征与NLP预训练模型 - 肘子开的博客</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/nnfx-dark.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>肘子开的博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/bg/bg2.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="第十三讲-基于上下文的表征与NLP预训练模型">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-06-15 20:47" pubdate>
+        2022年6月15日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      6.3k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      53 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">第十三讲-基于上下文的表征与NLP预训练模型</h1>
+            
+            <div class="markdown-body">
+              <h1 id="词向量知识回顾">1 词向量知识回顾</h1>
+<h2 id="词向量表征">1.1 词向量表征</h2>
+<ul>
+<li>现在我们可以获得一个单词的表示
+<ul>
+<li>我们开始时学过的单词向量
+<ul>
+<li>Word2vec，GloVe，fastText</li>
+</ul></li>
+</ul></li>
+</ul>
+<h2 id="预训练的词向量">1.2 预训练的词向量</h2>
+<ul>
+<li>我们可以随机初始化词向量，并根据我们自己的下游任务训练它们</li>
+<li>但在绝大多数情况下，使用预训练词向量是有帮助的，因为它们本身是自带信息的
+(我们可以在更大体量的预训练语料上训练得到它们)</li>
+</ul>
+<h2 id="未知词的词向量应用建议">1.3 未知词的词向量应用建议</h2>
+<ul>
+<li><p>简单且常见的解决方案：</p></li>
+<li><p>训练时：词汇表<span class="math inline">\(\{\text { words
+occurring, say }, \geq 5 \text { times }\}
+\cup\{&lt;\mathrm{UNK}&gt;\}\)</span></p>
+<ul>
+<li>将<strong>所有</strong>罕见的词 (数据集中出现次数小于 5)
+都映射为<span
+class="math inline">\(&lt;UNK&gt;\)</span>，为其训练一个词向量</li>
+</ul></li>
+<li><p><strong>运行时</strong>：使用<span
+class="math inline">\(&lt;UNK&gt;\)</span>代替词汇表之外的词
+OOV</p></li>
+<li><p><strong>问题</strong>：</p>
+<ul>
+<li>没有办法区分不同 UNK words，无论是身份还是意义</li>
+</ul></li>
+</ul>
+<p><strong>解决方案</strong></p>
+<p>​ <strong>使用字符级模型学习词向量</strong></p>
+<ul>
+<li>特别是在 QA 中，match on word identity
+是很重要的，即使词向量词汇表以外的单词</li>
+</ul>
+<p>​ <strong>尝试这些建议</strong> (from Dhingra, Liu, Salakhutdinov,
+Cohen 2017)</p>
+<ul>
+<li><p>如果测试时的<span
+class="math inline">\(&lt;UNK&gt;\)</span>单词不在你的词汇表中，但是出现在你使用的无监督词嵌入中，测试时直接使用这个向量</p></li>
+<li><p>此外，你可以将其视为新的单词，并为其分配一个随机向量，将它们添加到你的词汇表</p></li>
+<li><p>帮助很大或者也许能帮点忙</p></li>
+<li><p>你可以试试另一件事</p>
+<ul>
+<li>将它们分解为词类 (如未知号码，大写等等)，每种都对应一个 <span
+class="math inline">\(&lt;UNK-class&gt;\)</span></li>
+</ul></li>
+</ul>
+<h2 id="单词的表示">1.4 单词的表示</h2>
+<p><strong>存在两个大问题</strong></p>
+<ul>
+<li>对于一个 word type 总是是用相同的表示，不考虑这个 word token
+出现的上下文
+<ul>
+<li>我们可以进行非常细粒度的词义消歧</li>
+</ul></li>
+<li>我们对一个词只有一种表示，但是单词有不同的方面，包括语义，句法行为，以及表达
+/ 含义</li>
+</ul>
+<h2 id="我们一直都有解决这个问题的办法吗">1.5
+我们一直都有解决这个问题的办法吗？</h2>
+<ul>
+<li>在NLM中，我们直接将单词向量 (可能只在语料库上训练) 插入LSTM层</li>
+<li>那些LSTM层被训练来预测下一个单词</li>
+<li>但这些语言模型在每一个位置生成特定于上下文的词表示</li>
+</ul>
+<h2 id="论文解读-peters-et-al.-2017-taglm-pre-elmo">1.6 论文解读 Peters
+et al. (2017): TagLM – “Pre-ELMo”</h2>
+<ul>
+<li><strong>想法</strong>：想要获得单词在上下文的意思，但标准的 RNN
+学习任务只在 task-labeled 的小数据上 (如 NER )</li>
+<li>为什么不通过半监督学习的方式在大型无标签数据集上训练
+NLM，而不只是词向量</li>
+</ul>
+<h2 id="标签语言模型-tag-lm">1.7 标签语言模型 (Tag LM )</h2>
+<ul>
+<li><strong>步骤3</strong>：在序列标记模型中同时使用单词嵌入和 LM
+嵌入</li>
+<li><strong>步骤2</strong>：为输入序列中的每个标记准备单词嵌入和 LM
+嵌入</li>
+<li><strong>步骤1</strong>：预训练词嵌入和语言模型</li>
+<li>与上文无关的单词嵌入 + RNN model 得到的 hidden states
+作为特征输入</li>
+</ul>
+<p><img src="/img/nlp/第十三讲/1.png" srcset="/img/loading.gif" lazyload /></p>
+<ul>
+<li>Char CNN / RNN + Token Embedding 作为 bi-LSTM 的输入</li>
+<li>得到的 hidden states 与 Pre-trained bi-LM (冻结的) 的 hidden states
+连接起来输入到第二层的 bi-LSTM 中</li>
+</ul>
+<p><img src="/img/nlp/第十三讲/2.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="命名实体识别-ner">1.8 命名实体识别 (NER)</h2>
+<ul>
+<li>一个非常重要的NLP子任务：<strong>查找</strong>和<strong>分类</strong>文本中的实体</li>
+</ul>
+<h2 id="论文解读-peters-et-al.2017-taglm-pre-elmo">1.9 论文解读 Peters
+et al.(2017): TagLM-"Pre-ELMo"</h2>
+<ul>
+<li>语言模型在 <code>Billion word benchmark</code>
+的8亿个训练单词上训练</li>
+</ul>
+<p><strong>语言模型观察结果</strong></p>
+<ul>
+<li>在监督数据集上训练的语言模型并不会受益</li>
+<li>双向语言模型仅有助于 forward 过程，提升约 0.2</li>
+<li>具有巨大的语言模型设计 (困惑度 30) 比较小的模型 (困惑度 48) 提升约
+0.3</li>
+</ul>
+<p><strong>任务特定的BiLSTM观察结果</strong></p>
+<ul>
+<li>仅使用LM嵌入来预测并不是很好：88.17 F1
+<ul>
+<li>远低于仅在标记数据上使用 BiLSTM 标记器</li>
+</ul></li>
+</ul>
+<h2 id="论文解读-also-in-the-air-mccann-et-al.2017cove">1.10 论文解读
+Also in the air: McCann et al.2017:CoVe</h2>
+<ul>
+<li><p>也有一种思路：使用训练好的序列模型，为其他NLP模型提供上下文</p></li>
+<li><p><strong>思路</strong>：机器翻译是为了保存意思，所以这也许是个好目标？</p></li>
+<li><p>使用 seq2seq + attention NMT system 中的 Encoder，即 2 层
+bi-LSTM，作为上下文提供者</p></li>
+<li><p>所得到的 CoVe 向量在各种任务上都优于 GloVe 向量</p></li>
+<li><p>但是，结果并不像其他幻灯片中描述的更简单的 NLM
+训练那么好，所以似乎被放弃了</p>
+<ul>
+<li>也许NMT只是比语言建模更难？</li>
+<li>或许有一天这个想法会回来？</li>
+</ul></li>
+</ul>
+<h1 id="elmo模型">2.ELMo模型</h1>
+<h2
+id="论文解读-peters-et-al.-2018-elmo-embeddings-from-language-models">2.1
+论文解读 Peters et al. (2018): ELMo: Embeddings from Language
+Models</h2>
+<ul>
+<li><p>单词标记向量或上下文词向量的突破</p></li>
+<li><p>使用长上下文而不是上下文窗口学习词标记向量
+(这里，整个句子可能更长)</p></li>
+<li><p>学习深度 Bi-NLM，并在预测中使用它的所有层</p></li>
+<li><p>训练一个双向语言模型 (LM)</p></li>
+<li><p>目标是效果 OK 但不要太大的语言模型 (LM)</p>
+<ul>
+<li>使用 2 个 biLSTM 层</li>
+<li>(仅) 使用字符CNN构建初始单词表示
+<ul>
+<li>2048 个 char n-gram filters 和 2 个 highway layers，512 维的
+projection</li>
+</ul></li>
+<li>4096 dim hidden/cell LSTM状态，使用 512 dim
+的对下一个输入的投影</li>
+<li>使用残差连接</li>
+<li>绑定 token 的输入和输出的参数
+(softmax)，并将这些参数绑定到正向和反向语言模型 (LM) 之间</li>
+</ul></li>
+<li><p>ELMo 学习 biLM 表示的特定任务组合</p></li>
+<li><p>这是一个创新，TagLM 中仅仅使用堆叠 LSTM 的顶层，ELMo 认为 BiLSTM
+所有层都是有用的</p></li>
+</ul>
+<p><span class="math display">\[
+\begin{aligned}
+R_{k} &amp;=\left\{\mathbf{x}_{k}^{L M}, \overrightarrow{\mathbf{h}}_{k,
+j}^{L M}, \overleftarrow{\mathbf{h}}_{k, j}^{L M} \mid j=1, \ldots,
+L\right\} \\
+&amp;=\left\{\mathbf{h}_{k, j}^{L M} \mid j=0, \ldots, L\right\}
+\end{aligned}
+\]</span></p>
+<p><span class="math display">\[
+\mathbf{E L M o}_{k}^{\text {task }}=E\left(R_{k} ; \Theta^{\text {task
+}}\right)=\gamma^{\text {task }} \sum_{j=0}^{L} s_{j}^{\text {task }}
+\mathbf{h}_{k, j}^{L M}
+\]</span></p>
+<ul>
+<li><p><span class="math inline">\(\gamma^{t a s k}\)</span>衡量 ELMo
+对任务的总体有用性，是为特定任务学习的全局比例因子</p></li>
+<li><p><span class="math inline">\(s^{task}\)</span>是 softmax
+归一化的混合模型权重，是 BiLSTM
+的加权平均值的权重，对不同的任务是不同的，因为不同的任务对不同层的
+BiLSTM 的</p></li>
+<li><p>首先运行 biLM 获取每个单词的表示</p></li>
+<li><p>然后，让 (无论什么) 最终任务模型使用它们</p>
+<ul>
+<li>冻结 ELMo 的权重，用于监督模型</li>
+<li>将 ELMo 权重连接到特定于任务的模型中
+<ul>
+<li>细节取决于任务
+<ul>
+<li>像 TagLM 一样连接到中间层是典型的</li>
+<li>可以在生产输出时提供更多的表示，例如在问答系统中</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+<h2 id="elmo在序列标记器中的使用">2.2 ELMo在序列标记器中的使用</h2>
+<p><img src="/img/nlp/第十三讲/3.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="elmo-层权重">2.3 ELMo ：层权重</h2>
+<ul>
+<li>这两个 biLSTM NLM 层有不同的用途 / 含义
+<ul>
+<li>低层更适合低级语法，例如
+<ul>
+<li>词性标注(part-of-speech tagging)、句法依赖(syntactic
+dependency)、NER</li>
+</ul></li>
+<li>高层更适合更高级别的语义
+<ul>
+<li>情绪、语义角色标记、问答系统、SNLI</li>
+</ul></li>
+</ul></li>
+<li>这似乎很有趣，但它是如何通过两层以上的网络来实现的看起来更有趣</li>
+</ul>
+<h1 id="ulmfit模型">3.ULMfit模型</h1>
+<h2 id="ulmfit">3.1 ULMfit</h2>
+<ul>
+<li><p>转移 NLM 知识的一般思路是一样的</p></li>
+<li><p>这里应用于文本分类</p>
+<p><img src="/img/nlp/第十三讲/4.png" srcset="/img/loading.gif" lazyload /></p></li>
+<li><p>在大型通用领域的无监督语料库上使用 biLM 训练</p>
+<ul>
+<li><p>在目标任务数据上调整 LM</p></li>
+<li><p>对特定任务将分类器进行微调</p>
+<p><img src="/img/nlp/第十三讲/5.png" srcset="/img/loading.gif" lazyload /></p></li>
+</ul></li>
+<li><p>使用合理大小的 <code>1 GPU</code>
+语言模型，并不是真的很大</p></li>
+<li><p>在LM调优中要注意很多</p>
+<ul>
+<li>不同的每层学习速度</li>
+<li>倾斜三角形学习率 (STLR) 计划</li>
+</ul></li>
+<li><p>学习分类器时逐步分层解冻和STLR</p></li>
+<li><p>使用<span class="math inline">\(\left[h_{T},
+\operatorname{maxpool}(\mathbf{h}), \text { meanpool
+}(\mathbf{h})\right]\)</span>进行分类</p></li>
+<li><p>使用大型的预训练语言模型，是一种提高性能的非常有效的方法</p></li>
+</ul>
+<h1 id="transformer结构">4.Transformer结构</h1>
+<h2 id="transformer介绍">4.1 Transformer介绍</h2>
+<p><img src="/img/nlp/第十三讲/6.png" srcset="/img/loading.gif" lazyload /></p>
+<ul>
+<li>所有这些模型都是以Transformer为主结构的，我们应该学习一下Transformer吧</li>
+</ul>
+<p><strong>补充说明</strong></p>
+<ul>
+<li>Transformer 不仅很强大，而且允许扩展到更大的尺寸</li>
+</ul>
+<h2 id="transformers-动机">4.2 Transformers 动机</h2>
+<ul>
+<li><p>我们想要并行化，但是RNNs本质上是顺序的</p></li>
+<li><p>尽管有 GRUs 和 LSTMs，RNNs
+仍然需要注意机制来处理长期依赖关系——否则状态之间的 path length
+<strong>路径长度</strong> 会随着序列增长</p></li>
+<li><p>但如果注意力让我们进入任何一个状态……也许我们可以只用注意力而不需要RNN?</p></li>
+</ul>
+<h2 id="transformer-概览">4.3 Transformer 概览</h2>
+<ul>
+<li>序列到序列编码解码模型，但它是非循环非串行结构</li>
+<li><strong>任务</strong>：平行语料库的机器翻译</li>
+<li>预测每个翻译单词</li>
+<li>最终成本/误差函数是 softmax 分类器基础上的标准交叉熵误差</li>
+</ul>
+<p><img src="/img/nlp/第十三讲/7.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="transformer-基础">4.4 Transformer 基础</h2>
+<ul>
+<li>自学 transformer
+<ul>
+<li>主要推荐资源
+<ul>
+<li>http://nlp.seas.harvard.edu/2018/04/03/attention.html</li>
+<li>The Annotated Transformer by Sasha Rush</li>
+</ul></li>
+<li>一个使用PyTorch的Jupyter笔记本，解释了一切！</li>
+</ul></li>
+<li>现在：我们定义 Transformer 网络的基本构建块：第一，新的注意力层</li>
+</ul>
+<h2 id="点乘注意力-dot-product-attention">4.5 点乘注意力 Dot-Product
+Attention</h2>
+<ul>
+<li><p><strong>输入</strong>：对于一个输出而言的查询<span
+class="math inline">\(q\)</span>和一组键-值对<span
+class="math inline">\((k-v)\)</span></p></li>
+<li><p>Query，keys，values，and output 都是向量</p></li>
+<li><p>输出值的加权和</p></li>
+<li><p>权重的每个值是由查询和相关键的内积计算结果</p></li>
+<li><p>Query 和 keys 有相同维数<span
+class="math inline">\(d_k\)</span>，value 的维数为<span
+class="math inline">\(d_v\)</span></p></li>
+</ul>
+<p><span class="math display">\[
+A(q, K, V)=\sum_{i} \frac{e^{q \cdot k_{i}}}{\sum_{j} e^{q \cdot k_{j}}}
+v_{i}
+\]</span></p>
+<h2 id="点乘注意力矩阵表示法">4.6 点乘注意力矩阵表示法</h2>
+<ul>
+<li>当我们有多个查询<span
+class="math inline">\(q\)</span>时，我们将它们叠加在一个矩阵<span
+class="math inline">\(Q\)</span>中</li>
+<li>变成<span class="math inline">\(A(Q, K,
+V)=\operatorname{softmax}\left(Q K^{T}\right) V\)</span></li>
+</ul>
+<h2 id="缩放点乘注意力">4.7 缩放点乘注意力</h2>
+<ul>
+<li><p><strong>问题</strong>：<span
+class="math inline">\(d_k\)</span>变大时，<span
+class="math inline">\(q^Tk\)</span>的方差增大 → 一些 softmax
+中的值的方差将会变大 → softmax 得到的是峰值 → 因此梯度变小了</p></li>
+<li><p><strong>解决方案</strong>：通过 query / key
+向量的长度进行缩放</p></li>
+</ul>
+<p><span class="math display">\[
+A(Q, K, V)=\operatorname{softmax}\left(\frac{Q
+K^{T}}{\sqrt{d_{k}}}\right) V
+\]</span></p>
+<p><img src="/img/nlp/第十三讲/11.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/nlp/第十三讲/9.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/nlp/第十三讲/8.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/nlp/第十三讲/10.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="编码器中的自注意力">4.8 编码器中的自注意力</h2>
+<ul>
+<li><p>输入单词向量是 queries，keys and values</p></li>
+<li><p>换句话说：<strong>这个词向量自己选择彼此</strong></p></li>
+<li><p>词向量堆栈= Q = K = V</p></li>
+<li><p>我们会通过解码器明白为什么我们在定义中将他们分开</p></li>
+</ul>
+<h2 id="多头注意力">4.9 多头注意力</h2>
+<ul>
+<li>简单 self-attention 的问题
+<ul>
+<li>单词只有一种相互交互的方式</li>
+</ul></li>
+<li><strong>解决方案</strong>：<strong>多头注意力</strong></li>
+<li>首先，通过矩阵<span class="math inline">\(W\)</span>将<span
+class="math inline">\(Q\)</span>，<span
+class="math inline">\(K\)</span>，<span
+class="math inline">\(V\)</span>映射到<span
+class="math inline">\(h=8\)</span>的许多低维空间</li>
+<li>然后，应用注意力，然后连接输出，通过线性层</li>
+</ul>
+<p><span class="math display">\[
+\operatorname{MultiHead}(\boldsymbol{Q}, \boldsymbol{K},
+\boldsymbol{V})=\operatorname{Concat}\left(\right.  head  _{1}, \ldots ,
+head  \left._{h}\right)  where \ head\  hention  _{i}=  Attention (
+\left.Q W_{i}^{Q}, K W_{i}^{K}, V W_{i}^{V}\right)
+\]</span></p>
+<p><img src="/img/nlp/第十三讲/12.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/nlp/第十三讲/13.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="完整的transformer模块">4.10 完整的transformer模块</h2>
+<ul>
+<li><p>每个 Block 都有两个子层</p>
+<ul>
+<li><p>多头 attention</p></li>
+<li><p>两层的前馈神经网络，使用 ReLU</p></li>
+</ul></li>
+<li><p>这两个子层都</p>
+<ul>
+<li>残差连接以及层归一化</li>
+<li>LayerNorm(x+Sublayer(x))</li>
+<li>层归一化将输入转化为均值是0，方差是1，每一层和每一个训练点
+(并且添加了两个参数)</li>
+</ul></li>
+</ul>
+<p><span class="math display">\[
+\mu^{l}=\frac{1}{H} \sum_{i=1}^{H} a_{i}^{l} \quad
+\sigma^{l}=\sqrt{\frac{1}{H}
+\sum_{i=1}^{H}\left(a_{i}^{l}-\mu^{l}\right)^{2}} \quad
+h_{i}=f\left(\frac{g_{i}}{\sigma_{i}}\left(a_{i}-\mu_{i}\right)+b_{i}\right)
+\]</span></p>
+<h2 id="编码器输入">4.11 编码器输入</h2>
+<ul>
+<li><p>实际的词表示是 byte-pair 编码</p></li>
+<li><p>还添加了一个 positional encoding
+位置编码，相同的词语在不同的位置有不同的整体表征</p></li>
+</ul>
+<p><span class="math display">\[
+\left\{\begin{array}{l}
+P E(p o s, 2 i)=\sin \left(p o s / 10000^{2 i / d_{\text {model
+}}}\right) \\
+P E(\operatorname{pos}, 2 i+1)=\cos \left(p o s / 10000^{2 i / d_{\text
+{model }}}\right)
+\end{array}\right.
+\]</span></p>
+<p><img src="/img/nlp/第十三讲/14.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="完整编码器encoder">4.12 完整编码器Encoder</h2>
+<ul>
+<li><p>encoder 中，每个 Block 都是来自前一层的<span
+class="math inline">\(Q,K,V\)</span></p></li>
+<li><p>Blocks 被重复 6 次 (垂直方向)</p></li>
+<li><p>在每个阶段，你可以通过多头注意力看到句子中的各个地方，累积信息并将其推送到下一层。在任一方向上的序列逐步推送信息来计算感兴趣的值</p></li>
+<li><p>非常善于学习语言结构</p></li>
+</ul>
+<p><img src="/img/nlp/第十三讲/15.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="注意力可视化">4.13 注意力可视化</h2>
+<p><img src="/img/nlp/第十三讲/16.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="transformer解码器">4.14 Transformer解码器</h2>
+<ul>
+<li><p>decoder 中有两个稍加改变的子层</p></li>
+<li><p>对之前生成的输出进行 Masked decoder self-attention</p></li>
+<li><p>Encoder-Decoder Attention，queries 来自于前一个 decoder 层，keys
+和 values 来自于 encoder 的输出</p></li>
+<li><p>Blocks 同样重复 6 次</p></li>
+</ul>
+<p><img src="/img/nlp/第十三讲/17.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="transformer的技巧与建议">4.15 Transformer的技巧与建议</h2>
+<p><strong>细节</strong>(论文/之后的讲座)</p>
+<ul>
+<li><p>Byte-pair encodings</p></li>
+<li><p>Checkpoint averaging</p></li>
+<li><p>Adam 优化器控制学习速率变化</p></li>
+<li><p>训练时，在每一层添加残差之前进行 Dropout</p></li>
+<li><p>标签平滑</p></li>
+<li><p>带有束搜索和长度惩罚的自回归解码</p></li>
+<li><p>因为 transformer
+正在蔓延，但他们很难优化并且不像LSTMs那样开箱即用，他们还不能很好与其他任务的构件共同工作</p></li>
+</ul>
+<h1 id="bert模型">5.BERT模型</h1>
+<h2 id="论文解读-bert-devlin-chang-lee-toutanova-2018">5.1 论文解读
+BERT: Devlin, Chang, Lee, Toutanova (2018)</h2>
+<ul>
+<li><p>BERT：用于语言理解的预训练深度双向 transformers</p></li>
+<li><p>问题：语言模型只使用左上下文或右上下文，但语言理解是双向的</p></li>
+<li><p>为什么LMs是单向的？</p>
+<ul>
+<li><strong>原因1</strong>：方向性对于生成格式良好的概率分布是有必要的
+[我们不在乎这个]</li>
+<li><strong>原因2</strong>：双向编码器中单词可以
+<code>看到自己</code></li>
+</ul></li>
+</ul>
+<p><img src="/img/nlp/第十三讲/18.png" srcset="/img/loading.gif" lazyload /></p>
+<ul>
+<li><p>解决方案：掩盖k%的输入单词，然后预测 masked words</p></li>
+<li><p>不再是传统的计算生成句子的概率的语言模型，目标是填空</p>
+<ul>
+<li>总是使用k=15%</li>
+</ul></li>
+<li><p>Masking 太少：训练太昂贵</p></li>
+<li><p>Masking 太多：没有足够的上下文</p></li>
+<li><p><strong>GPT</strong> 是经典的单项的语言模型</p></li>
+<li><p><strong>ELMo</strong>
+是双向的，但是两个模型是完全独立训练的，只是将输出连接在一起，并没有使用双向的
+context</p></li>
+<li><p><strong>BERT</strong> 使用 mask
+的方式进行整个上下文的预测，使用了双向的上下文信息</p></li>
+</ul>
+<p><img src="/img/nlp/第十三讲/19.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="bert-模型微调">5.2 BERT 模型微调</h2>
+<ul>
+<li>只学习一个建立在顶层的分类器，微调的每个任务</li>
+</ul>
+<p><img src="/img/nlp/第十三讲/120.png" srcset="/img/loading.gif" lazyload /></p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Deep-Learning/">Deep Learning</a>
+                    
+                      <a class="hover-with-bg" href="/categories/Deep-Learning/NLP/">NLP</a>
+                    
+                  </div>
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/06/15/%E7%AC%AC%E5%8D%81%E4%B8%80%E8%AE%B2-NLP%E4%B8%AD%E7%9A%84%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/">
+                        <span class="hidden-mobile">第十一讲-NLP中的卷积神经网络</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        loader: {
+          load: ['ui/lazy']
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
