@@ -1,0 +1,508 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=dark>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="肘子开">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="模型介绍        模型代码 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GoogleNet">
+<meta property="og:url" content="http://example.com/2022/09/29/GoogleNet/index.html">
+<meta property="og:site_name" content="肘子开的博客">
+<meta property="og:description" content="模型介绍        模型代码 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/cv/image-20220929165102079.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20220929165115906.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20220929165128922.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20220929165145364.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20220929165157614.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20220929165210033.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20220929165223735.png">
+<meta property="article:published_time" content="2022-09-29T08:50:18.000Z">
+<meta property="article:modified_time" content="2022-09-29T08:54:36.063Z">
+<meta property="article:author" content="肘子开">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/cv/image-20220929165102079.png">
+  
+  
+  <title>GoogleNet - 肘子开的博客</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/nnfx-dark.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>肘子开的博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/bg/bg2.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="GoogleNet">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-09-29 16:50" pubdate>
+        2022年9月29日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      11k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      92 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">GoogleNet</h1>
+            
+            <div class="markdown-body">
+              <h1 id="模型介绍">模型介绍</h1>
+<p><img src="/img/cv/image-20220929165102079.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/cv/image-20220929165115906.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/cv/image-20220929165128922.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/cv/image-20220929165145364.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/cv/image-20220929165157614.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/cv/image-20220929165210033.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/cv/image-20220929165223735.png" srcset="/img/loading.gif" lazyload /></p>
+<h1 id="模型代码">模型代码</h1>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">import</span> torch.nn <span class="hljs-keyword">as</span> nn<br><span class="hljs-keyword">import</span> torch<br><span class="hljs-keyword">import</span> torch.nn.functional <span class="hljs-keyword">as</span> F<br><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">GoogLeNet</span>(nn.Module):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, num_classes=<span class="hljs-number">1000</span>, aux_logits=<span class="hljs-literal">True</span>, init_weights=<span class="hljs-literal">False</span></span>):<br>        <span class="hljs-built_in">super</span>(GoogLeNet, self).__init__()<br>        self.aux_logits = aux_logits<br><br>        self.conv1 = BasicConv2d(<span class="hljs-number">3</span>, <span class="hljs-number">64</span>, kernel_size=<span class="hljs-number">7</span>, stride=<span class="hljs-number">2</span>, padding=<span class="hljs-number">3</span>)<br>        self.maxpool1 = nn.MaxPool2d(<span class="hljs-number">3</span>, stride=<span class="hljs-number">2</span>, ceil_mode=<span class="hljs-literal">True</span>)<br><br>        self.conv2 = BasicConv2d(<span class="hljs-number">64</span>, <span class="hljs-number">64</span>, kernel_size=<span class="hljs-number">1</span>)<br>        self.conv3 = BasicConv2d(<span class="hljs-number">64</span>, <span class="hljs-number">192</span>, kernel_size=<span class="hljs-number">3</span>, padding=<span class="hljs-number">1</span>)<br>        self.maxpool2 = nn.MaxPool2d(<span class="hljs-number">3</span>, stride=<span class="hljs-number">2</span>, ceil_mode=<span class="hljs-literal">True</span>)<br><br>        self.inception3a = Inception(<span class="hljs-number">192</span>, <span class="hljs-number">64</span>, <span class="hljs-number">96</span>, <span class="hljs-number">128</span>, <span class="hljs-number">16</span>, <span class="hljs-number">32</span>, <span class="hljs-number">32</span>)<br>        self.inception3b = Inception(<span class="hljs-number">256</span>, <span class="hljs-number">128</span>, <span class="hljs-number">128</span>, <span class="hljs-number">192</span>, <span class="hljs-number">32</span>, <span class="hljs-number">96</span>, <span class="hljs-number">64</span>)<br>        self.maxpool3 = nn.MaxPool2d(<span class="hljs-number">3</span>, stride=<span class="hljs-number">2</span>, ceil_mode=<span class="hljs-literal">True</span>)<br><br>        self.inception4a = Inception(<span class="hljs-number">480</span>, <span class="hljs-number">192</span>, <span class="hljs-number">96</span>, <span class="hljs-number">208</span>, <span class="hljs-number">16</span>, <span class="hljs-number">48</span>, <span class="hljs-number">64</span>)<br>        self.inception4b = Inception(<span class="hljs-number">512</span>, <span class="hljs-number">160</span>, <span class="hljs-number">112</span>, <span class="hljs-number">224</span>, <span class="hljs-number">24</span>, <span class="hljs-number">64</span>, <span class="hljs-number">64</span>)<br>        self.inception4c = Inception(<span class="hljs-number">512</span>, <span class="hljs-number">128</span>, <span class="hljs-number">128</span>, <span class="hljs-number">256</span>, <span class="hljs-number">24</span>, <span class="hljs-number">64</span>, <span class="hljs-number">64</span>)<br>        self.inception4d = Inception(<span class="hljs-number">512</span>, <span class="hljs-number">112</span>, <span class="hljs-number">144</span>, <span class="hljs-number">288</span>, <span class="hljs-number">32</span>, <span class="hljs-number">64</span>, <span class="hljs-number">64</span>)<br>        self.inception4e = Inception(<span class="hljs-number">528</span>, <span class="hljs-number">256</span>, <span class="hljs-number">160</span>, <span class="hljs-number">320</span>, <span class="hljs-number">32</span>, <span class="hljs-number">128</span>, <span class="hljs-number">128</span>)<br>        self.maxpool4 = nn.MaxPool2d(<span class="hljs-number">3</span>, stride=<span class="hljs-number">2</span>, ceil_mode=<span class="hljs-literal">True</span>)<br><br>        self.inception5a = Inception(<span class="hljs-number">832</span>, <span class="hljs-number">256</span>, <span class="hljs-number">160</span>, <span class="hljs-number">320</span>, <span class="hljs-number">32</span>, <span class="hljs-number">128</span>, <span class="hljs-number">128</span>)<br>        self.inception5b = Inception(<span class="hljs-number">832</span>, <span class="hljs-number">384</span>, <span class="hljs-number">192</span>, <span class="hljs-number">384</span>, <span class="hljs-number">48</span>, <span class="hljs-number">128</span>, <span class="hljs-number">128</span>)<br><br>        <span class="hljs-keyword">if</span> self.aux_logits:<br>            self.aux1 = InceptionAux(<span class="hljs-number">512</span>, num_classes)<br>            self.aux2 = InceptionAux(<span class="hljs-number">528</span>, num_classes)<br><br>        self.avgpool = nn.AdaptiveAvgPool2d((<span class="hljs-number">1</span>, <span class="hljs-number">1</span>))<br>        self.dropout = nn.Dropout(<span class="hljs-number">0.4</span>)<br>        self.fc = nn.Linear(<span class="hljs-number">1024</span>, num_classes)<br>        <span class="hljs-keyword">if</span> init_weights:<br>            self._initialize_weights()<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">forward</span>(<span class="hljs-params">self, x</span>):<br>        <span class="hljs-comment"># N x 3 x 224 x 224</span><br>        x = self.conv1(x)<br>        <span class="hljs-comment"># N x 64 x 112 x 112</span><br>        x = self.maxpool1(x)<br>        <span class="hljs-comment"># N x 64 x 56 x 56</span><br>        x = self.conv2(x)<br>        <span class="hljs-comment"># N x 64 x 56 x 56</span><br>        x = self.conv3(x)<br>        <span class="hljs-comment"># N x 192 x 56 x 56</span><br>        x = self.maxpool2(x)<br><br>        <span class="hljs-comment"># N x 192 x 28 x 28</span><br>        x = self.inception3a(x)<br>        <span class="hljs-comment"># N x 256 x 28 x 28</span><br>        x = self.inception3b(x)<br>        <span class="hljs-comment"># N x 480 x 28 x 28</span><br>        x = self.maxpool3(x)<br>        <span class="hljs-comment"># N x 480 x 14 x 14</span><br>        x = self.inception4a(x)<br>        <span class="hljs-comment"># N x 512 x 14 x 14</span><br>        <span class="hljs-keyword">if</span> self.training <span class="hljs-keyword">and</span> self.aux_logits:    <span class="hljs-comment"># eval model lose this layer</span><br>            aux1 = self.aux1(x)<br><br>        x = self.inception4b(x)<br>        <span class="hljs-comment"># N x 512 x 14 x 14</span><br>        x = self.inception4c(x)<br>        <span class="hljs-comment"># N x 512 x 14 x 14</span><br>        x = self.inception4d(x)<br>        <span class="hljs-comment"># N x 528 x 14 x 14</span><br>        <span class="hljs-keyword">if</span> self.training <span class="hljs-keyword">and</span> self.aux_logits:    <span class="hljs-comment"># eval model lose this layer</span><br>            aux2 = self.aux2(x)<br><br>        x = self.inception4e(x)<br>        <span class="hljs-comment"># N x 832 x 14 x 14</span><br>        x = self.maxpool4(x)<br>        <span class="hljs-comment"># N x 832 x 7 x 7</span><br>        x = self.inception5a(x)<br>        <span class="hljs-comment"># N x 832 x 7 x 7</span><br>        x = self.inception5b(x)<br>        <span class="hljs-comment"># N x 1024 x 7 x 7</span><br><br>        x = self.avgpool(x)<br>        <span class="hljs-comment"># N x 1024 x 1 x 1</span><br>        x = torch.flatten(x, <span class="hljs-number">1</span>)<br>        <span class="hljs-comment"># N x 1024</span><br>        x = self.dropout(x)<br>        x = self.fc(x)<br>        <span class="hljs-comment"># N x 1000 (num_classes)</span><br>        <span class="hljs-keyword">if</span> self.training <span class="hljs-keyword">and</span> self.aux_logits:   <span class="hljs-comment"># eval model lose this layer</span><br>            <span class="hljs-keyword">return</span> x, aux2, aux1<br>        <span class="hljs-keyword">return</span> x<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">_initialize_weights</span>(<span class="hljs-params">self</span>):<br>        <span class="hljs-keyword">for</span> m <span class="hljs-keyword">in</span> self.modules():<br>            <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(m, nn.Conv2d):<br>                nn.init.kaiming_normal_(m.weight, mode=<span class="hljs-string">&#x27;fan_out&#x27;</span>, nonlinearity=<span class="hljs-string">&#x27;relu&#x27;</span>)<br>                <span class="hljs-keyword">if</span> m.bias <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>                    nn.init.constant_(m.bias, <span class="hljs-number">0</span>)<br>            <span class="hljs-keyword">elif</span> <span class="hljs-built_in">isinstance</span>(m, nn.Linear):<br>                nn.init.normal_(m.weight, <span class="hljs-number">0</span>, <span class="hljs-number">0.01</span>)<br>                nn.init.constant_(m.bias, <span class="hljs-number">0</span>)<br><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Inception</span>(nn.Module):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, in_channels, ch1x1, ch3x3red, ch3x3, ch5x5red, ch5x5, pool_proj</span>):<br>        <span class="hljs-built_in">super</span>(Inception, self).__init__()<br><br>        self.branch1 = BasicConv2d(in_channels, ch1x1, kernel_size=<span class="hljs-number">1</span>)<br><br>        self.branch2 = nn.Sequential(<br>            BasicConv2d(in_channels, ch3x3red, kernel_size=<span class="hljs-number">1</span>),<br>            BasicConv2d(ch3x3red, ch3x3, kernel_size=<span class="hljs-number">3</span>, padding=<span class="hljs-number">1</span>)   <span class="hljs-comment"># 保证输出大小等于输入大小</span><br>        )<br><br>        self.branch3 = nn.Sequential(<br>            BasicConv2d(in_channels, ch5x5red, kernel_size=<span class="hljs-number">1</span>),<br>            <span class="hljs-comment"># 在官方的实现中，其实是3x3的kernel并不是5x5，这里我也懒得改了，具体可以参考下面的issue</span><br>            <span class="hljs-comment"># Please see https://github.com/pytorch/vision/issues/906 for details.</span><br>            BasicConv2d(ch5x5red, ch5x5, kernel_size=<span class="hljs-number">5</span>, padding=<span class="hljs-number">2</span>)   <span class="hljs-comment"># 保证输出大小等于输入大小</span><br>        )<br><br>        self.branch4 = nn.Sequential(<br>            nn.MaxPool2d(kernel_size=<span class="hljs-number">3</span>, stride=<span class="hljs-number">1</span>, padding=<span class="hljs-number">1</span>),<br>            BasicConv2d(in_channels, pool_proj, kernel_size=<span class="hljs-number">1</span>)<br>        )<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">forward</span>(<span class="hljs-params">self, x</span>):<br>        branch1 = self.branch1(x)<br>        branch2 = self.branch2(x)<br>        branch3 = self.branch3(x)<br>        branch4 = self.branch4(x)<br><br>        outputs = [branch1, branch2, branch3, branch4]<br>        <span class="hljs-keyword">return</span> torch.cat(outputs, <span class="hljs-number">1</span>)<br><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">InceptionAux</span>(nn.Module):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, in_channels, num_classes</span>):<br>        <span class="hljs-built_in">super</span>(InceptionAux, self).__init__()<br>        self.averagePool = nn.AvgPool2d(kernel_size=<span class="hljs-number">5</span>, stride=<span class="hljs-number">3</span>)<br>        self.conv = BasicConv2d(in_channels, <span class="hljs-number">128</span>, kernel_size=<span class="hljs-number">1</span>)  <span class="hljs-comment"># output[batch, 128, 4, 4]</span><br><br>        self.fc1 = nn.Linear(<span class="hljs-number">2048</span>, <span class="hljs-number">1024</span>)<br>        self.fc2 = nn.Linear(<span class="hljs-number">1024</span>, num_classes)<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">forward</span>(<span class="hljs-params">self, x</span>):<br>        <span class="hljs-comment"># aux1: N x 512 x 14 x 14, aux2: N x 528 x 14 x 14</span><br>        x = self.averagePool(x)<br>        <span class="hljs-comment"># aux1: N x 512 x 4 x 4, aux2: N x 528 x 4 x 4</span><br>        x = self.conv(x)<br>        <span class="hljs-comment"># N x 128 x 4 x 4</span><br>        x = torch.flatten(x, <span class="hljs-number">1</span>)<br>        x = F.dropout(x, <span class="hljs-number">0.5</span>, training=self.training)<br>        <span class="hljs-comment"># N x 2048</span><br>        x = F.relu(self.fc1(x), inplace=<span class="hljs-literal">True</span>)<br>        x = F.dropout(x, <span class="hljs-number">0.5</span>, training=self.training)<br>        <span class="hljs-comment"># N x 1024</span><br>        x = self.fc2(x)<br>        <span class="hljs-comment"># N x num_classes</span><br>        <span class="hljs-keyword">return</span> x<br><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">BasicConv2d</span>(nn.Module):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, in_channels, out_channels, **kwargs</span>):<br>        <span class="hljs-built_in">super</span>(BasicConv2d, self).__init__()<br>        self.conv = nn.Conv2d(in_channels, out_channels, **kwargs)<br>        self.relu = nn.ReLU(inplace=<span class="hljs-literal">True</span>)<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">forward</span>(<span class="hljs-params">self, x</span>):<br>        x = self.conv(x)<br>        x = self.relu(x)<br>        <span class="hljs-keyword">return</span> x<br></code></pre></div></td></tr></table></figure>
+<h1 id="训练代码">训练代码</h1>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">import</span> os<br><span class="hljs-keyword">import</span> sys<br><span class="hljs-keyword">import</span> json<br><br><span class="hljs-keyword">import</span> torch<br><span class="hljs-keyword">import</span> torch.nn <span class="hljs-keyword">as</span> nn<br><span class="hljs-keyword">from</span> torchvision <span class="hljs-keyword">import</span> transforms, datasets<br><span class="hljs-keyword">import</span> torch.optim <span class="hljs-keyword">as</span> optim<br><span class="hljs-keyword">from</span> tqdm <span class="hljs-keyword">import</span> tqdm<br><br><span class="hljs-keyword">from</span> model <span class="hljs-keyword">import</span> GoogLeNet<br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">main</span>():<br>    device = torch.device(<span class="hljs-string">&quot;cuda:0&quot;</span> <span class="hljs-keyword">if</span> torch.cuda.is_available() <span class="hljs-keyword">else</span> <span class="hljs-string">&quot;cpu&quot;</span>)<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;using &#123;&#125; device.&quot;</span>.<span class="hljs-built_in">format</span>(device))<br><br>    data_transform = &#123;<br>        <span class="hljs-string">&quot;train&quot;</span>: transforms.Compose([transforms.RandomResizedCrop(<span class="hljs-number">224</span>),<br>                                     transforms.RandomHorizontalFlip(),<br>                                     transforms.ToTensor(),<br>                                     transforms.Normalize((<span class="hljs-number">0.5</span>, <span class="hljs-number">0.5</span>, <span class="hljs-number">0.5</span>), (<span class="hljs-number">0.5</span>, <span class="hljs-number">0.5</span>, <span class="hljs-number">0.5</span>))]),<br>        <span class="hljs-string">&quot;val&quot;</span>: transforms.Compose([transforms.Resize((<span class="hljs-number">224</span>, <span class="hljs-number">224</span>)),<br>                                   transforms.ToTensor(),<br>                                   transforms.Normalize((<span class="hljs-number">0.5</span>, <span class="hljs-number">0.5</span>, <span class="hljs-number">0.5</span>), (<span class="hljs-number">0.5</span>, <span class="hljs-number">0.5</span>, <span class="hljs-number">0.5</span>))])&#125;<br><br>    data_root = os.path.abspath(os.path.join(os.getcwd(), <span class="hljs-string">&quot;../..&quot;</span>))  <span class="hljs-comment"># get data root path</span><br>    image_path = os.path.join(data_root, <span class="hljs-string">&quot;data_set&quot;</span>, <span class="hljs-string">&quot;flower_data&quot;</span>)  <span class="hljs-comment"># flower data set path</span><br>    <span class="hljs-keyword">assert</span> os.path.exists(image_path), <span class="hljs-string">&quot;&#123;&#125; path does not exist.&quot;</span>.<span class="hljs-built_in">format</span>(image_path)<br>    train_dataset = datasets.ImageFolder(root=os.path.join(image_path, <span class="hljs-string">&quot;train&quot;</span>),<br>                                         transform=data_transform[<span class="hljs-string">&quot;train&quot;</span>])<br>    train_num = <span class="hljs-built_in">len</span>(train_dataset)<br><br>    <span class="hljs-comment"># &#123;&#x27;daisy&#x27;:0, &#x27;dandelion&#x27;:1, &#x27;roses&#x27;:2, &#x27;sunflower&#x27;:3, &#x27;tulips&#x27;:4&#125;</span><br>    flower_list = train_dataset.class_to_idx<br>    cla_dict = <span class="hljs-built_in">dict</span>((val, key) <span class="hljs-keyword">for</span> key, val <span class="hljs-keyword">in</span> flower_list.items())<br>    <span class="hljs-comment"># write dict into json file</span><br>    json_str = json.dumps(cla_dict, indent=<span class="hljs-number">4</span>)<br>    <span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(<span class="hljs-string">&#x27;class_indices.json&#x27;</span>, <span class="hljs-string">&#x27;w&#x27;</span>) <span class="hljs-keyword">as</span> json_file:<br>        json_file.write(json_str)<br><br>    batch_size = <span class="hljs-number">32</span><br>    nw = <span class="hljs-built_in">min</span>([os.cpu_count(), batch_size <span class="hljs-keyword">if</span> batch_size &gt; <span class="hljs-number">1</span> <span class="hljs-keyword">else</span> <span class="hljs-number">0</span>, <span class="hljs-number">8</span>])  <span class="hljs-comment"># number of workers</span><br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Using &#123;&#125; dataloader workers every process&#x27;</span>.<span class="hljs-built_in">format</span>(nw))<br><br>    train_loader = torch.utils.data.DataLoader(train_dataset,<br>                                               batch_size=batch_size, shuffle=<span class="hljs-literal">True</span>,<br>                                               num_workers=nw)<br><br>    validate_dataset = datasets.ImageFolder(root=os.path.join(image_path, <span class="hljs-string">&quot;val&quot;</span>),<br>                                            transform=data_transform[<span class="hljs-string">&quot;val&quot;</span>])<br>    val_num = <span class="hljs-built_in">len</span>(validate_dataset)<br>    validate_loader = torch.utils.data.DataLoader(validate_dataset,<br>                                                  batch_size=batch_size, shuffle=<span class="hljs-literal">False</span>,<br>                                                  num_workers=nw)<br><br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;using &#123;&#125; images for training, &#123;&#125; images for validation.&quot;</span>.<span class="hljs-built_in">format</span>(train_num,<br>                                                                           val_num))<br><br>    <span class="hljs-comment"># test_data_iter = iter(validate_loader)</span><br>    <span class="hljs-comment"># test_image, test_label = test_data_iter.next()</span><br><br>    net = GoogLeNet(num_classes=<span class="hljs-number">5</span>, aux_logits=<span class="hljs-literal">True</span>, init_weights=<span class="hljs-literal">True</span>)<br>    <span class="hljs-comment"># 如果要使用官方的预训练权重，注意是将权重载入官方的模型，不是我们自己实现的模型</span><br>    <span class="hljs-comment"># 官方的模型中使用了bn层以及改了一些参数，不能混用</span><br>    <span class="hljs-comment"># import torchvision</span><br>    <span class="hljs-comment"># net = torchvision.models.googlenet(num_classes=5)</span><br>    <span class="hljs-comment"># model_dict = net.state_dict()</span><br>    <span class="hljs-comment"># # 预训练权重下载地址: https://download.pytorch.org/models/googlenet-1378be20.pth</span><br>    <span class="hljs-comment"># pretrain_model = torch.load(&quot;googlenet.pth&quot;)</span><br>    <span class="hljs-comment"># del_list = [&quot;aux1.fc2.weight&quot;, &quot;aux1.fc2.bias&quot;,</span><br>    <span class="hljs-comment">#             &quot;aux2.fc2.weight&quot;, &quot;aux2.fc2.bias&quot;,</span><br>    <span class="hljs-comment">#             &quot;fc.weight&quot;, &quot;fc.bias&quot;]</span><br>    <span class="hljs-comment"># pretrain_dict = &#123;k: v for k, v in pretrain_model.items() if k not in del_list&#125;</span><br>    <span class="hljs-comment"># model_dict.update(pretrain_dict)</span><br>    <span class="hljs-comment"># net.load_state_dict(model_dict)</span><br>    net.to(device)<br>    loss_function = nn.CrossEntropyLoss()<br>    optimizer = optim.Adam(net.parameters(), lr=<span class="hljs-number">0.0003</span>)<br><br>    epochs = <span class="hljs-number">30</span><br>    best_acc = <span class="hljs-number">0.0</span><br>    save_path = <span class="hljs-string">&#x27;./googleNet.pth&#x27;</span><br>    train_steps = <span class="hljs-built_in">len</span>(train_loader)<br>    <span class="hljs-keyword">for</span> epoch <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(epochs):<br>        <span class="hljs-comment"># train</span><br>        net.train()<br>        running_loss = <span class="hljs-number">0.0</span><br>        train_bar = tqdm(train_loader, file=sys.stdout)<br>        <span class="hljs-keyword">for</span> step, data <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(train_bar):<br>            images, labels = data<br>            optimizer.zero_grad()<br>            logits, aux_logits2, aux_logits1 = net(images.to(device))<br>            loss0 = loss_function(logits, labels.to(device))<br>            loss1 = loss_function(aux_logits1, labels.to(device))<br>            loss2 = loss_function(aux_logits2, labels.to(device))<br>            loss = loss0 + loss1 * <span class="hljs-number">0.3</span> + loss2 * <span class="hljs-number">0.3</span><br>            loss.backward()<br>            optimizer.step()<br><br>            <span class="hljs-comment"># print statistics</span><br>            running_loss += loss.item()<br><br>            train_bar.desc = <span class="hljs-string">&quot;train epoch[&#123;&#125;/&#123;&#125;] loss:&#123;:.3f&#125;&quot;</span>.<span class="hljs-built_in">format</span>(epoch + <span class="hljs-number">1</span>,<br>                                                                     epochs,<br>                                                                     loss)<br><br>        <span class="hljs-comment"># validate</span><br>        net.<span class="hljs-built_in">eval</span>()<br>        acc = <span class="hljs-number">0.0</span>  <span class="hljs-comment"># accumulate accurate number / epoch</span><br>        <span class="hljs-keyword">with</span> torch.no_grad():<br>            val_bar = tqdm(validate_loader, file=sys.stdout)<br>            <span class="hljs-keyword">for</span> val_data <span class="hljs-keyword">in</span> val_bar:<br>                val_images, val_labels = val_data<br>                outputs = net(val_images.to(device))  <span class="hljs-comment"># eval model only have last output layer</span><br>                predict_y = torch.<span class="hljs-built_in">max</span>(outputs, dim=<span class="hljs-number">1</span>)[<span class="hljs-number">1</span>]<br>                acc += torch.eq(predict_y, val_labels.to(device)).<span class="hljs-built_in">sum</span>().item()<br><br>        val_accurate = acc / val_num<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;[epoch %d] train_loss: %.3f  val_accuracy: %.3f&#x27;</span> %<br>              (epoch + <span class="hljs-number">1</span>, running_loss / train_steps, val_accurate))<br><br>        <span class="hljs-keyword">if</span> val_accurate &gt; best_acc:<br>            best_acc = val_accurate<br>            torch.save(net.state_dict(), save_path)<br><br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Finished Training&#x27;</span>)<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    main()\<br></code></pre></div></td></tr></table></figure>
+<h1 id="预测代码">预测代码</h1>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">import</span> os<br><span class="hljs-keyword">import</span> json<br><br><span class="hljs-keyword">import</span> torch<br><span class="hljs-keyword">from</span> PIL <span class="hljs-keyword">import</span> Image<br><span class="hljs-keyword">from</span> torchvision <span class="hljs-keyword">import</span> transforms<br><span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt<br><br><span class="hljs-keyword">from</span> model <span class="hljs-keyword">import</span> GoogLeNet<br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">main</span>():<br>    device = torch.device(<span class="hljs-string">&quot;cuda:0&quot;</span> <span class="hljs-keyword">if</span> torch.cuda.is_available() <span class="hljs-keyword">else</span> <span class="hljs-string">&quot;cpu&quot;</span>)<br><br>    data_transform = transforms.Compose(<br>        [transforms.Resize((<span class="hljs-number">224</span>, <span class="hljs-number">224</span>)),<br>         transforms.ToTensor(),<br>         transforms.Normalize((<span class="hljs-number">0.5</span>, <span class="hljs-number">0.5</span>, <span class="hljs-number">0.5</span>), (<span class="hljs-number">0.5</span>, <span class="hljs-number">0.5</span>, <span class="hljs-number">0.5</span>))])<br><br>    <span class="hljs-comment"># load image</span><br>    img_path = <span class="hljs-string">&quot;../tulip.jpg&quot;</span><br>    <span class="hljs-keyword">assert</span> os.path.exists(img_path), <span class="hljs-string">&quot;file: &#x27;&#123;&#125;&#x27; dose not exist.&quot;</span>.<span class="hljs-built_in">format</span>(img_path)<br>    img = Image.<span class="hljs-built_in">open</span>(img_path)<br>    plt.imshow(img)<br>    <span class="hljs-comment"># [N, C, H, W]</span><br>    img = data_transform(img)<br>    <span class="hljs-comment"># expand batch dimension</span><br>    img = torch.unsqueeze(img, dim=<span class="hljs-number">0</span>)<br><br>    <span class="hljs-comment"># read class_indict</span><br>    json_path = <span class="hljs-string">&#x27;./class_indices.json&#x27;</span><br>    <span class="hljs-keyword">assert</span> os.path.exists(json_path), <span class="hljs-string">&quot;file: &#x27;&#123;&#125;&#x27; dose not exist.&quot;</span>.<span class="hljs-built_in">format</span>(json_path)<br><br>    <span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(json_path, <span class="hljs-string">&quot;r&quot;</span>) <span class="hljs-keyword">as</span> f:<br>        class_indict = json.load(f)<br><br>    <span class="hljs-comment"># create model</span><br>    model = GoogLeNet(num_classes=<span class="hljs-number">5</span>, aux_logits=<span class="hljs-literal">False</span>).to(device)<br><br>    <span class="hljs-comment"># load model weights</span><br>    weights_path = <span class="hljs-string">&quot;./googleNet.pth&quot;</span><br>    <span class="hljs-keyword">assert</span> os.path.exists(weights_path), <span class="hljs-string">&quot;file: &#x27;&#123;&#125;&#x27; dose not exist.&quot;</span>.<span class="hljs-built_in">format</span>(weights_path)<br>    missing_keys, unexpected_keys = model.load_state_dict(torch.load(weights_path, map_location=device),<br>                                                          strict=<span class="hljs-literal">False</span>)<br><br>    model.<span class="hljs-built_in">eval</span>()<br>    <span class="hljs-keyword">with</span> torch.no_grad():<br>        <span class="hljs-comment"># predict class</span><br>        output = torch.squeeze(model(img.to(device))).cpu()<br>        predict = torch.softmax(output, dim=<span class="hljs-number">0</span>)<br>        predict_cla = torch.argmax(predict).numpy()<br><br>    print_res = <span class="hljs-string">&quot;class: &#123;&#125;   prob: &#123;:.3&#125;&quot;</span>.<span class="hljs-built_in">format</span>(class_indict[<span class="hljs-built_in">str</span>(predict_cla)],<br>                                                 predict[predict_cla].numpy())<br>    plt.title(print_res)<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(predict)):<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;class: &#123;:10&#125;   prob: &#123;:.3&#125;&quot;</span>.<span class="hljs-built_in">format</span>(class_indict[<span class="hljs-built_in">str</span>(i)],<br>                                                  predict[i].numpy()))<br>    plt.show()<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    main()<br></code></pre></div></td></tr></table></figure>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Deep-Learning/">Deep Learning</a>
+                    
+                      <a class="hover-with-bg" href="/categories/Deep-Learning/cv/">cv</a>
+                    
+                  </div>
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/29/AlexNet/">
+                        <span class="hidden-mobile">AlexNet</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        loader: {
+          load: ['ui/lazy']
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
