@@ -4,6 +4,27 @@
   
   
   <entry>
+    <title>RCNN</title>
+    <link href="/2022/09/29/RCNN/"/>
+    <url>/2022/09/29/RCNN/</url>
+    
+    <content type="html"><![CDATA[<h1 id="模型介绍">模型介绍</h1><p><img src="/img/cv/image-20220929174947399.png" /></p><p><img src="/img/cv/image-20220929174959830.png" /></p><p><img src="/img/cv/image-20220929175012228.png" /></p><p><img src="/img/cv/image-20220929175024811.png" /></p><p><img src="/img/cv/image-20220929175035980.png" /></p><p><img src="/img/cv/image-20220929175055640.png" /></p><p><img src="/img/cv/image-20220929175116843.png" /></p><p><img src="/img/cv/image-20220929175137830.png" /></p><p><img src="/img/cv/image-20220929175155293.png" /></p><p><img src="/img/cv/image-20220929175207362.png" /></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>Deep Learning</category>
+      
+      <category>cv</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>GoogleNet</title>
     <link href="/2022/09/29/GoogleNet/"/>
     <url>/2022/09/29/GoogleNet/</url>
