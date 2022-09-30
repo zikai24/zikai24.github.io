@@ -4,6 +4,27 @@
   
   
   <entry>
+    <title>FPN</title>
+    <link href="/2022/09/30/FPN/"/>
+    <url>/2022/09/30/FPN/</url>
+    
+    <content type="html"><![CDATA[<h1 id="模型介绍">模型介绍</h1><p><img src="/img/cv/image-20220930111912244.png" /></p><p><img src="/img/cv/image-20220930111926838.png" /></p><p><img src="/img/cv/image-20220930111940668.png" /></p><p><img src="/img/cv/image-20220930112000674.png" /></p><p><img src="/img/cv/image-20220930112024501.png" /></p><p><img src="/img/cv/image-20220930112036794.png" /></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>Deep Learning</category>
+      
+      <category>cv</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Faster_R-CNN</title>
     <link href="/2022/09/30/Faster-R-CNN/"/>
     <url>/2022/09/30/Faster-R-CNN/</url>
