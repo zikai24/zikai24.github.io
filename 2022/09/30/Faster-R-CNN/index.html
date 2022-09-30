@@ -18,29 +18,34 @@
   
     <meta name="description" content="模型介绍">
 <meta property="og:type" content="article">
-<meta property="og:title" content="RCNN">
-<meta property="og:url" content="http://example.com/2022/09/29/RCNN/index.html">
+<meta property="og:title" content="Faster_R-CNN">
+<meta property="og:url" content="http://example.com/2022/09/30/Faster-R-CNN/index.html">
 <meta property="og:site_name" content="肘子开的博客">
 <meta property="og:description" content="模型介绍">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/img/cv/image-20220929174947399.png">
-<meta property="og:image" content="http://example.com/img/cv/image-20220929174959830.png">
-<meta property="og:image" content="http://example.com/img/cv/image-20220929175012228.png">
-<meta property="og:image" content="http://example.com/img/cv/image-20220929175024811.png">
-<meta property="og:image" content="http://example.com/img/cv/image-20220929175035980.png">
-<meta property="og:image" content="http://example.com/img/cv/image-20220929175055640.png">
-<meta property="og:image" content="http://example.com/img/cv/image-20220929175116843.png">
-<meta property="og:image" content="http://example.com/img/cv/image-20220929175137830.png">
-<meta property="og:image" content="http://example.com/img/cv/image-20220929175155293.png">
-<meta property="og:image" content="http://example.com/img/cv/image-20220929175207362.png">
-<meta property="article:published_time" content="2022-09-29T09:47:56.000Z">
-<meta property="article:modified_time" content="2022-09-29T11:45:58.663Z">
+<meta property="og:image" content="http://example.com/img/cv/image-20220930104009662.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20220930104029226.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20220930104047080.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20220930104101860.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20220930104253294.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20220930104309535.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20220930104322156.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20220930104332006.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20220930104345120.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20220930104356421.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20220930104409007.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20220930104420565.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20220930104433453.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20220930104446017.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20220930104500570.png">
+<meta property="article:published_time" content="2022-09-30T02:37:56.000Z">
+<meta property="article:modified_time" content="2022-09-30T02:45:06.182Z">
 <meta property="article:author" content="肘子开">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/img/cv/image-20220929174947399.png">
+<meta name="twitter:image" content="http://example.com/img/cv/image-20220930104009662.png">
   
   
-  <title>RCNN - 肘子开的博客</title>
+  <title>Faster_R-CNN - 肘子开的博客</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
 
@@ -186,7 +191,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="RCNN">
+            <span class="h2" id="subtitle" title="Faster_R-CNN">
               
             </span>
 
@@ -196,8 +201,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2022-09-29 17:47" pubdate>
-        2022年9月29日 下午
+      <time datetime="2022-09-30 10:37" pubdate>
+        2022年9月30日 上午
       </time>
     </span>
   
@@ -245,20 +250,25 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">RCNN</h1>
+            <h1 style="display: none">Faster_R-CNN</h1>
             
             <div class="markdown-body">
               <h1 id="模型介绍">模型介绍</h1>
-<p><img src="/img/cv/image-20220929174947399.png" srcset="/img/loading.gif" lazyload /></p>
-<p><img src="/img/cv/image-20220929174959830.png" srcset="/img/loading.gif" lazyload /></p>
-<p><img src="/img/cv/image-20220929175012228.png" srcset="/img/loading.gif" lazyload /></p>
-<p><img src="/img/cv/image-20220929175024811.png" srcset="/img/loading.gif" lazyload /></p>
-<p><img src="/img/cv/image-20220929175035980.png" srcset="/img/loading.gif" lazyload /></p>
-<p><img src="/img/cv/image-20220929175055640.png" srcset="/img/loading.gif" lazyload /></p>
-<p><img src="/img/cv/image-20220929175116843.png" srcset="/img/loading.gif" lazyload /></p>
-<p><img src="/img/cv/image-20220929175137830.png" srcset="/img/loading.gif" lazyload /></p>
-<p><img src="/img/cv/image-20220929175155293.png" srcset="/img/loading.gif" lazyload /></p>
-<p><img src="/img/cv/image-20220929175207362.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/cv/image-20220930104009662.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/cv/image-20220930104029226.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/cv/image-20220930104047080.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/cv/image-20220930104101860.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/cv/image-20220930104253294.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/cv/image-20220930104309535.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/cv/image-20220930104322156.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/cv/image-20220930104332006.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/cv/image-20220930104345120.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/cv/image-20220930104356421.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/cv/image-20220930104409007.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/cv/image-20220930104420565.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/cv/image-20220930104433453.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/cv/image-20220930104446017.png" srcset="/img/loading.gif" lazyload /></p>
+<p><img src="/img/cv/image-20220930104500570.png" srcset="/img/loading.gif" lazyload /></p>
 
             </div>
             <hr>
@@ -288,18 +298,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2022/09/30/Fast-R-CNN/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Fast_R-CNN</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2022/09/29/GoogleNet/">
-                        <span class="hidden-mobile">GoogleNet</span>
+                      <a href="/2022/09/30/Fast-R-CNN/">
+                        <span class="hidden-mobile">Fast_R-CNN</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
