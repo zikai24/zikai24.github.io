@@ -4,6 +4,48 @@
   
   
   <entry>
+    <title>yolov1</title>
+    <link href="/2022/09/30/yolov1/"/>
+    <url>/2022/09/30/yolov1/</url>
+    
+    <content type="html"><![CDATA[<h1 id="模型介绍">模型介绍</h1><p><img src="/img/cv/image-20220930153754299.png" /></p><p><img src="/img/cv/image-20220930153824653.png" /></p><p><img src="/img/cv/image-20220930153848083.png" /></p><p><img src="/img/cv/image-20220930153904048.png" /></p><p><img src="/img/cv/image-20220930153921376.png" /></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>Deep Learning</category>
+      
+      <category>cv</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>SSD</title>
+    <link href="/2022/09/30/SSD/"/>
+    <url>/2022/09/30/SSD/</url>
+    
+    <content type="html"><![CDATA[<h1 id="模型介绍">模型介绍</h1><p><img src="/img/cv/image-20220930152818338.png" /></p><p><img src="/img/cv/image-20220930152839522.png" /></p><p><img src="/img/cv/image-20220930152851705.png" /></p><p><img src="/img/cv/image-20220930152903880.png" /></p><p><img src="/img/cv/image-20220930152918813.png" /></p><p><img src="/img/cv/image-20220930152930806.png" /></p><p><img src="/img/cv/image-20220930152941778.png" /></p><p><img src="/img/cv/image-20220930152952521.png" /></p><p><img src="/img/cv/image-20220930153004458.png" /></p><p><img src="/img/cv/image-20220930153015647.png" /></p><p><img src="/img/cv/image-20220930153028568.png" /></p><p><img src="/img/cv/image-20220930153042132.png" /></p><p><img src="/img/cv/image-20220930153054831.png" /></p><p><img src="/img/cv/image-20220930153110871.png" /></p><p><img src="/img/cv/image-20220930153121772.png" /></p><p><img src="/img/cv/image-20220930153132417.png" /></p><p><img src="/img/cv/image-20220930153142800.png" /></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>Deep Learning</category>
+      
+      <category>cv</category>
+      
+    </categories>
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>FPN</title>
     <link href="/2022/09/30/FPN/"/>
     <url>/2022/09/30/FPN/</url>
