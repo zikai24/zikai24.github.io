@@ -1,0 +1,603 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=dark>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="肘子开">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="论文：MAXIM: Multi-Axis MLP for Image Processing  摘要 文章提出了一种基于多轴MLP的底层图像处理任务的架构：MAXIM。MAXIM使用U-net的结构。具体来说，MAXIM包含两个基于MLP的块：一个多轴门控MLP（multi-axis gated MLP），可以在局部&#x2F;全局视觉信息上进行充分的空间混合；一个交叉门控块（cross-gat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MAXIM">
+<meta property="og:url" content="http://example.com/2022/11/14/MAXIM/index.html">
+<meta property="og:site_name" content="肘子开的博客">
+<meta property="og:description" content="论文：MAXIM: Multi-Axis MLP for Image Processing  摘要 文章提出了一种基于多轴MLP的底层图像处理任务的架构：MAXIM。MAXIM使用U-net的结构。具体来说，MAXIM包含两个基于MLP的块：一个多轴门控MLP（multi-axis gated MLP），可以在局部&#x2F;全局视觉信息上进行充分的空间混合；一个交叉门控块（cross-gat">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/cv/image-20221114164926504.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20221114165825735.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20221114170902221.png">
+<meta property="og:image" content="http://example.com/2022/11/14/img/cv/image-20221114172412249.png">
+<meta property="article:published_time" content="2022-11-14T08:43:33.000Z">
+<meta property="article:modified_time" content="2022-11-14T09:31:26.803Z">
+<meta property="article:author" content="肘子开">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/cv/image-20221114164926504.png">
+  
+  
+  <title>MAXIM - 肘子开的博客</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/nnfx-dark.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>肘子开的博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/bg/bg2.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="MAXIM">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-11-14 16:43" pubdate>
+        2022年11月14日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3.2k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      27 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">MAXIM</h1>
+            
+            <div class="markdown-body">
+              <ul>
+<li>论文：MAXIM: Multi-Axis MLP for Image Processing</li>
+</ul>
+<h1 id="摘要">摘要</h1>
+<p>文章提出了一种基于多轴MLP的底层图像处理任务的架构：MAXIM。MAXIM使用U-net的结构。具体来说，MAXIM包含两个基于MLP的块：一个<strong>多轴门控MLP（multi-axis
+gated
+MLP）</strong>，可以在局部/全局视觉信息上进行充分的空间混合；一个<strong>交叉门控块（cross-gating
+block）</strong>，作为交叉注意力的替代方案。MAXIM既能<strong>具有局部/全局感受野</strong>，也能满足低层次视觉任务需要的<strong>全卷积特性</strong>。模型在5个图像处理任务(去噪、去模糊、去雾、去雨、图像增强)的10多个数据集上均<strong>达到SOTA</strong>。</p>
+<h1 id="contribution">Contribution</h1>
+<ul>
+<li>提出一种新的应用于图像处理任务的架构：MAXIM，在去噪、去模糊、去雨、去雾、图像增强等多个领域的10多个数据集上均取得SOTA结果；</li>
+<li>提出一种多轴门控MLP模块（Multi-axis gated MLP
+block），具有<strong>全局感受野</strong>和<strong>全卷积特性</strong>，同时只需要<strong>线性复杂度</strong>；</li>
+<li>提出一种交叉门控模块（Cross-Gating
+block），用来调制Encoder到Decoder之间的skip
+connection，同样具有<strong>全局感受野</strong>和<strong>全卷积特性</strong>；</li>
+</ul>
+<h1 id="模型结构">模型结构</h1>
+<h2 id="整体结构">整体结构</h2>
+<p><img src="/img/cv/image-20221114164926504.png" srcset="/img/loading.gif" lazyload /></p>
+<h2 id="多轴门控mlpmulti-axis-gated-mlp-block">多轴门控MLP（Multi-Axis
+Gated MLP Block）</h2>
+<p><img src="/img/cv/image-20221114165825735.png" srcset="/img/loading.gif" lazyload /></p>
+<p>如图，输入特征图首先通过LayerNorm-Dense-GELU，随后沿通道维度分为两个部分，分别进行局部/全局的空间交互。</p>
+<p>上半部分的Local Branch将图像划分为<strong>固定窗口大小</strong> <span
+class="math inline">\(b \times b\)</span> 的blcok，特征图尺寸由 <span
+class="math inline">\([H,W,C]\)</span> 变为 <span
+class="math inline">\(\left[\frac{H}{b} \times \frac{W}{b}, b \times b,
+C\right]\)</span>，随后在第二个维度进行gMLP计算，其余维度共享参数，随后通过一个unblock恢复为
+<span class="math inline">\([H,W,C]\)</span> 的尺寸；下半部分的Global
+Branch与上半部分类似，区别在于采用<strong>固定的窗口个数</strong>，以及Global
+Branch是在第一个维度进行gMLP计算。</p>
+<p>最后将Local Branch和Global
+Branch的结果进行Concat后通过Dense变换减少通道数，与输入进行长距离连接结合。</p>
+<p>这样，上半部分采用关注每个固定大小block的局部感受野，下半部分采用关注grid每个部分的全局感受野；而且因为MLP是在一个固定的、和图像尺寸无关维度进行的，这样的变换<strong>可以实现全卷积，且是线性的时间复杂度：</strong>
+<span class="math display">\[
+\Omega(\mathrm{MAB})=\underbrace{d^{2} H W C}_{\text {Global gMLP
+}}+\underbrace{b^{2} H W C}_{\text {Local gMLP }}+\underbrace{10 H W
+C^{2}}_{\text {Dense layers }}\ \ \ \ \ \ \ (1)
+\]</span></p>
+<h2 id="交叉门控模块cross-gated-mlp-block">交叉门控模块（Cross Gated MLP
+Block）</h2>
+<p><img src="/img/cv/image-20221114170902221.png" srcset="/img/loading.gif" lazyload /></p>
+<p>交叉门控模块用于U-net的skip
+connection中选择性地控制特征传播，通过一种交叉注意力机制实现</p>
+<p>X、Y为输入的两个特征图，首先通过一个Dense变换分别得到 <span
+class="math inline">\(X_1\)</span> 和 <span
+class="math inline">\(Y_1\)</span> ；</p>
+<p>随后通过LN-Dense-GELU得到 <span class="math inline">\(X_2\)</span> 、
+<span class="math inline">\(Y_2\)</span> ：</p>
+<p><span class="math display">\[
+\mathbf{X}_{2}=\sigma\left(\mathbf{W}_{1}
+\mathrm{LN}\left(\mathbf{X}_{1}\right)\right), \quad
+\mathbf{Y}_{2}=\sigma\left(\mathbf{W}_{2}
+\mathrm{LN}\left(\mathbf{Y}_{1}\right)\right)\ \ \ \ \ \ \ (2)
+\]</span> 再通过交叉门控的方式得到 <span
+class="math inline">\(\hat{X}\)</span> 和 <span
+class="math inline">\(\hat{Y}\)</span></p>
+<p><span class="math display">\[
+\hat{\mathbf{X}}=\mathbf{X}_{2} \odot
+\mathrm{G}\left(\mathbf{Y}_{2}\right), \quad
+\hat{\mathbf{Y}}=\mathbf{Y}_{2} \odot
+\mathrm{G}\left(\mathbf{X}_{2}\right)\ \ \ \ \ \ \ (3)
+\]</span> 其中 <span class="math inline">\(\odot\)</span>
+代表element-wise
+multiplication，这里的G采用与（2）中多轴门控MLP相同的方法实现。 <span
+class="math display">\[
+\mathrm{G}(\mathbf{x})=\mathbf{W}_{5}\left(\left[\mathbf{W}_{3}
+\operatorname{Block}_{b}\left(\mathbf{z}_{1}\right), \mathbf{W}_{4}
+\operatorname{Grid}_{d}\left(\mathbf{z}_{\mathbf{2}}\right)\right]\right)\
+\ \ \ \ \ \ (4)
+\]</span> 其中 <span class="math inline">\([\cdot, \cdot]\)</span>
+代表concatenate，这里的 <span class="math inline">\((z_1, z_2)\)</span>
+是 <span class="math inline">\(z\)</span>
+从channel维度进行分割成的两个单独head <span class="math display">\[
+\left[\mathbf{z}_{1},
+\mathbf{z}_{2}\right]=\mathbf{z}=\sigma\left(\mathbf{W}_{6} \mathbf{L
+N}(\mathbf{x})\right)\ \ \ \ \ \ \ (5)
+\]</span> 最后通过一个残差连接得到输出 <span
+class="math inline">\(X_3\)</span> 、 <span
+class="math inline">\(Y_3\)</span> ： <span class="math display">\[
+\mathbf{X}_{3}=\mathbf{X}_{1}+\mathbf{W}_{7} \hat{\mathbf{X}}, \quad
+\mathbf{Y}_{3}=\mathbf{Y}_{1}+\mathbf{W}_{8} \hat{\mathbf{Y}}\ \ \ \ \ \
+\ (6)
+\]</span>
+这个交叉门控模块可以起到全局/局部感受野传递特征信息的作用，并且同样具有线性时间复杂度。</p>
+<h2 id="多阶段多尺度架构">多阶段多尺度架构</h2>
+<p><img src="../img/cv/image-20221114172412249.png" srcset="/img/loading.gif" lazyload /></p>
+<p>实验发现，<strong>使用多阶段小模型要比单阶段大模型的效果要好很多</strong>，所以文章采用了一种多阶段多尺度的结构来实现模型，如图所示，横向为多阶段，纵向为多尺度，最终输出结果为最后阶段的最大尺度输出</p>
+<p>模型的损失函数为多个阶段、多个尺度的输出计算Charbonnier损失和频域变换的L1损失的加权：
+<span class="math display">\[
+\mathcal{L}=\sum_{s=1}^{S} \sum_{n=1}^{N}\left[\mathcal{L}_{c h a
+r}\left(\mathbf{R}_{s, n}, \mathbf{T}_{n}\right)+\lambda \mathcal{L}_{f
+r e q}\left(\mathbf{R}_{s, n}, \mathbf{T}_{n}\right)\right]\ \ \ \ \ \ \
+(7)
+\]</span> 其中 <span class="math inline">\(T_n\)</span>
+表示(双线性缩放)多尺度目标图像，<span
+class="math inline">\(\mathcal{L}_{c h a r}\)</span> 是Charbonnier
+loss： <span class="math display">\[
+\mathcal{L}_{c h a r}(\mathbf{R},
+\mathbf{T})=\sqrt{\|\mathbf{R}-\mathbf{T}\|^{2}+\epsilon^{2}}\ \ \ \ \ \
+\ (8)
+\]</span> 其中 <span class="math inline">\(\epsilon\)</span> 我们设置为
+<span class="math inline">\(10^{-3}\)</span> ，<span
+class="math inline">\(\mathcal{L}_{f r e q}\)</span>
+是执行高频细节的频率重构损失： <span class="math display">\[
+\mathcal{L}_{\text {freq }}(\mathbf{R},
+\mathbf{T})=\|\mathcal{F}(\mathbf{R})-\mathcal{F}(\mathbf{T})\|_{1}\ \ \
+\ \ \ \ (9)
+\]</span> 其中 <span class="math inline">\(\mathcal{F}\)</span>
+代表2D快速傅里叶变换。我们在所有实验中都使用 <span
+class="math inline">\(\lambda = 0.1\)</span> 作为权重因子。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Deep-Learning/">Deep Learning</a>
+                    
+                      <a class="hover-with-bg" href="/categories/Deep-Learning/cv/">cv</a>
+                    
+                  </div>
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/11/11/gMLP/">
+                        <span class="hidden-mobile">gMLP</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        loader: {
+          load: ['ui/lazy']
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
