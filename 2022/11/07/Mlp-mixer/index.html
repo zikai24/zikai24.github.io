@@ -16,22 +16,23 @@
   <meta name="author" content="肘子开">
   <meta name="keywords" content="">
   
-    <meta name="description" content="模型图  代码实现 Mlp  123456789101112131415161718192021222324import torchimport torch.nn as nnfrom torchsummary import summaryfrom torch.nn import Conv2dfrom einops.layers.torch import Rearrange, Reduce">
+    <meta name="description" content="论文：MLP-Mixer: An all-MLP Architecture for Vision   Mixer Architecture MLP-Mixer主要包括三部分：Per-patch Fully-connected、Mixer Layer、分类器。 其中分类器部分采用传统的全局平均池化（GAP）+ 全连接层（FC）+ Softmax 的方式构成，故不进行更多介绍，下面主">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Mlp-mixer">
 <meta property="og:url" content="http://example.com/2022/11/07/Mlp-mixer/index.html">
 <meta property="og:site_name" content="肘子开的博客">
-<meta property="og:description" content="模型图  代码实现 Mlp  123456789101112131415161718192021222324import torchimport torch.nn as nnfrom torchsummary import summaryfrom torch.nn import Conv2dfrom einops.layers.torch import Rearrange, Reduce">
+<meta property="og:description" content="论文：MLP-Mixer: An all-MLP Architecture for Vision   Mixer Architecture MLP-Mixer主要包括三部分：Per-patch Fully-connected、Mixer Layer、分类器。 其中分类器部分采用传统的全局平均池化（GAP）+ 全连接层（FC）+ Softmax 的方式构成，故不进行更多介绍，下面主">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/cv/image-20221115163816919.png">
 <meta property="og:image" content="http://example.com/img/cv/image-20221107220710150.png">
 <meta property="og:image" content="http://example.com/img/cv/image-20221107221903063.png">
 <meta property="og:image" content="http://example.com/img/cv/image-20221107221936346.png">
 <meta property="og:image" content="http://example.com/img/cv/image-20221107222216487.png">
 <meta property="article:published_time" content="2022-11-07T14:06:31.000Z">
-<meta property="article:modified_time" content="2022-11-07T14:23:47.348Z">
+<meta property="article:modified_time" content="2022-11-15T09:04:17.095Z">
 <meta property="article:author" content="肘子开">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/img/cv/image-20221107220710150.png">
+<meta name="twitter:image" content="http://example.com/img/cv/image-20221115163816919.png">
   
   
   <title>Mlp-mixer - 肘子开的博客</title>
@@ -201,7 +202,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      3.3k 字
+      4.5k 字
     </span>
   
 
@@ -210,7 +211,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      28 分钟
+      38 分钟
     </span>
   
 
@@ -242,13 +243,45 @@
             <h1 style="display: none">Mlp-mixer</h1>
             
             <div class="markdown-body">
-              <h1 id="模型图">模型图</h1>
+              <ul>
+<li>论文：MLP-Mixer: An all-MLP Architecture for Vision</li>
+</ul>
+<p><img src="/img/cv/image-20221115163816919.png" srcset="/img/loading.gif" lazyload /></p>
+<h1 id="mixer-architecture">Mixer Architecture</h1>
+<p>MLP-Mixer主要包括三部分：Per-patch Fully-connected、Mixer
+Layer、分类器。</p>
+<p>其中分类器部分采用传统的全局平均池化（GAP）+ 全连接层（FC）+ Softmax
+的方式构成，故不进行更多介绍，下面主要针对前两部分进行解释。</p>
+<h2 id="per-patch-fully-connected">Per-patch Fully-connected</h2>
+<p>FC相较于Conv，并不能获取局部区域间的信息，为了解决这个问题，MLP-Mixer通过Per-patch
+Fully-connected将输入图像转化为2D的Table，方便在后面进行局部区域间的信息融合。</p>
+<p>具体来说，MLP-Mixer将输入图像<strong>相邻无重叠</strong>地划分为S个Patch，<strong>每个Patch通过MLP映射为一维特征向量</strong>，其中一维向量长度为C，最后将每个Patch得到的特征向量组合得到大小为S*C的2D
+Table。<strong>需要注意的时，每个Patch使用的映射矩阵相同，即使用的MLP参数相同。</strong></p>
+<p>实际上，Per-patch
+Fully-connected实现了<strong>（W，H，C）的向量空间</strong>到<strong>（S，C）的向量空间</strong>的映射。</p>
+<p>例如，假设输入图像大小为240<em>240</em>3，模型选取的Patch为16<em>16，那么一张图片可以划分为（240</em>240）/（16<em>16）=
+225个Patch。结合图片的通道数，每个Patch包含了16</em>16<em>3 =
+768个值，把这768个值做Flatten作为MLP的输入，其中MLP的输出层神经元个数为128。这样，每个Patch就可以得到长度的128的特征向量，组合得到225</em>128的Table。MLP-Mixer中Patch大小和MLP输出单元个数为超参数。</p>
+<h2 id="mixer-layer">Mixer Layer</h2>
+<p>观察Per-patch
+Fully-connected得到的Table会发现，Table的行代表了同一空间位置在不同通道上的信息，列代表了不同空间位置在同一通道上的信息。<strong>换句话说，对Table的每一行进行操作可以实现通道域的信息融合，对Table的每一列进行操作可以实现空间域的信息融合</strong>。</p>
+<p>在传统<a
+target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=CNN&amp;spm=1001.2101.3001.7020">CNN</a>中，可以通过1*1
+Conv来实现通道域的信息融合，如果使用更大一点的卷积核，可以同时实现空间域和通道域的信息融合。</p>
+<p>在<a
+target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=Transformer&amp;spm=1001.2101.3001.7020">Transformer</a>中，通过Self-Attention实现空间域的信息融合，通过MLP同时实现空间域和通道域的信息融合。</p>
+<p>而在MLP-Mixer中，通过Mixer
+Layer使用MLP先后对列、行进行映射，实现空间域和通道域的信息融合。<strong>与传统卷积不同的是，Mixer
+Layer将空间域和通道域分开操作</strong>，这种思想与Xception和MobileNet中的深度可分离卷积相似。</p>
+<h2 id="创新点">创新点</h2>
+<p>MLP-Mixer的创新点在于使用了MLP代替了Conv和Self-Attention，这表明使用最基础的MLP的拟合能力足以构建一个相对性能较好的CV模型。</p>
+<h1 id="模型图">模型图</h1>
 <p><img src="/img/cv/image-20221107220710150.png" srcset="/img/loading.gif" lazyload /></p>
 <h1 id="代码实现">代码实现</h1>
 <h2 id="mlp">Mlp</h2>
 <p><img src="/img/cv/image-20221107221903063.png" srcset="/img/loading.gif" lazyload /></p>
 <figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">import</span> torch<br><span class="hljs-keyword">import</span> torch.nn <span class="hljs-keyword">as</span> nn<br><span class="hljs-keyword">from</span> torchsummary <span class="hljs-keyword">import</span> summary<br><span class="hljs-keyword">from</span> torch.nn <span class="hljs-keyword">import</span> Conv2d<br><span class="hljs-keyword">from</span> einops.layers.torch <span class="hljs-keyword">import</span> Rearrange, Reduce<br><span class="hljs-keyword">from</span> tensorboardX <span class="hljs-keyword">import</span> SummaryWriter<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">FeedForward</span>(nn.Module):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self,dim,hidden_dim,dropout=<span class="hljs-number">0.</span></span>):<br>        <span class="hljs-built_in">super</span>().__init__()<br>        self.net=nn.Sequential(<br>            <span class="hljs-comment">#由此可以看出 FeedForward 的输入和输出维度是一致的</span><br>            nn.Linear(dim,hidden_dim),<br>            <span class="hljs-comment">#激活函数</span><br>            nn.GELU(),<br>            <span class="hljs-comment">#防止过拟合</span><br>            nn.Dropout(dropout),<br>            <span class="hljs-comment">#重复上述过程</span><br>            nn.Linear(hidden_dim,dim),<br>            nn.Dropout(dropout)<br>        )<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">forward</span>(<span class="hljs-params">self,x</span>):<br>        x=self.net(x)<br>        <span class="hljs-keyword">return</span> x<br></code></pre></div></td></tr></table></figure>
-<h2 id="mixer-layer">Mixer-Layer</h2>
+<h2 id="mixer-layer-1">Mixer-Layer</h2>
 <p><img src="/img/cv/image-20221107221936346.png" srcset="/img/loading.gif" lazyload /></p>
 <figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">MixerBlock</span>(nn.Module):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self,dim,num_patch,token_dim,channel_dim,dropout=<span class="hljs-number">0.</span></span>):<br>        <span class="hljs-built_in">super</span>().__init__()<br>        self.token_mixer=nn.Sequential(<br>            nn.LayerNorm(dim),<br>            Rearrange(<span class="hljs-string">&#x27;b n d -&gt; b d n&#x27;</span>),<br>            FeedForward(num_patch,token_dim,dropout),<br>            Rearrange(<span class="hljs-string">&#x27;b d n -&gt; b n d&#x27;</span>)<br><br>         )<br>        self.channel_mixer=nn.Sequential(<br>            nn.LayerNorm(dim),<br>            FeedForward(dim,channel_dim,dropout)<br>        )<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">forward</span>(<span class="hljs-params">self,x</span>):<br>        x = x+self.token_mixer(x)<br>        x = x+self.channel_mixer(x)<br>        <span class="hljs-keyword">return</span> x<br></code></pre></div></td></tr></table></figure>
 <h2 id="mlp-mixer">Mlp-Mixer</h2>
