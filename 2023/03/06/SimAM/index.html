@@ -16,22 +16,23 @@
   <meta name="author" content="肘子开">
   <meta name="keywords" content="">
   
-    <meta name="description" content="ASPP（Atrous Spatial Pyramid Pooling），空洞空间卷积池化金字塔。简单理解就是个至尊版池化层，其目的与普通的池化层一致，尽可能地去提取特征。ASPP 的结构如下：  123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525">
+    <meta name="description" content="论文：SimAM: A Simple, Parameter-Free Attention Module for Convolutional Neural Networks  method 现有的注意力模块通常被继承到每个块中，以改进来自先前层的输出。这种细化步骤通常沿着通道维度或空间维度操作,这些方法生成一维或二维权重，并平等对待每个通道或空间位置中的神经元：  通道注意力：1D注意力">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ASPP">
-<meta property="og:url" content="http://example.com/2023/03/05/ASPP/index.html">
+<meta property="og:title" content="SimAM">
+<meta property="og:url" content="http://example.com/2023/03/06/SimAM/index.html">
 <meta property="og:site_name" content="肘子开的博客">
-<meta property="og:description" content="ASPP（Atrous Spatial Pyramid Pooling），空洞空间卷积池化金字塔。简单理解就是个至尊版池化层，其目的与普通的池化层一致，尽可能地去提取特征。ASPP 的结构如下：  123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525">
+<meta property="og:description" content="论文：SimAM: A Simple, Parameter-Free Attention Module for Convolutional Neural Networks  method 现有的注意力模块通常被继承到每个块中，以改进来自先前层的输出。这种细化步骤通常沿着通道维度或空间维度操作,这些方法生成一维或二维权重，并平等对待每个通道或空间位置中的神经元：  通道注意力：1D注意力">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/img/cv/image-20230305100613533.png">
-<meta property="article:published_time" content="2023-03-05T02:04:46.000Z">
-<meta property="article:modified_time" content="2023-03-05T02:06:48.222Z">
+<meta property="og:image" content="http://example.com/img/cv/image-20230306101414478.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20230306101627185.png">
+<meta property="article:published_time" content="2023-03-06T02:13:24.000Z">
+<meta property="article:modified_time" content="2023-03-06T02:33:23.358Z">
 <meta property="article:author" content="肘子开">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/img/cv/image-20230305100613533.png">
+<meta name="twitter:image" content="http://example.com/img/cv/image-20230306101414478.png">
   
   
-  <title>ASPP - 肘子开的博客</title>
+  <title>SimAM - 肘子开的博客</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
 
@@ -177,7 +178,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="ASPP">
+            <span class="h2" id="subtitle" title="SimAM">
               
             </span>
 
@@ -187,8 +188,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2023-03-05 10:04" pubdate>
-        2023年3月5日 上午
+      <time datetime="2023-03-06 10:13" pubdate>
+        2023年3月6日 上午
       </time>
     </span>
   
@@ -198,7 +199,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.6k 字
+      3.1k 字
     </span>
   
 
@@ -207,7 +208,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      14 分钟
+      26 分钟
     </span>
   
 
@@ -236,14 +237,93 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">ASPP</h1>
+            <h1 style="display: none">SimAM</h1>
             
             <div class="markdown-body">
-              <p> ASPP（Atrous Spatial Pyramid
-Pooling），空洞空间卷积池化金字塔。简单理解就是个至尊版池化层，其目的与普通的池化层一致，尽可能地去提取特征。ASPP
-的结构如下：</p>
-<p><img src="/img/cv/image-20230305100613533.png" srcset="/img/loading.gif" lazyload /></p>
-<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-comment"># 空洞卷积</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">ASPPConv</span>(nn.Sequential):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, in_channels, out_channels, dilation</span>):<br>        modules = [<br>            nn.Conv2d(in_channels, out_channels, <span class="hljs-number">3</span>, padding=dilation, dilation=dilation, bias=<span class="hljs-literal">False</span>),<br>            nn.BatchNorm2d(out_channels),<br>            nn.ReLU()<br>        ]<br>        <span class="hljs-built_in">super</span>(ASPPConv, self).__init__(*modules)<br><br><span class="hljs-comment"># 池化 -&gt; 1*1 卷积 -&gt; 上采样</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">ASPPPooling</span>(nn.Sequential):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, in_channels, out_channels</span>):<br>        <span class="hljs-built_in">super</span>(ASPPPooling, self).__init__(<br>            nn.AdaptiveAvgPool2d(<span class="hljs-number">1</span>),  <span class="hljs-comment"># 自适应均值池化</span><br>            nn.Conv2d(in_channels, out_channels, <span class="hljs-number">1</span>, bias=<span class="hljs-literal">False</span>),<br>            nn.BatchNorm2d(out_channels),<br>            nn.ReLU())<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">forward</span>(<span class="hljs-params">self, x</span>):<br>        size = x.shape[-<span class="hljs-number">2</span>:]<br>        <span class="hljs-keyword">for</span> mod <span class="hljs-keyword">in</span> self:<br>            x = mod(x)<br>        <span class="hljs-comment"># 上采样</span><br>        <span class="hljs-keyword">return</span> F.interpolate(x, size=size, mode=<span class="hljs-string">&#x27;bilinear&#x27;</span>, align_corners=<span class="hljs-literal">False</span>)  <br><br><span class="hljs-comment"># 整个 ASPP 架构</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">ASPP</span>(nn.Module):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, in_channels, atrous_rates, out_channels=<span class="hljs-number">256</span></span>):<br>        <span class="hljs-built_in">super</span>(ASPP, self).__init__()<br>        modules = []<br>        <span class="hljs-comment"># 1*1 卷积</span><br>        modules.append(nn.Sequential(<br>            nn.Conv2d(in_channels, out_channels, <span class="hljs-number">1</span>, bias=<span class="hljs-literal">False</span>),<br>            nn.BatchNorm2d(out_channels),<br>            nn.ReLU()))<br><br>        <span class="hljs-comment"># 多尺度空洞卷积</span><br>        rates = <span class="hljs-built_in">tuple</span>(atrous_rates)<br>        <span class="hljs-keyword">for</span> rate <span class="hljs-keyword">in</span> rates:<br>            modules.append(ASPPConv(in_channels, out_channels, rate))<br><br>        <span class="hljs-comment"># 池化</span><br>        modules.append(ASPPPooling(in_channels, out_channels))<br><br>        self.convs = nn.ModuleList(modules)<br>        <br>        <span class="hljs-comment"># 拼接后的卷积</span><br>        self.project = nn.Sequential(<br>            nn.Conv2d(<span class="hljs-built_in">len</span>(self.convs) * out_channels, out_channels, <span class="hljs-number">1</span>, bias=<span class="hljs-literal">False</span>),<br>            nn.BatchNorm2d(out_channels),<br>            nn.ReLU(),<br>            nn.Dropout(<span class="hljs-number">0.5</span>))<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">forward</span>(<span class="hljs-params">self, x</span>):<br>        res = []<br>        <span class="hljs-keyword">for</span> conv <span class="hljs-keyword">in</span> self.convs:<br>            res.append(conv(x))<br>        res = torch.cat(res, dim=<span class="hljs-number">1</span>)<br>        <span class="hljs-keyword">return</span> self.project(res)<br><br></code></pre></div></td></tr></table></figure>
+              <p>论文：SimAM: A Simple, Parameter-Free Attention Module for
+Convolutional Neural Networks</p>
+<p><img src="/img/cv/image-20230306101414478.png" srcset="/img/loading.gif" lazyload /></p>
+<h1 id="method">method</h1>
+<p>现有的注意力模块通常被继承到每个块中，以改进来自先前层的输出。这种细化步骤通常沿着通道维度或空间维度操作,这些方法生成一维或二维权重，并平等对待每个通道或空间位置中的神经元：</p>
+<ol type="1">
+<li><p>通道注意力：1D注意力，它对不同通道区别对待，对所有位置同等对待；</p></li>
+<li><p>空间注意力：2D注意力，它对不同位置区别对待，对所有通道同等对待。 这可能会限制他们学习更多辨别线索的能力。因此三维权重优于传统的一维和二维权重注意力</p>
+<p><img src="/img/cv/image-20230306101627185.png" srcset="/img/loading.gif" lazyload /></p></li>
+</ol>
+<p>已有研究BAM、CBAM分别将空间注意力与通道注意力进行并行或串行组合。然而，人脑的两种注意力往往是协同工作，因此，我们提出了统一权值的注意力模块。为更好的实现注意力，我们需要评估每个神经元的重要性。在神经科学中，信息丰富的神经元通常表现出与周围神经元不同的放电模式。而且，激活神经元通常会抑制周围神经元，即空域抑制。换句话说，具有空域抑制效应的神经元应当赋予更高的重要性。最简单的寻找重要神经元的方法：度量神经元之间的线性可分性。基于这些神经科学发现，我们为每个神经元定义如下能量函数：
+<span class="math display">\[
+e_{t}\left(w_{t}, b_{t}, \mathbf{y},
+x_{i}\right)=\left(y_{t}-\hat{t}\right)^{2}+\frac{1}{M-1}
+\sum_{i=1}^{M-1}\left(y_{o}-\hat{x}_{i}\right)^{2}\ \ \ \ \ (1)
+\]</span> 其中 <span class="math inline">\(\hat{t}=w_{t}
+t+b_{t}\)</span> 和 <span class="math inline">\(\hat{x} = w_tx_i +
+b_t\)</span> 是 <span class="math inline">\(t\)</span> 和 <span
+class="math inline">\(x_i\)</span> 的线性变换，其中 <span
+class="math inline">\(t\)</span> 和 <span
+class="math inline">\(x_i\)</span> 是输入特征 <span
+class="math inline">\(\mathbf{X} \in \mathbb{R}^{C \times H \times
+W}\)</span> 的单个通道中的目标神经元和其他神经元。<span
+class="math inline">\(i\)</span> 是空间维度上的索引，<span
+class="math inline">\(M = H \times W\)</span>
+是该通道上的神经元数目。<span class="math inline">\(w_t\)</span> 和
+<span class="math inline">\(b_t\)</span> 是变换的权重和偏置。方程( 1
+)中的所有值都是标量。当 <span class="math inline">\(\hat{t} =
+y_t\)</span> 时，方程( 1 )取得最小值，其他所有的 <span
+class="math inline">\(x_i\)</span> 都是 <span
+class="math inline">\(y_0\)</span> ，其中 <span
+class="math inline">\(y_t\)</span> 和 <span
+class="math inline">\(y_0\)</span>
+是两个不同的值。通过最小化该方程，方程( 1 )等价于寻找目标神经元 <span
+class="math inline">\(t\)</span>
+与同一通道内所有其他神经元之间的线性可分性。为了简单起见，我们对 <span
+class="math inline">\(y_t\)</span> 和 <span
+class="math inline">\(y_0\)</span> 使用了二进制标签(即1和-
+1)，并且在方程( 1 )中加入了正则项。最终的能量函数为： <span
+class="math display">\[
+\begin{aligned}
+e_{t}\left(w_{t}, b_{t}, \mathbf{y}, x_{i}\right) &amp; =\frac{1}{M-1}
+\sum_{i=1}^{M-1}\left(-1-\left(w_{t} x_{i}+b_{t}\right)\right)^{2}
++\left(1-\left(w_{t} t+b_{t}\right)\right)^{2}+\lambda w_{t}^{2}
+\end{aligned}\ \ \ \ (2)
+\]</span>
+理论上，每个通道有M个能量函数。通过像SGD这样的迭代求解器来求解所有这些方程在计算上是很麻烦的。幸运的是，方程(
+2 )有一个关于 <span class="math inline">\(w_t\)</span> 和 <span
+class="math inline">\(b_t\)</span> 的快速闭式解，可以很容易地得到：
+<span class="math display">\[
+w_{t}=-\frac{2\left(t-\mu_{t}\right)}{\left(t-\mu_{t}\right)^{2}+2
+\sigma_{t}^{2}+2 \lambda}\ \ \ \ \ \ \ \ \ \ (3)
+\]</span></p>
+<p><span class="math display">\[
+b_{t}=-\frac{1}{2}\left(t+\mu_{t}\right) w_{t}\ \ \ \ \ \ \ \ \ \ \ \
+(4)
+\]</span></p>
+<p><span class="math inline">\(\mu_{t}=\frac{1}{M-1} \sum_{i=1}^{M-1}
+x_{i}\)</span> 和 <span
+class="math inline">\(\hat{\sigma}^{2}=\frac{1}{M}
+\sum_{i=1}^{M}\left(x_{i}-\hat{\mu}\right)^{2}\)</span> 是在该通道除
+<span class="math inline">\(t\)</span>
+外的所有神经元上计算的均值和方差。由于式( 3 )和式( 4
+)所示的现有解决方案是在单个通道上获得的，因此可以合理地假设单个通道中的所有像素遵循相同的分布。给定这个假设，可以在所有神经元上计算均值和方差，并对该通道(Hariharan
+et al.,
+2012)上的所有神经元重用。它可以显著降低计算成本，避免为每个位置迭代计算
+μ 和 σ。因此，可以用下面的方法计算最小能量： <span
+class="math display">\[
+e_{t}^{*}=\frac{4\left(\hat{\sigma}^{2}+\lambda\right)}{(t-\hat{\mu})^{2}+2
+\hat{\sigma}^{2}+2 \lambda}
+\]</span> 其中 <span class="math inline">\(\hat{\mu}=\frac{1}{M}
+\sum_{i=1}^{M} x_{i}\)</span> 以及 <span
+class="math inline">\(\hat{\sigma}^{2}=\frac{1}{M}
+\sum_{i=1}^{M}\left(x_{i}-\hat{\mu}\right)^{2}\)</span> 。</p>
+<p>到目前为止，我们推导出一个能量函数，并发现每个神经元的重要性。根据(希利亚德等,
+1998)，哺乳动物大脑中的注意力调节通常表现为对神经元反应的增益(即,缩放)效应。因此，我们使用缩放运算符而不是添加来进行特征细化。我们模块的整个精化阶段是：
+<span class="math display">\[
+\widetilde{\mathbf{X}}=\operatorname{sigmoid}\left(\frac{1}{\mathbf{E}}\right)
+\odot \mathbf{X}
+\]</span> 式中：E跨通道和空间维度对所有的 <span
+class="math inline">\(e^t_*\)</span>
+进行分组，增加sigmoid以限制E中过大的值，不会影响每个神经元的相对重要性，因为sigmoid是单调函数。</p>
+<h1 id="源代码">源代码</h1>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">import</span> torch<br><span class="hljs-keyword">import</span> torch.nn <span class="hljs-keyword">as</span> nn<br><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">simam_module</span>(torch.nn.Module):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, channels = <span class="hljs-literal">None</span>, e_lambda = <span class="hljs-number">1e-4</span></span>):<br>        <span class="hljs-built_in">super</span>(simam_module, self).__init__()<br><br>        self.activation = nn.Sigmoid()<br>        self.e_lambda = e_lambda<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__repr__</span>(<span class="hljs-params">self</span>):<br>        s = self.__class__.__name__ + <span class="hljs-string">&#x27;(&#x27;</span><br>        s += (<span class="hljs-string">&#x27;lambda=%f)&#x27;</span> % self.e_lambda)<br>        <span class="hljs-keyword">return</span> s<br><br><span class="hljs-meta">    @staticmethod</span><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">get_module_name</span>():<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;simam&quot;</span><br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">forward</span>(<span class="hljs-params">self, x</span>):<br><br>        b, c, h, w = x.size()<br>        <br>        n = w * h - <span class="hljs-number">1</span><br><br>        x_minus_mu_square = (x - x.mean(dim=[<span class="hljs-number">2</span>,<span class="hljs-number">3</span>], keepdim=<span class="hljs-literal">True</span>)).<span class="hljs-built_in">pow</span>(<span class="hljs-number">2</span>)<br>        y = x_minus_mu_square / (<span class="hljs-number">4</span> * (x_minus_mu_square.<span class="hljs-built_in">sum</span>(dim=[<span class="hljs-number">2</span>,<span class="hljs-number">3</span>], keepdim=<span class="hljs-literal">True</span>) / n + self.e_lambda)) + <span class="hljs-number">0.5</span><br><br>        <span class="hljs-keyword">return</span> x * self.activation(y)<br></code></pre></div></td></tr></table></figure>
 
             </div>
             <hr>
@@ -273,18 +353,12 @@ Pooling），空洞空间卷积池化金字塔。简单理解就是个至尊版�
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2023/03/06/SimAM/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">SimAM</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2023/02/22/ACmix/">
-                        <span class="hidden-mobile">ACmix</span>
+                      <a href="/2023/03/05/ASPP/">
+                        <span class="hidden-mobile">ASPP</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
