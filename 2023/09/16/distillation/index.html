@@ -24,8 +24,9 @@
 <meta property="og:description" content="Distillation Classification FitNet FITNETS: HINTS FOR THIN DEEP NETS (ICLR 2015) Knowledge Distillation via the Target-aware Transformer (CVPR 2022)  贡献：  我们提出通过target-aware transformer（TaT）">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/img/cv/image-20230916163256829.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20230916170214352.png">
 <meta property="article:published_time" content="2023-09-16T08:27:59.000Z">
-<meta property="article:modified_time" content="2023-09-16T08:48:49.541Z">
+<meta property="article:modified_time" content="2023-09-16T09:25:02.036Z">
 <meta property="article:author" content="肘子开">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://example.com/img/cv/image-20230916163256829.png">
@@ -198,7 +199,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.5k 字
+      3.3k 字
     </span>
   
 
@@ -207,7 +208,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      13 分钟
+      28 分钟
     </span>
   
 
@@ -288,6 +289,66 @@ Distillation将特征图进行池化采样成小特征图进行计算TaT损失</
 \mathcal{L}_{\mathrm{TaT}}^{\mathcal{A}}
 \]</span></p>
 <h2 id="object-detection">Object Detection</h2>
+<h3
+id="improve-object-detection-with-feature-based-knowledge-distillation-towards-accurate-and-efficient-detectors-iclr-2021"><strong>IMPROVE
+OBJECT DETECTION WITH FEATURE-BASED KNOWLEDGE DISTILLATION: TOWARDS
+ACCURATE AND EFFICIENT DETECTORS (ICLR 2021)</strong></h3>
+<p><img src="/img/cv/image-20230916170214352.png" srcset="/img/loading.gif" lazyload /></p>
+<p>KD在目标检测方向的应用受限主要是因为如下两个原因</p>
+<ul>
+<li>前后背景的像素点数量不平衡</li>
+<li>像素间的关联性缺少一定的蒸馏</li>
+</ul>
+<p>对应的解决策略如下：</p>
+<ul>
+<li>既然存在不平衡关系，那我直接只针对这些bbox的区域做不就好了吗。有些是直接二值mask过滤、有的是将二值soft成高斯分布的形式</li>
+<li>采用Non-Local算子产生attention map，针对attention
+map计算L2损失回归</li>
+</ul>
+<h4 id="attention-guided-distillation">ATTENTION-GUIDED
+DISTILLATION</h4>
+<p>那么，空间注意力图和通道注意力图的生成就等同于找到映射函数$^s: ^{C,
+H, W} ^{H, W} <span class="math inline">\(和\)</span>^c: ^{C, H, W}
+^C$。由于特征中每个元素的绝对值都意味着其重要性，因此我们通过对通道维度的绝对值求和来构建
+<span
+class="math inline">\(\mathcal{G}^s\)</span>，并通过对宽度和高度维度的绝对值求和来构建
+<span class="math inline">\(\mathcal{G}^c\)</span>，具体公式为<span
+class="math inline">\(\mathcal{G}^c(A)=\frac{1}{H W} \sum_H^{i=1}
+\sum_W^{j=1}\left|A_{\cdot, i, j}\right|\)</span>和<span
+class="math inline">\(\mathcal{G}^s(A)=\frac{1}{C}
+\sum_C^{k=1}\left|A_{k,,
+\cdot}\right|\)</span>。然后，将教师和学生Detector的注意力图相加，就可以得到注意力引导蒸馏法中使用的空间注意力掩码
+<span class="math inline">\(M^s\)</span> 和通道注意力掩码 <span
+class="math inline">\(M^c\)</span>，公式为<span
+class="math inline">\(M^s=H W \cdot
+\operatorname{softmax}\left(\left(\mathcal{G}^s\left(A^{\mathcal{S}}\right)+\mathcal{G}^s\left(A^{\mathcal{T}}\right)\right)
+/ T\right)\)</span>和<span
+class="math inline">\(M^c=C\cdot\text{softmax}(\mathcal{G}^c(A^{\mathcal{S}})+\mathcal{G}^c(A^{\mathcal{T}}))/T)\)</span>。注意力引导蒸馏损失
+<span class="math inline">\(\mathcal{L}_{AGD}\)</span>
+由两部分组成--注意力转移损失 <span
+class="math inline">\(\mathcal{L}_{AT}\)</span> 和注意力屏蔽损失 <span
+class="math inline">\(\mathcal{L}_{AM}\)</span>。 <span
+class="math inline">\(\mathcal{L}_{AT}\)</span>
+鼓励学生模型模拟教师模型的空间和通道注意力: <span
+class="math display">\[
+\mathcal{L}_{AT}=\mathcal{L}_2(\mathcal{G}^s(A^{\mathcal{S}}),\mathcal{G}^s(A^{\mathcal{T}}))+\mathcal{L}_2(\mathcal{G}^c(A^{\mathcal{S}}),\mathcal{G}^c(A^{\mathcal{T}}))
+\]</span> <span
+class="math inline">\(\mathcal{L}_{AM}\)</span>鼓励学生模仿教师模型的特征:
+<span class="math display">\[
+\begin{aligned}\mathcal{L}_{AM}&amp;=\left(\sum_{k=1}^C\sum_{i=1}^H\sum_{j=1}^W(A_{k,i,j}^T-A_{k,i,j}^\mathcal{S})^2\cdot
+M_{i,j}^s\cdot M_k^c\right)^{\frac{1}{2}}\end{aligned}
+\]</span></p>
+<h4 id="non-local-distillation">NON-LOCAL DISTILLATION</h4>
+<p>使用NON-LOCAL模块来提取全局信息，最后Loss： <span
+class="math display">\[
+\mathcal{L}_{NLD}=\mathcal{L}_{2}(r^{\mathcal{S}},r^{\mathcal{T}})
+\]</span></p>
+<h4 id="overall-loss-function">OVERALL LOSS FUNCTION</h4>
+<p><span class="math display">\[
+\mathcal{L}_{Distill}(A^\mathcal{T},A^\mathcal{S})=\underbrace{\alpha\cdot\mathcal{L}_{AT}+\beta\cdot\mathcal{L}_{AM}}_{\text{Attention-guided
+distillation}}+\underbrace{\gamma\cdot\mathcal{L}_{NLD}.}_{\text{Non-local
+distillation}}
+\]</span></p>
 
             </div>
             <hr>
