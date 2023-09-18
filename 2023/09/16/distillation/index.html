@@ -28,8 +28,12 @@
 <meta property="og:image" content="http://example.com/img/cv/image-20230916172809521.png">
 <meta property="og:image" content="http://example.com/img/cv/image-20230916173404192.png">
 <meta property="og:image" content="http://example.com/img/cv/image-20230916173923018.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20230918105121610.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20230918172153838.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20230918174811736.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20230918175405238.png">
 <meta property="article:published_time" content="2023-09-16T08:27:59.000Z">
-<meta property="article:modified_time" content="2023-09-16T10:12:00.728Z">
+<meta property="article:modified_time" content="2023-09-18T10:24:46.437Z">
 <meta property="article:author" content="肘子开">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://example.com/img/cv/image-20230916163256829.png">
@@ -202,7 +206,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      5.9k 字
+      11k 字
     </span>
   
 
@@ -211,7 +215,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      50 分钟
+      91 分钟
     </span>
   
 
@@ -447,6 +451,167 @@ N_m=\sum_{i=1}^RM_i
 <h3 id="overall-loss-function-1">Overall loss function</h3>
 <p><span class="math display">\[
 \begin{aligned}L&amp;=L_{GT}+\lambda_1L_{Feature}+\lambda_2L_{Relation}+\lambda_3L_{Response}\end{aligned}
+\]</span></p>
+<h2
+id="distilling-object-detectors-via-decoupled-features-cvpr-2021">Distilling
+Object Detectors via Decoupled Features (CVPR 2021)</h2>
+<p>不足：</p>
+<ul>
+<li>以往的paper都没有使用背景区域进行蒸馏学习，只使用了目标区域</li>
+</ul>
+<p>创新点：</p>
+<ul>
+<li>使用解耦的目标区域和背景区域进行蒸馏学习</li>
+</ul>
+<p><img src="/img/cv/image-20230918105121610.png" srcset="/img/loading.gif" lazyload /></p>
+<h3 id="decouple-intermediate-features-in-distillation">Decouple
+Intermediate Features in Distillation</h3>
+<p>我们得出的结论是，中间特征中的背景区域可以补充目标区域，进一步帮助学生检测器的训练。利用ground-truth来生成二值化的掩码，随后使用二值化的掩码来区分前景和背景，然后解耦的进行损失值的计算。
+<span class="math display">\[
+\begin{aligned}&amp;\mathcal{L}_{fea}=\frac{\alpha_{obj}}{2N_{obj}}\sum_{h=1}^{H}\sum_{w=1}^{W}\sum_{c=1}^{C}M_{h,w}(\phi(\mathcal{S}_{h,w,c})-\mathcal{T}_{h,w,c})^2\\&amp;+\frac{\alpha_{bg}}{2N_{bg}}\sum_{h=1}^{H}\sum_{w=1}^{W}\sum_{c=1}^{C}(1-M_{h,w})(\phi(\mathcal{S}_{h,w,c})-\mathcal{T}_{h,w,c})^2,\end{aligned}
+\]</span></p>
+<h3 id="decouple-region-proposals-in-distillation">Decouple Region
+Proposals in Distillation</h3>
+<p>在蒸馏检测头时将区域建议分为positive建议和negative建议，所以还是对教师和学生的预测结果进行软化：
+<span class="math display">\[
+\begin{aligned}p^{s,T_{obj}}(c\mid\theta^s)&amp;=\frac{exp(z_c^s/T_{obj})}{\sum_{j=1}^Cexp(z_j^s/T_{obj})},c\in
+Y\\p^{t,T_{obj}}(c\mid\theta^t)&amp;=\frac{exp(z_c^t/T_{obj})}{\sum_{j=1}^Cexp(z_j^t/T_{obj})},c\in
+Y\end{aligned}
+\]</span> 最后就进行positive和negative的损失计算： <span
+class="math display">\[
+\begin{gathered}
+\begin{aligned}\mathcal{L}_{cls}&amp;=\frac{\beta_{obj}}{K_{obj}}\sum_{i=1}^{K}b_i\mathcal{L}_{KL}(p_i^{s,T_{obj}},p_i^{t,T_{obj}})\end{aligned}
+\\
++\frac{\beta_{\boldsymbol{b}g}}{K_{\boldsymbol{b}g}}\sum_{i=1}^K{(1-b_i)\mathcal{L}_{KL}(p_i^{s,T_{\boldsymbol{b}g}},p_i^{t,T_{\boldsymbol{b}g}})}
+\\
+\begin{aligned}\mathcal{L}_{KL}(p^{s,T},p^{t,T})&amp;=T^2\sum_{c=1}^Cp^{t,T}(c|\theta^t)\log\frac{p^{t,T}(c|\theta^t)}{p^{s,T}(c|\theta^s)}\end{aligned}
+\end{gathered}
+\]</span></p>
+<h2
+id="instance-conditional-knowledge-distillation-for-object-detection-nips2021"><strong>Instance-Conditional
+Knowledge Distillation for Object Detection</strong> (NIPS2021)</h2>
+<p>不足：</p>
+<ul>
+<li>许多方法会忽略信息量大的上下文区域，或涉及缜密的决策</li>
+<li>虽然注意力能为辨别区域提供固有提示，但激活与检测知识之间的关系仍不明确。</li>
+</ul>
+<p>创新点：</p>
+<ul>
+<li>我们设计了一个条件解码模块来定位知识，每个实例之间的相关性由实例感知注意力来计算</li>
+</ul>
+<p><img src="/img/cv/image-20230918172153838.png" srcset="/img/loading.gif" lazyload /></p>
+<h3 id="overview">Overview</h3>
+<p>为了促进KD，作者提出在教师和学生之间传输实例条件知识，Loss为： <span
+class="math display">\[
+\mathcal{L}_{distill}=\sum_{i=1}^N\mathcal{L}_d(\kappa_i^\mathcal{S},\kappa_i^\mathcal{T})
+\]</span> 其中<span
+class="math inline">\(\kappa_i^{\mathcal{T}}=\mathcal{G}(\mathcal{T},
+y_i)\)</span>，<span
+class="math inline">\(\mathcal{G}\)</span>是实例条件解码模块，由辅助loss进行优化。</p>
+<h3 id="instance-conditional-knowledge">Instance-conditional
+Knowledge</h3>
+<p>实例条件知识由两部分计算得出(1) 无条件知识 (2) 实例条件</p>
+<ul>
+<li><p>无条件知识 <span class="math inline">\(\mathcal{T}\)</span> ,
+表示教师探测器提供的所有信息。将多尺度特征表示为 <span
+class="math inline">\(\mathcal{T}=\{X_p \in \mathbb{R}^{D\times
+H_p\times W_p}\}_{p\in \mathcal{P}}\)</span> ，其中 <span
+class="math inline">\(\mathcal{P}\)</span> 是空间上的分辨率，D
+是维度。沿着空间维度方向对不同尺度的表征进行concat，我们就会获得 <span
+class="math inline">\(A^T\in \mathbb{R}^{L \times D}\)</span> ，其中
+<span class="math inline">\(L=\sum_{p \in \mathcal{P}}H_pW_p\)</span>
+是各尺度像素总数之和</p></li>
+<li><p>实例条件最初描述的是人类观察到的物体，用 <span
+class="math inline">\(\mathcal{Y} = \{y_i\}^N_{i=1}\)</span> 表示，其中
+N 是物体编号，<span class="math inline">\(y_i = (c_i, b_i)\)</span> 是第
+i 个实例的注释，包括类别 <span class="math inline">\(c_i\)</span>
+和框位置 <span class="math inline">\(b_i = (x_i, y_i, w_i,
+h_i)\)</span>，其中指定了定位和尺寸信息。</p>
+<p>为了为每个实例生成可学习的嵌入，注释被映射到隐藏空间中的查询特征向量
+<span
+class="math inline">\(q_i\)</span>，该向量指定了收集所需知识的条件：
+<span class="math display">\[
+\mathbf{q}_i=\mathcal{F}_q(\mathcal{E}(\mathrm{y}_i)),\mathrm{~}\mathbf{q}_i\in\mathbb{R}^D
+\]</span> 其中 <span class="math inline">\(\mathcal{E} (\cdot)\)</span>
+是一个编码方法，以及 <span class="math inline">\(\mathcal{F}_q\)</span>
+是一个MLP</p>
+<p>我们通过测量相关反应，从给定 <span
+class="math inline">\(q_i\)</span>的 <span
+class="math inline">\(\mathcal{T}\)</span>
+中检索知识。通过多头注意力机制进行计算得出。 <span
+class="math display">\[
+\begin{aligned}
+&amp;\mathrm{K}_{j}^{\mathcal{T}}&amp;&amp;
+=\mathcal{F}_j^k(\mathrm{A}^{\mathcal{T}}+\mathcal{F}_{pe}(\mathrm{P})),\text{
+K}_j^{\mathcal{T}}\in\mathbb{R}^{L\times d}  \\
+&amp;\mathrm{V}_j^{\mathcal{T}}&amp;&amp;
+=\mathcal{F}_j^v(\mathrm{A}^{\mathcal{T}}),\text{
+V}_j^{\mathcal{T}}\in\mathbb{R}^{L\times d}  \\
+&amp;\mathbf{q}_{ij}&amp;&amp;
+=\mathcal{F}_j^q(\mathbf{q}_i),\mathbf{q}_{ij}\in\mathbb{R}^d  \\
+&amp;\mathbf{m}_{ij}&amp;&amp;
+=softmax(\frac{\mathrm{K}_j^T\mathbf{q}_{ij}}{\sqrt{d}}),\mathbf{m}_{ij}\in\mathbb{R}^L
+\end{aligned}
+\]</span></p></li>
+</ul>
+<h3 id="auxiliary-task">Auxiliary Task</h3>
+<p>等下次再看，不太懂</p>
+<h2
+id="focal-and-global-knowledge-distillation-for-detectors-cvpr2022">Focal
+and Global Knowledge Distillation for Detectors (CVPR2022)</h2>
+<p>不足：</p>
+<ul>
+<li>将前景和背景不进行解耦一起进行蒸馏结果是最差的，这一现象表明，特征图的不均匀差异会对蒸馏产生负面影响。</li>
+<li>再往深处想，不仅前景和背景之间存在负面影响，像素和通道之间也存在负面影响。</li>
+<li>缺乏对全局信息的提取。</li>
+</ul>
+<p>创新点：</p>
+<ul>
+<li>提出focal蒸馏。在分离前景和背景的同时，焦点提炼还能计算出教师特征中不同像素和通道的关注度，让学生关注教师的关键像素和通道。</li>
+<li>提出global蒸馏。我们利用 GcBlock
+提取不同像素之间的关系，然后将其从教师提炼到学生。</li>
+</ul>
+<p><img src="/img/cv/image-20230918174811736.png" srcset="/img/loading.gif" lazyload /></p>
+<h3 id="focal-distillation">Focal Distillation</h3>
+<p>针对前景和背景不平衡的问题，我们提出了焦点蒸馏法来分离图像，引导学生关注关键像素和通道。对于蒸馏区域的对比如下图所示:</p>
+<p><img src="/img/cv/image-20230918175405238.png" srcset="/img/loading.gif" lazyload /></p>
+<p>首先还是利用ground-truth来得到二值化掩码M。在不同的图像中，像素数量和前景与背景的比例差异很大。因此，为了对不同目标一视同仁，平衡前景和背景的损失，我们将比例掩码
+S 设置为： <span class="math display">\[
+\begin{aligned}S_{i,j}&amp;=\begin{cases}\frac1{H_rW_r},&amp;\mathrm{if~}\left(i,j\right)\in
+r\\\frac1{N_{bg}},&amp;\mathrm{Otherwise}&amp;\end{cases}\\\\N_{bg}&amp;=\sum_{i=1}^H\sum_{j=1}^W(1-M_{i,j})\end{aligned}
+\]</span>
+其中r就是ground-truth。如果一个像素属于不同的目标，我们会选择最小的方框来计算
+S。</p>
+<p>随后先选择焦点像素和通道，然后得到相应的注意力掩码。我们分别计算不同像素和不同通道的绝对平均值：
+<span class="math display">\[
+\begin{aligned}G^S(F)&amp;=\frac1C\cdot\sum_{c=1}^C|F_c|\\\\G^C(F)&amp;=\frac1{HW}\cdot\sum_{i=1}^H\sum_{j=1}^W|F_{i,j}|\end{aligned}
+\]</span> 然后得到注意力机制掩码： <span class="math display">\[
+\begin{aligned}A^S(F)&amp;=H\cdot W\cdot
+softmax\big(G^S(F)/T\big)\\\\A^C(F)&amp;=C\cdot
+softmax\big(G^C(F)/T\big)\end{aligned}
+\]</span> 得到特征损失函数： <span class="math display">\[
+\begin{aligned}L_{fea}&amp;=\alpha\sum_{k=1}^C\sum_{i=1}^H\sum_{j=1}^WM_{i,j}S_{i,j}A_{i,j}^SA_k^C\left(F_{k,i,j}^T-f(F_{k,i,j}^S)\right)^2\\&amp;+\beta\sum_{k=1}^C\sum_{i=1}^H\sum_{j=1}^W(1-M_{i,j})S_{i,j}A_{i,j}^SA_k^C\left(F_{k,i,j}^T-f(F_{k,i,j}^S)\right)^2\end{aligned}
+\]</span>
+此外，我们还利用注意力损失使学生检测器模仿教师检测器的空间和通道注意力掩码，其公式为：
+<span class="math display">\[
+    L_{at}=\gamma\cdot\left(l(A_t^S,A_S^S)+l(A_t^C,A_S^C)\right)
+\]</span> 最后的Focal loss为： <span class="math display">\[
+L_{focal}=L_{fea}+L_{at}
+\]</span></p>
+<h3 id="global-distillation">Global Distillation</h3>
+<p>利用 GcBlock
+在单幅图像中捕捉全局关系信息，并迫使学生探测器从教师那里学习关系。全局Loss为：
+<span class="math display">\[
+\begin{aligned}
+L_{global}=&amp;
+\lambda\cdot\sum\left(\mathcal{R}(F^T)-\mathcal{R}(F^S)\right)^2  \\
+\mathcal{R}(F)=&amp; \begin{aligned}F+W_{v2}(ReLU(LN(W_{v1}\end{aligned}
+\begin{aligned}(\sum_{j=1}^{N_p}\frac{e^{W_kF_j}}{\sum_{m=1}^{N_p}e^{W_kF_M}}F_j))))\end{aligned}
+\end{aligned}
+\]</span></p>
+<h3 id="overall-loss">Overall loss</h3>
+<p>于是总的Loss为： <span class="math display">\[
+L=L_{original}+L_{focal}+L_{global}
 \]</span></p>
 
             </div>
