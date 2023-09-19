@@ -32,8 +32,9 @@
 <meta property="og:image" content="http://example.com/img/cv/image-20230918172153838.png">
 <meta property="og:image" content="http://example.com/img/cv/image-20230918174811736.png">
 <meta property="og:image" content="http://example.com/img/cv/image-20230918175405238.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20230919163725146.png">
 <meta property="article:published_time" content="2023-09-16T08:27:59.000Z">
-<meta property="article:modified_time" content="2023-09-18T10:24:46.437Z">
+<meta property="article:modified_time" content="2023-09-19T12:42:46.755Z">
 <meta property="article:author" content="肘子开">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://example.com/img/cv/image-20230916163256829.png">
@@ -206,7 +207,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      11k 字
+      14k 字
     </span>
   
 
@@ -215,7 +216,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      91 分钟
+      114 分钟
     </span>
   
 
@@ -300,9 +301,9 @@ Distillation将特征图进行池化采样成小特征图进行计算TaT损失</
 \]</span></p>
 <h1 id="object-detection">Object Detection</h1>
 <h2
-id="improve-object-detection-with-feature-based-knowledge-distillation-towards-accurate-and-efficient-detectors-iclr-2021"><strong>IMPROVE
+id="improve-object-detection-with-feature-based-knowledge-distillation-towards-accurate-and-efficient-detectors-iclr-2021">IMPROVE
 OBJECT DETECTION WITH FEATURE-BASED KNOWLEDGE DISTILLATION: TOWARDS
-ACCURATE AND EFFICIENT DETECTORS (ICLR 2021)</strong></h2>
+ACCURATE AND EFFICIENT DETECTORS (ICLR 2021)</h2>
 <p>KD在目标检测方向的应用受限主要是因为如下两个原因</p>
 <ul>
 <li>前后背景的像素点数量不平衡</li>
@@ -360,14 +361,14 @@ distillation}}+\underbrace{\gamma\cdot\mathcal{L}_{NLD}.}_{\text{Non-local
 distillation}}
 \]</span></p>
 <h2
-id="localization-distillation-for-object-detection-tpami"><strong>Localization
-Distillation for Object Detection</strong> (TPAMI)</h2>
+id="localization-distillation-for-object-detection-tpami">Localization
+Distillation for Object Detection (TPAMI)</h2>
 <p><img src="/img/cv/image-20230916172809521.png" srcset="/img/loading.gif" lazyload /></p>
 <p>还没看懂，后面再看</p>
 <h2
-id="general-instance-distillation-for-object-detection-cvpr-2021"><strong>General
-Instance Distillation for Object Detection (</strong>CVPR
-2021<strong>)</strong></h2>
+id="general-instance-distillation-for-object-detection-cvpr-2021">General
+Instance Distillation for Object Detection (<strong>CVPR
+2021</strong>)</h2>
 <p>不足：</p>
 <ul>
 <li>此外，目前的检测蒸馏方法不能同时在多个检测框架中很好地发挥作用，例如两阶段、一阶段、无锚方法。</li>
@@ -488,8 +489,8 @@ class="math display">\[
 \end{gathered}
 \]</span></p>
 <h2
-id="instance-conditional-knowledge-distillation-for-object-detection-nips2021"><strong>Instance-Conditional
-Knowledge Distillation for Object Detection</strong> (NIPS2021)</h2>
+id="instance-conditional-knowledge-distillation-for-object-detection-nips2021">Instance-Conditional
+Knowledge Distillation for Object Detection (NIPS2021)</h2>
 <p>不足：</p>
 <ul>
 <li>许多方法会忽略信息量大的上下文区域，或涉及缜密的决策</li>
@@ -613,6 +614,34 @@ L_{global}=&amp;
 <p>于是总的Loss为： <span class="math display">\[
 L=L_{original}+L_{focal}+L_{global}
 \]</span></p>
+<h3 id="代码实现">代码实现</h3>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">get_fea_loss</span>(<span class="hljs-params">self, preds_S, preds_T, Mask_fg, Mask_bg, C_s, C_t, S_s, S_t</span>):<br>        loss_mse = nn.MSELoss(reduction=<span class="hljs-string">&#x27;sum&#x27;</span>)<br><br>        Mask_fg = Mask_fg.unsqueeze(dim=<span class="hljs-number">1</span>)  <span class="hljs-comment"># [N, 1, H, W]</span><br>        Mask_bg = Mask_bg.unsqueeze(dim=<span class="hljs-number">1</span>)  <span class="hljs-comment"># [N, 1, H, W]</span><br><br>        C_t = C_t.unsqueeze(dim=-<span class="hljs-number">1</span>)  <span class="hljs-comment"># [N, C, 1]</span><br>        C_t = C_t.unsqueeze(dim=-<span class="hljs-number">1</span>)  <span class="hljs-comment"># [N, C, 1, 1]</span><br><br>        S_t = S_t.unsqueeze(dim=<span class="hljs-number">1</span>)  <span class="hljs-comment"># [N, 1, H, W]</span><br><br>        <span class="hljs-comment"># use `sqrt` because the feature loss is a mse loss!</span><br>        <span class="hljs-comment"># the following two sections are using to get attention-based feature map</span><br>        <span class="hljs-comment"># and then decouple the background and foreground.</span><br>        fea_t = torch.mul(preds_T, torch.sqrt(S_t))<br>        fea_t = torch.mul(fea_t, torch.sqrt(C_t))<br>        fg_fea_t = torch.mul(fea_t, torch.sqrt(Mask_fg))<br>        bg_fea_t = torch.mul(fea_t, torch.sqrt(Mask_bg))<br><br>        fea_s = torch.mul(preds_S, torch.sqrt(S_t))<br>        fea_s = torch.mul(fea_s, torch.sqrt(C_t))<br>        fg_fea_s = torch.mul(fea_s, torch.sqrt(Mask_fg))<br>        bg_fea_s = torch.mul(fea_s, torch.sqrt(Mask_bg))<br><br>        <span class="hljs-comment"># get loss of background and foreground feature map, len(maks_x) = batch size (N)</span><br>        fg_loss = loss_mse(fg_fea_s, fg_fea_t)/<span class="hljs-built_in">len</span>(Mask_fg)<br>        bg_loss = loss_mse(bg_fea_s, bg_fea_t)/<span class="hljs-built_in">len</span>(Mask_bg)<br><br>        <span class="hljs-keyword">return</span> fg_loss, bg_loss<br></code></pre></div></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">get_mask_loss</span>(<span class="hljs-params">self, C_s, C_t, S_s, S_t</span>):<br>      <span class="hljs-comment"># get L1 loss of attention map</span><br>      mask_loss = torch.<span class="hljs-built_in">sum</span>(torch.<span class="hljs-built_in">abs</span>((C_s-C_t)))/<span class="hljs-built_in">len</span>(C_s) + \<br>          torch.<span class="hljs-built_in">sum</span>(torch.<span class="hljs-built_in">abs</span>((S_s-S_t)))/<span class="hljs-built_in">len</span>(S_s)<br><br>      <span class="hljs-keyword">return</span> mask_loss<br></code></pre></div></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-comment"># GC block</span><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">spatial_pool</span>(<span class="hljs-params">self, x, in_type</span>):<br>        batch, channel, width, height = x.size()<br>        input_x = x<br>        <span class="hljs-comment"># [N, C, H * W]</span><br>        input_x = input_x.view(batch, channel, height * width)<br>        <span class="hljs-comment"># [N, 1, C, H * W]</span><br>        input_x = input_x.unsqueeze(<span class="hljs-number">1</span>)<br>        <span class="hljs-comment"># [N, 1, H, W]</span><br>        <span class="hljs-keyword">if</span> in_type == <span class="hljs-number">0</span>:<br>            context_mask = self.conv_mask_s(x)<br>        <span class="hljs-keyword">else</span>:<br>            context_mask = self.conv_mask_t(x)<br>        <span class="hljs-comment"># [N, 1, H * W]</span><br>        context_mask = context_mask.view(batch, <span class="hljs-number">1</span>, height * width)<br>        <span class="hljs-comment"># [N, 1, H * W]</span><br>        context_mask = F.softmax(context_mask, dim=<span class="hljs-number">2</span>)<br>        <span class="hljs-comment"># [N, 1, H * W, 1]</span><br>        context_mask = context_mask.unsqueeze(-<span class="hljs-number">1</span>)<br>        <span class="hljs-comment"># [N, 1, C, 1]</span><br>        context = torch.matmul(input_x, context_mask)<br>        <span class="hljs-comment"># [N, C, 1, 1]</span><br>        context = context.view(batch, channel, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>)<br><br>        <span class="hljs-keyword">return</span> context<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">get_rela_loss</span>(<span class="hljs-params">self, preds_S, preds_T</span>):<br>        loss_mse = nn.MSELoss(reduction=<span class="hljs-string">&#x27;sum&#x27;</span>)<br><br>        context_s = self.spatial_pool(preds_S, <span class="hljs-number">0</span>)<br>        context_t = self.spatial_pool(preds_T, <span class="hljs-number">1</span>)<br><br>        out_s = preds_S<br>        out_t = preds_T<br><br>        channel_add_s = self.channel_add_conv_s(context_s)<br>        out_s = out_s + channel_add_s<br><br>        channel_add_t = self.channel_add_conv_t(context_t)<br>        out_t = out_t + channel_add_t<br><br>        rela_loss = loss_mse(out_s, out_t)/<span class="hljs-built_in">len</span>(out_s)<br><br>        <span class="hljs-keyword">return</span> rela_loss<br></code></pre></div></td></tr></table></figure>
+<h2
+id="channel-wise-knowledge-distillation-for-dense-prediction-iccv-2021">Channel-wise
+Knowledge Distillation for Dense Prediction (ICCV 2021)</h2>
+<p>不足：</p>
+<ul>
+<li>以往蒸馏方法都是挖掘空间上的知识</li>
+</ul>
+<p>创新点：</p>
+<ul>
+<li>对通道方向上进行蒸馏</li>
+</ul>
+<p><img src="/img/cv/image-20230919163725146.png" srcset="/img/loading.gif" lazyload /></p>
+<h3 id="channel-wise-distillation">Channel-wise Distillation</h3>
+<p>整体公式如下所示： <span class="math display">\[
+\varphi(\phi(y^T),\phi(y^S))=\varphi(\phi(y_c^T),\phi(y_c^S)).
+\]</span> 其中 <span class="math inline">\(\phi (\cdot)\)</span>
+代表在每个通道内进行softmax操作，<span
+class="math inline">\(\varphi(\cdot))\)</span>
+用于评估教师网络与学生网络通道分布之间的差异。然后使用KL散度： <span
+class="math display">\[
+\varphi\big(y^T,y^S\big)=\frac{\mathcal{T}^2}C\sum_{c=1}^C\sum_{i=1}^{W\cdot
+H}\phi(y_{c,i}^T)\cdot\log\Big[\frac{\phi(y_{c,i}^T)}{\phi(y_{c,i}^S)}\Big].
+\]</span>
+这样可以让学生网络倾向于在前景显著性中产生相似的激活分布，而教师网络中对应于背景区域的激活对学习的影响较小。</p>
 
             </div>
             <hr>
