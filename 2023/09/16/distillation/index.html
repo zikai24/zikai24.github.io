@@ -25,6 +25,8 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/img/cv/image-20230916163256829.png">
 <meta property="og:image" content="http://example.com/img/cv/image-20231011102343580.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20231016102351891.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20231016112424199.png">
 <meta property="og:image" content="http://example.com/img/cv/image-20230916170214352.png">
 <meta property="og:image" content="http://example.com/img/cv/image-20230916172809521.png">
 <meta property="og:image" content="http://example.com/img/cv/image-20230916173404192.png">
@@ -40,8 +42,12 @@
 <meta property="og:image" content="http://example.com/img/cv/image-20231011205606991.png">
 <meta property="og:image" content="http://example.com/img/cv/image-20231012112322091.png">
 <meta property="og:image" content="http://example.com/img/cv/image-20231012114013290.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20231016160318941.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20231016170239040.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20231016173222829.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20231016193819839.png">
 <meta property="article:published_time" content="2023-09-16T08:27:59.000Z">
-<meta property="article:modified_time" content="2023-10-12T10:03:44.474Z">
+<meta property="article:modified_time" content="2023-10-16T13:09:57.130Z">
 <meta property="article:author" content="肘子开">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://example.com/img/cv/image-20230916163256829.png">
@@ -214,7 +220,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      26k 字
+      31k 字
     </span>
   
 
@@ -223,7 +229,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      214 分钟
+      255 分钟
     </span>
   
 
@@ -351,6 +357,60 @@ f(s_i),t_i\rangle}{||f(s_i)||_2||t_i||_2}
 \]</span> 其中 <span class="math inline">\(f(\cdot)\)</span>
 就是多个projector。最后总的loss如下： <span class="math display">\[
 \mathcal{L}_{total}=\mathcal{L}_{CE}+\alpha\mathcal{L}_{MDA}
+\]</span></p>
+<h2
+id="exploring-inter-channel-correlation-for-diversity-preserved-knowledge-distillationiccv-2023">Exploring
+Inter-Channel Correlation for Diversity-preserved Knowledge
+Distillation（ICCV 2023）</h2>
+<p>不足：</p>
+<ul>
+<li>以往的知识蒸馏方法忽略了特征的多样性和同质性，导致学生网络无法学习到教师网络的内在特征分布和丰富性。</li>
+</ul>
+<p>创新点：</p>
+<ul>
+<li>提出了一种基于通道间相关性的知识蒸馏方法，能够有效地传递教师网络的特征多样性和同质性，提高学生网络的泛化能力和表达能力</li>
+<li>提出了一种网格级别的通道间相关性蒸馏方法，能够稳定地进行密集预测任务的知识蒸馏，并保留空间信息。</li>
+</ul>
+<p><img src="/img/cv/image-20231016102351891.png" srcset="/img/loading.gif" lazyload /></p>
+<h3 id="formulation">Formulation</h3>
+<p>在本节中，我们介绍通道间相关性的公式。给定两个通道，相关性度量应该返回反映它们相关性的值。一个比较高的值代表同源，否则相反。最终，所有相关性度量按顺序收集以表示通道的整体多样性。通道间相关性可以被表示为：
+<span class="math display">\[
+\mathcal{G}_{m,n}^{F^T}=K(\mathrm{v}(F_m^T),\mathrm{v}(F_n^T))
+\]</span> 其中 <span class="math inline">\(F^T_m \in \mathbb{R}^{h
+\times w}\)</span> 代表第m个通道，v()
+将2D特征图向量化为长度hw的向量，K()是衡量输入相关性的函数，其中使用内积。公式中无论通道的空间维度如何，都会返回一个标量，这可以用矩阵乘法的方式重写，形成我们的ICC矩阵：
+<span class="math display">\[
+\mathcal{G}^{F^T}=\mathrm{f}(F^T)\cdot\mathrm{f}(F^T)^\top
+\]</span> 其中f()用于将空间维度拉平。不管空间维度h和w如何，ICC矩阵都是
+<span class="math inline">\(c \times c\)</span>
+的大小。根据经验设置，我们在学生特征的基础上添加一个线性变换层 <span
+class="math inline">\(C_l\)</span>
+，它由一个具有1x1的卷积核的卷积层和一个没有激活函数的BN层组成，用来匹配学生和老师的维度不匹配。我们对学生和老师的ICC矩阵之间的L2距离进行惩罚，让学生获得相似的特征多样性：
+<span class="math display">\[
+\mathcal{L}_{CC}=\frac1{c^2}\|\mathcal{G}^{C^{(F^S)}_l}-\mathcal{G}^{F^T}\|_2^2
+\]</span>
+我们将上述方法称为ICKD-C，它主要是为图像分类而开发的。最后，我们方法的目标由下式给出:
+<span class="math display">\[
+\mathcal{L}_{\mathrm{ICKD-C}}=\mathcal{L}_{\mathrm{CE}}+\beta_1\mathcal{L}_{\mathrm{KL}}+\beta_2\mathcal{L}_{\mathrm{CC}},
+\]</span></p>
+<h3 id="grid-level-inter-channel-correlation">Grid-Level Inter-Channel
+Correlation</h3>
+<p><img src="/img/cv/image-20231016112424199.png" srcset="/img/loading.gif" lazyload /></p>
+<p>受分治法的启发，我们寻求分割特征图，然后单独进行知识蒸馏。我们沿着像素位置将特征分割成n
+x m的部分。每个部分的ICC都是单独计算的。 <span class="math display">\[
+\begin{gathered}
+\mathcal{G}^{F_{(i,j)}^T}=\text{f}(F_{(i,j)}^T)\cdot\text{f}(F_{(i,j)}^T)^\top,
+\\
+\mathcal{G}^{F_{(i,j)}^{S}}=\mathrm{f}(F_{(i,j)}^{S})\cdot\mathrm{f}(F_{(i,j)}^{S})^{\top},
+\\
+\mathcal{L}_{\mathrm{CC}}^{n\times m}=\frac1{n\times m\times
+c^2}\sum_i^n\sum_j^m||\mathcal{G}^{F_{(i,j)}^T}-\mathcal{G}^{F_{(i,j)}^S}||_2^2.
+\end{gathered}
+\]</span> 我们使用Grid
+Mask将整个特征均匀地划分为不同的组。尽管空间维度发生了变化，但得到的ICC矩阵的大小始终取决于通道数，即c。此外，网格划分还有助于提取更多的空间和局部信息，这有利于正确分类像素进行语义分割。这个变体被称为ICKD
+- S。最后，语义分割的目标被表述为： <span class="math display">\[
+\mathcal{L}_{\mathrm{ICKD-S}}=\mathcal{L}_{\mathrm{Seg}}+\alpha\mathcal{L}_{\mathrm{CC}}^{n\times
+m},
 \]</span></p>
 <h1 id="object-detection">Object Detection</h1>
 <h2
@@ -1067,6 +1127,111 @@ T)+}\end{aligned}  \\
 &amp;\begin{aligned}\frac{1}{N-N&#39;}\sum_{i\in\mathcal{N}}\mathrm{MSE(z_i^S,z_i^T)}.\end{aligned}
 \end{aligned}
 \]</span></p>
+<h2 id="multi-level-logit-distillation-cvpr-2023">Multi-level Logit
+Distillation (CVPR 2023)</h2>
+<p><img src="/img/cv/image-20231016160318941.png" srcset="/img/loading.gif" lazyload /></p>
+<p>多级Logit蒸馏使用的不是单个数据的输出，而是整个Batch的输出。我们将Logit输出表示为
+<span class="math inline">\(z \in \mathbb{R}^{V \times C}\)</span>
+，其中B是batch
+size，C是类别。我们的方法又两个核心部分：（1）预测增强（2）多层对齐</p>
+<h3 id="prediction-augmentation">Prediction Augmentation</h3>
+<p>我们通过模型校准进行预测增强。我们采取温度定标，一种广泛采用的定标方法。
+<span class="math display">\[
+p_{i,j,k}=\frac{e^{z_{i,j}/T_k}}{\sum_{c=1}^Ce^{z_{i,c}/T_k}},
+\]</span> 使用多个温度便可以获得多个预测输出。</p>
+<h3 id="multi-level-alignment">Multi-level Alignment</h3>
+<p>通过增加预测，我们提出将教师输出和相应的学生输出(根据温度)一一对应。不同于传统的基于KL散度的logit对齐，我们提出了一种新的多级对齐方法，包括1
+)实例级对齐，2 )批级对齐和3 )类级对齐。</p>
+<p><strong>Instance-level Alignment</strong>
+我们继承了原始KD机制中进行实例级的对齐。具体来说，我们一对一最小化教师和学生之间增强的预测的KL散度：
+<span class="math display">\[
+\begin{aligned}
+L_{ins}&amp;
+=\sum_{i=1}^N\sum_{k=1}^KKL(p_{i,k}^{tea}||p_{i,k}^{stu})  \\
+&amp;=\sum_{i=1}^N\sum_{k=1}^K\sum_{j=1}^Cp_{i,j,k}^{tea}log(\frac{p_{i,j,k}^{tea}}{p_{i,j,k}^{stu}}),
+\end{aligned}
+\]</span> 和原始KD的核心不同就是我们的方法具有多个预测值进行学习。</p>
+<p><strong>Batch-level Alignment</strong>
+我们建议通过输入相关性（两个输入之间的关系）进行批量级对齐，而不是仅在实例级别对齐预测，这是通过以前的工作中的特征进行建模的。在我们的方法中，我们采用逻辑预测来量化它。我们计算模型预测的Gram矩阵：
+<span class="math display">\[
+G^k=p_kp_k^T,G_{ab}^k=\sum_{j=1}^Cp_{a,j,k}\cdot p_{b,j,k}
+\]</span> 其中 <span class="math inline">\(G^k\)</span>
+是一个BxB的矩阵，以及 <span class="math inline">\(p_k\)</span> 代表通过
+<span class="math inline">\(T_k\)</span> 获得的预测。我们可以获得 <span
+class="math inline">\(G_{ab}^k\)</span>
+对第a个和第b个输入分类到同一块的概率建模，这表明了它们之间的关系。之后根据不同的
+<span
+class="math inline">\(T_k\)</span>，分别通过学生和教师的预测计算输入相关矩阵
+<span
+class="math inline">\(G_k\)</span>。我们的目标是减轻他们的差异，因此相应的损失可以是：
+<span class="math display">\[
+L_{batch}=\frac1B\sum_{k=1}^K||G_{tea}^k-G_{stu}^k||_2^2,
+\]</span> <strong>Class-level Alignment</strong>
+我们指出模型预测可以描述类别之间的关系，例如如果一个类与真实类别很相似，那么模型很容易在他们之间表现出不情愿，形成预测的两个高峰。这种类别相关性可以通过对一个batch的数据预测来建模，如下所示：
+<span class="math display">\[
+M^k=p_k^Tp_k,M_{ab}^k=\sum_{i=1}^Np_{i,a,k}\cdot p_{i,b,k}
+\]</span> 其中 <span class="math inline">\(M_k\)</span>
+是一个CxC的矩阵， <span class="math inline">\(M_{ab}\)</span>
+代表一个batch中的输入同时被分类到第a类和第b类的概率，这能计算出两个类之间的关系。量化类别相关性后，我们可以通过以下损失强制学生模型从教师模型中吸收这部分知识：
+<span class="math display">\[
+L_{class}=\frac1C\sum_{k=1}^K||M_{tea}^k-M_{stu}^k||_2^2
+\]</span> <strong>Multi-level Alignment</strong> 最后总的loss为： <span
+class="math display">\[
+L_{total}=L_{ins}+L_{batch}+L_{class}.
+\]</span></p>
+<h2
+id="scalekd-distilling-scale-aware-knowledge-in-small-object-detectorcvpr-2023">ScaleKD:
+Distilling Scale-Aware Knowledge in Small Object Detector(CVPR
+2023)</h2>
+<p>不足：</p>
+<ul>
+<li>Small Object Detector（SOD
+）通常受到噪声特征表示的影响。由于小物体的性质，它们通常占据整个图像中的一小部分区域，因此这些小物体的特征表示可能会被背景和其他尺寸相对较大的实例污染。</li>
+<li>物体检测器对小物体上的噪声边界框的容忍度较低。教师模型不可避免地会做出错误的预测。教师边界框上的小扰动可能会极大地损害学生检测器上的
+SOD 性能。</li>
+</ul>
+<p>创新点：</p>
+<ul>
+<li>尺度解耦的特征蒸馏模块，将教师的特征表示分解为多尺度嵌入，从而能够在小物体上对学生模型进行显式特征模仿。</li>
+<li>跨尺度助手，用于细化嘈杂且无信息的边界框预测学生模型，这可能会误导学生模型并损害知识蒸馏的功效。</li>
+</ul>
+<p><img src="/img/cv/image-20231016170239040.png" srcset="/img/loading.gif" lazyload /></p>
+<h3 id="scale-decoupled-feature-distillation">Scale-Decoupled Feature
+Distillation</h3>
+<p><img src="/img/cv/image-20231016173222829.png" srcset="/img/loading.gif" lazyload /></p>
+<p>我们的目标是分解教师的特征表达为多个部分，其中每个部分仅解决相似的目标大小。据推测，这样的操作可以迫使学生检测器不仅理解整个图像的全局知识，而且还理解特定尺度的知识。</p>
+<p>为了充分利用多尺度的图像特征，我们采用了一个多分支结构，其中每一个分支使用了不同扩张率的卷积层。我们使用ResNet中的残差模块，其中包含三个卷积层（1x1,
+3x3,
+1x1）以及一个跳跃连接。对于3x3的卷积层，我们在三个分支中使用不同的扩张率(1,
+2, 3)。</p>
+<p>如果我们对数据间每个分支间进行匹配计算loss，会占用大量内存。因此，我们从神经架构搜索中的权重共享网络中汲取灵感，并采用权重共享尺度解耦特征。这是基于以下事实：所有三个分支都具有相同的运算符。在实践中，我们只保存三个分支的一组权重，大大降低了训练内存成本。</p>
+<p>同时我们注意到使用三个独立loss来匹配三个平行的分支会造成大量成本来在超参数调整上。最后，对于每个分支，我们使用一个flattened层，最后将三个拉直的向量concat起来。最后使用L2作为loss。</p>
+<h3 id="cross-scale-assistant">Cross-Scale Assistant</h3>
+<p><img src="/img/cv/image-20231016193819839.png" srcset="/img/loading.gif" lazyload /></p>
+<p>我们通过cross-attention模块来搭建 Cross-Scala
+Assistant。在交叉注意力中，在教室知识范围内生成一系列的key和query来计算KQ注意力，然后与学生模型的输出张量进行映射，以获得每个对应query的特征中的注意区域。这个过程在每个学生金字塔尺度上执行，以检索基于信息区域的特征。当图像中出现大物体时，交叉注意力会将注意力转向这些大物体，而忽略小物体。为此，与普通的交叉注意力相比，我们开发了一个多尺度交叉注意力层。我们将melti-scale
+cross-attention(MSC) 公式化： <span class="math display">\[
+\begin{aligned}
+Q_i=F^SW_i^Q \\
+{I} {_i}=MSC(F^{T},r_{i})W_{i}^{K},V_{i}=MSC(F^{T},r_{i})W_{i}^{V},  \\
+V_i=V_i+P(V_i)
+\end{aligned}
+\]</span> 其中 <span class="math inline">\(MSC(\cdot, r_i)\)</span>
+是在第i个头中聚合的 MLP 层，下采样率为 <span
+class="math inline">\(r_i\)</span>，<span
+class="math inline">\(P(\cdot)\)</span>
+是用于投影的卷积层。与标准交叉注意力相比，保留了更多有利于SOD的细粒度和低级细节。最后，我们通过以下方式计算注意力张量：
+<span class="math display">\[
+h_i=Softmax(\frac{Q_iK_i^T}{\sqrt{d_h}}V_i)
+\]</span> 其中 <span class="math inline">\(d_h\)</span>
+是维度。总的loss为： <span class="math display">\[
+L_{total}=\alpha L_{feat}+\beta L_{cls}+\gamma L_{bbox}+L_{det}
+\]</span></p>
+<h2 id="decoupled-knowledge-distillationcvpr-2022">Decoupled Knowledge
+Distillation（CVPR 2022）</h2>
+<h2
+id="class-attention-transfer-based-knowledge-distillationcvpr-2022">Class
+Attention Transfer Based Knowledge Distillation（CVPR 2022）</h2>
 
             </div>
             <hr>
