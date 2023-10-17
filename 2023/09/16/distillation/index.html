@@ -46,8 +46,9 @@
 <meta property="og:image" content="http://example.com/img/cv/image-20231016170239040.png">
 <meta property="og:image" content="http://example.com/img/cv/image-20231016173222829.png">
 <meta property="og:image" content="http://example.com/img/cv/image-20231016193819839.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20231017115748702.png">
 <meta property="article:published_time" content="2023-09-16T08:27:59.000Z">
-<meta property="article:modified_time" content="2023-10-16T13:09:57.130Z">
+<meta property="article:modified_time" content="2023-10-17T11:37:57.878Z">
 <meta property="article:author" content="肘子开">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://example.com/img/cv/image-20230916163256829.png">
@@ -220,7 +221,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      31k 字
+      33k 字
     </span>
   
 
@@ -229,7 +230,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      255 分钟
+      277 分钟
     </span>
   
 
@@ -1229,6 +1230,76 @@ L_{total}=\alpha L_{feat}+\beta L_{cls}+\gamma L_{bbox}+L_{det}
 \]</span></p>
 <h2 id="decoupled-knowledge-distillationcvpr-2022">Decoupled Knowledge
 Distillation（CVPR 2022）</h2>
+<p>不足：</p>
+<ul>
+<li>传统KD的loss包含两个部分，目标类别蒸馏(TCKD)和非目标类别蒸馏(NCKD)，传统KD抑制了NCKD的有效性，并且限制了两个部分之间平衡的灵活性</li>
+</ul>
+<p>创新点：</p>
+<ul>
+<li>为了解决这些问题，我们提出了一种灵活高效的 Logit
+蒸馏方法，称为Decoupled Knowledge Distillation（DKD）。 DKD 通过将 NCKD
+损失与与教师置信度负相关的系数解耦，将其替换为常数值，从而提高了对预测良好的样本的蒸馏效率。同时，NCKD和TCKD也是解耦的，可以通过调整各部分的权重来单独考虑它们的重要性。</li>
+</ul>
+<p><img src="/img/cv/image-20231017115748702.png" srcset="/img/loading.gif" lazyload /></p>
+<h3 id="reformulating-kd">Reformulating KD</h3>
+<p><strong>Notations</strong>
+为了分离与目标类别相关和不相关的预测，我们定义了如下符号。 <span
+class="math inline">\(b = [p_t, p_{\textbackslash t}] \in \mathbb{B}^{1
+\times 2}\)</span> 代表目标类别 <span class="math inline">\(p_t\)</span>
+和非类别 <span class="math inline">\(p_{\textbackslash t}\)</span>
+的二元概率，可以通过如下计算得到： <span class="math display">\[
+p_t=\frac{\exp(z_t)}{\sum_{j=1}^C\exp(z_j)},p_{\backslash
+t}=\frac{\sum_{k=1,k\neq t}^C\exp(z_k)}{\sum_{j=1}^C\exp(z_j)}.
+\]</span> 同时，我们声明 <span
+class="math inline">\(:\hat{\mathbf{p}}=[\hat{p}_{1},...,\hat{p}_{t-1},\hat{p}_{t+1},...,\hat{p}_{C}]
+\in \mathbb{R}^{1 \times (C-1)}\)</span>
+去独立构建非目标类别中的概率。每个元素被如下计算： <span
+class="math display">\[
+\hat{p_i}=\frac{\exp(z_i)}{\sum_{j=1,j\neq t}^C\exp(z_j)}
+\]</span> <strong>Reformulation</strong>
+传统使用KL-Divergence作为loss的KD可以被写为： <span
+class="math display">\[
+\begin{aligned}
+\text{KD}&amp;
+=\mathrm{KL}(\mathbf{p}^{\mathcal{T}}||\mathbf{p}^{\mathcal{S}})  \\
+&amp;=p_t^\mathcal{T}\log(\frac{p_t^\mathcal{T}}{p_t^\mathcal{S}})+\sum_{i=1,i\neq
+t}^Cp_i^\mathcal{T}\log(\frac{p_i^\mathcal{T}}{p_i^\mathcal{S}}).
+\end{aligned}
+\]</span> 根据前面的等式，我们可以得到 <span
+class="math inline">\(\hat{p_i}=p_i / p_{\backslash t}\)</span>
+，所以我们可以重写上面的公式： <span class="math display">\[
+\begin{aligned}
+\text{KD}&amp;
+=p_t^{\mathcal{T}}\log(\frac{p_t^{\mathcal{T}}}{p_t^{\mathcal{S}}})+p_{\backslash  t}^{\mathcal{T}}\sum_{i=1,i\neq
+t}^{C}\hat{p}_i^{\mathcal{T}}(\log(\frac{\hat{p}_i^{\mathcal{T}}}{\hat{p}_i^{\mathcal{S}}})+\log(\frac{p_{\setminus
+t}^{\mathcal{T}}}{p_{\setminus t}^{\mathcal{S}}}))  \\
+&amp;=\underbrace{p_t^{\mathcal{T}}\log(\frac{p_t^{\mathcal{T}}}{p_t^{\mathcal{S}}})+p_{\backslash  t}^{\mathcal{T}}\log(\frac{p_t^{\mathcal{T}}}{p_t^{\mathcal{S}}})}_{\mathrm{KL}(\mathbf{b}^{\mathcal{T}}||\mathbf{b}^{\mathcal{S}})}+\underbrace{p_{\backslash  t}^{\mathcal{T}}\sum_{i=1,i\neq
+t}^{C}\hat{p}_i^{\mathcal{T}}\log(\frac{\hat{p}_i^{\mathcal{T}}}{\hat{p}_i^{\mathcal{S}}})}_{\mathrm{KL}(\hat{\mathbf{p}}^{\mathcal{T}}||\hat{\mathbf{p}}^{\mathcal{S}})}.
+\end{aligned}
+\]</span> 之后最后的等式可以写为： <span class="math display">\[
+\mathrm{KD}=\mathrm{KL}(\mathbf{b}^\mathcal{T}||\mathbf{b}^\mathcal{S})+(1-p_t^\mathcal{T})\mathrm{KL}(\hat{\mathbf{p}}^\mathcal{T}||\hat{\mathbf{p}}^\mathcal{S})
+\]</span> 这样KD的loss就被重新分为了两个部分的加权和，<span
+class="math inline">\(\mathrm{KL}(\mathbf{b}^\mathcal{T}||\mathbf{b}^\mathcal{S})\)</span>
+代表老师和学生之间的目标类别二元概率的相似度。同时另外一部分代表学生和老师非目标类别概率的相似度。最后还可以重写为：
+<span class="math display">\[
+\mathrm{KD}=\mathrm{TCKD}+(1-p_t^{\mathcal{T}})\text{NCKD}.
+\]</span> 显而易见，NCKD的权重由 <span
+class="math inline">\(p_t^\mathcal{T}\)</span> 耦合。</p>
+<h3 id="effects-of-tckd-and-nckd">Effects of TCKD and NCKD</h3>
+<p>验证了 TCKD 的有效性并揭示了 NCKD 的抑制作用。具体来说，TCKD
+传递有关训练样本“难度”的知识。 TCKD
+在更具挑战性的训练数据上可以获得更显着的改进。 NCKD
+在非目标类之间传递知识，在权重$ (1 − p_t^ )
+$相对较小的情况下，知识会被抑制。</p>
+<h3 id="decoupled-knowledge-distillation">Decoupled Knowledge
+Distillation</h3>
+<p>受益于我们对 KD
+的重新表述，我们提出了一种新颖的逻辑蒸馏方法，称为解耦知识蒸馏（DKD）来解决上述问题。我们提出的
+DKD 在解耦公式中独立考虑 TCKD 和
+NCKD。具体来说，我们引入两个超参数α和β，分别作为TCKD和NCKD的权重。
+DKD的损失函数可以写成如下： <span class="math display">\[
+\mathrm{DKD}=\alpha\text{TCKD}+\beta\text{NCKD}.
+\]</span></p>
 <h2
 id="class-attention-transfer-based-knowledge-distillationcvpr-2022">Class
 Attention Transfer Based Knowledge Distillation（CVPR 2022）</h2>
