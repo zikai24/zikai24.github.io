@@ -48,7 +48,7 @@
 <meta property="og:image" content="http://example.com/img/cv/image-20231016193819839.png">
 <meta property="og:image" content="http://example.com/img/cv/image-20231017115748702.png">
 <meta property="article:published_time" content="2023-09-16T08:27:59.000Z">
-<meta property="article:modified_time" content="2023-11-01T07:22:39.133Z">
+<meta property="article:modified_time" content="2023-11-06T03:29:40.747Z">
 <meta property="article:author" content="肘子开">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://example.com/img/cv/image-20230916163256829.png">
@@ -432,9 +432,11 @@ map计算L2损失回归</li>
 <p><img src="/img/cv/image-20230916170214352.png" srcset="/img/loading.gif" lazyload /></p>
 <h3 id="attention-guided-distillation">ATTENTION-GUIDED
 DISTILLATION</h3>
-<p>那么，空间注意力图和通道注意力图的生成就等同于找到映射函数$^s: ^{C,
-H, W} ^{H, W} <span class="math inline">\(和\)</span>^c: ^{C, H, W}
-^C$。由于特征中每个元素的绝对值都意味着其重要性，因此我们通过对通道维度的绝对值求和来构建
+<p>那么，空间注意力图和通道注意力图的生成就等同于找到映射函数 <span
+class="math inline">\(\mathcal{G}^s: \mathbb{R}^{C, H, W} \rightarrow
+\mathbb{R}^{H, W}\)</span> 和 <span class="math inline">\(\mathcal{G}^c:
+\mathbb{R}^{C, H, W} \rightarrow
+\mathbb{R}^C\)</span>。由于特征中每个元素的绝对值都意味着其重要性，因此我们通过对通道维度的绝对值求和来构建
 <span
 class="math inline">\(\mathcal{G}^s\)</span>，并通过对宽度和高度维度的绝对值求和来构建
 <span class="math inline">\(\mathcal{G}^c\)</span>，具体公式为<span
