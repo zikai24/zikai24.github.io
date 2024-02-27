@@ -47,8 +47,10 @@
 <meta property="og:image" content="http://example.com/img/cv/image-20231016173222829.png">
 <meta property="og:image" content="http://example.com/img/cv/image-20231016193819839.png">
 <meta property="og:image" content="http://example.com/img/cv/image-20231017115748702.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20240227114529362.png">
+<meta property="og:image" content="http://example.com/img/cv/image-20240227155628845.png">
 <meta property="article:published_time" content="2023-09-16T08:27:59.000Z">
-<meta property="article:modified_time" content="2023-11-06T03:29:40.747Z">
+<meta property="article:modified_time" content="2024-02-27T08:41:32.761Z">
 <meta property="article:author" content="肘子开">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://example.com/img/cv/image-20230916163256829.png">
@@ -221,7 +223,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      33k 字
+      34k 字
     </span>
   
 
@@ -230,7 +232,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      277 分钟
+      286 分钟
     </span>
   
 
@@ -1301,6 +1303,50 @@ DKD 在解耦公式中独立考虑 TCKD 和
 NCKD。具体来说，我们引入两个超参数α和β，分别作为TCKD和NCKD的权重。
 DKD的损失函数可以写成如下： <span class="math display">\[
 \mathrm{DKD}=\alpha\text{TCKD}+\beta\text{NCKD}.
+\]</span></p>
+<h2
+id="dual-relation-knowledge-distillation-for-object-detectionijcai2023">Dual
+Relation Knowledge Distillation for Object Detection（IJCAI2023）</h2>
+<p><img src="/img/cv/image-20240227114529362.png" srcset="/img/loading.gif" lazyload /></p>
+<h3 id="pixel-wise-relation-distillation">Pixel-wise Relation
+Distillation</h3>
+<p>像素级关系蒸馏帮助学生检测器学习前景和背景特征之间的关系，解决特征不平衡问题。采用名为
+GloRe
+的图卷积模块来捕获全局像素关系。它可以比注意力机制更有效地捕获全局上下文，达到更好的蒸馏效果。</p>
+<p>具体来说，我们分别从教师和学生的主干中提取多尺度特征，并将它们输入到不同的
+GloRe 模块以捕获全局像素关系。蒸馏公式如下所示： <span
+class="math display">\[
+L_{PR}=\dfrac{1}{k}\sum_{i=1}^{k}\|\phi(t_i)-f(\phi(s_i))\|_2
+\]</span> 其中 <span class="math inline">\(\phi()\)</span>
+为GloRe模块。</p>
+<h3 id="instance-wise-relation-distillation">Instance-wise Relation
+Distillation</h3>
+<h4 id="instance-feature-extraction">Instance Feature Extraction</h4>
+<p>为了获取实例级关系，我们需要提取实例特征。通过gt来获取特征图上的实例特征，并使用ROI
+Align映射到同一大小</p>
+<h4 id="instance-wise-relation-module-and-distillation">Instance-wise
+Relation Module and Distillation</h4>
+<p><img src="/img/cv/image-20240227155628845.png" srcset="/img/loading.gif" lazyload /></p>
+<p>结构如图4所示，输入特征大小为 <span class="math inline">\(X \in R^{N
+\times DKK}\)</span>
+。N代表同一个图像中的实例个数，D代表实例特征的通道数，K代表实例特征图的大小。Instance-wise
+relation module 可以被表示为： <span class="math display">\[
+\psi\left(s_i,s_j\right)=\frac1\tau
+e^{w_{ij}g_1(s_i)g_2(s_j)},\tau=\sum_{\forall
+i}e^{w_{ij}g_1(s_i)g_2(s_j)}
+\]</span> 其中 <span class="math inline">\(s_i\)</span> 和 <span
+class="math inline">\(s_j\)</span> 为实例特征，<span
+class="math inline">\(g_i\)</span> 和 <span
+class="math inline">\(g_j\)</span> 为全连接层。<span
+class="math inline">\(w_{ij}\)</span> 是关系矩阵 <span
+class="math inline">\(W \in R^{N \times N}\)</span>
+权重，如图四过滤器所示。 <span class="math inline">\(\psi()\)</span>
+代表instance-wise relation feature。我们定义了instance-wise relation
+distillation function ： <span class="math display">\[
+L_{IR}=\sum_{(i,j)\in\mathbb{N}^2}\left\|\psi\left(t_i,t_j\right)-f\left(\psi\left(s_i,s_j\right)\right)\right\|_2
+\]</span></p>
+<p><span class="math display">\[
+L_{INS}=\frac{1}{n}\sum_{i=1}^{n}\left\|t_{i}-f(s_{i})\right\|_{2}
 \]</span></p>
 
             </div>
